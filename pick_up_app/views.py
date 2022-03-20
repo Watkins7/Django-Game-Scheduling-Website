@@ -2,13 +2,18 @@ from django.shortcuts import render
 
 # Needed for registration
 from .forms import NewPickupUser
-from django.contrib.auth import login
+#from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+from django.shortcuts import redirect
+from django.http import HttpResponse
 ##########################################
 
 # Create your views here.
 ##########################################
 # Register Request
+
+"""
 def register_request(request):
 
     from django.contrib.auth import get_user_model
@@ -39,3 +44,24 @@ def register_request(request):
     # Else it was a GET method to get userform
     form = NewPickupUser()
     return render (request=request, template_name='pick_up_app/register.html', context={"register_form":form})
+"""
+
+def register_request(request):
+    if request.method == 'POST':
+        f = NewPickupUser(request.POST)
+        if f.is_valid():
+            f.save()
+            messages.success(request, 'Account created successfully')
+            return redirect('done/')
+        else:
+            messages.success(request, 'Account NOT created successfully')
+            return redirect('done/')
+
+
+    else:
+        f = NewPickupUser()
+
+    return render(request, 'pick_up_app/register.html', {'form': f})
+
+def done(request):
+    return HttpResponse('Account Made')
