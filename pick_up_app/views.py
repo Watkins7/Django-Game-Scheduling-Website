@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 # Needed for registration
-from .forms import NewPickupUser
+from .forms import NewPickupUserForm
 #from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
@@ -48,7 +48,7 @@ def register_request(request):
 
 def register_request(request):
     if request.method == 'POST':
-        f = NewPickupUser(request.POST)
+        f = NewPickupUserForm(request.POST)
         if f.is_valid():
             f.save()
             messages.success(request, 'Account created successfully')
@@ -59,7 +59,7 @@ def register_request(request):
 
 
     else:
-        f = NewPickupUser()
+        f = NewPickupUserForm()
 
     return render(request, 'pick_up_app/register.html', {'form': f})
 

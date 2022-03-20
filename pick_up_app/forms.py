@@ -2,17 +2,21 @@
 from django.contrib.auth.models import User
 from django import forms
 from django.core.exceptions import ValidationError
-#from .models import PickupTeam
+from .models import PickupTeam
 
 
 # Registration Class
-class NewPickupUser(forms.Form):
+class NewPickupUserForm(forms.ModelForm):
     username = forms.CharField(label='Enter Pickup Game Username (4-150 characters):', min_length=4, max_length=150)
     email = forms.EmailField(label='Enter email')
     password1 = forms.CharField(label='Enter password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Confirm password', widget=forms.PasswordInput)
     long_coordinates = forms.FloatField(label='Enter Longitude Coordinates (-180 <= x <= 180):')
     lat_coordinates = forms.FloatField(label='Enter Latitude Coordinates (-90 <= x <= 90):')
+
+    class Meta:
+        model = PickupTeam
+        fields = '__all__'
 
     def clean_username(self):
         username = self.cleaned_data['username'].lower()

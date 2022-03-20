@@ -22,3 +22,4 @@ class PickupTeam(models.Model):
                "\nPassword:",self.password +
                "\nLat:",self.team_coordinates_lat +
                "\nLong:",self.team_coordinate_long)
+
