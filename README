@@ -1,1 +1,6 @@
+Requirements: Django-current version, Selenium-current version
 
+Ensure you are in the pickup_game_447 directory before trying to run commands
+
+To run tests use the command python3 manage.py test
+To start the server use the command python3 manage.py runserver
