@@ -15,9 +15,14 @@ Including another URLconf
 
 """
 from django.contrib import admin
+from pick_up_app import views
 from django.urls import path, include
 
-urlpatterns = [
+app_name = 'pick_up_app'
+urlpatterns =[
+    path('login/', views.index, name='index'),
+    path('save/', views.save, name='save'),
     path('admin/', admin.site.urls),
-    path('register/', include('pick_up_app.urls'))
+    path('check/', views.check, name='check'),
+    path('register/', include('pick_up_app.urls')),
 ]
