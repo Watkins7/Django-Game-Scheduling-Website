@@ -13,3 +13,14 @@ class PickupTeam(models.Model):
     latitude = models.FloatField(default=39.2543)
 
     teamaccount = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
+from django.contrib.auth.models import AbstractUser
+
+# Create your models here.
+class User(AbstractUser):
+    teamName = models.TextField(20)
+
+    def authenticate(username, password):
+        for user in User.objects.all():
+            if (user.username == username and user.password == password):
+                return user
+        return None
