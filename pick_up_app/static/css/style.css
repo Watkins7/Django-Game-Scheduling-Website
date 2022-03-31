@@ -3,17 +3,43 @@ body {
     font-family: 'Ubuntu', sans-serif;
 }
 
+.search_area{
+    margin: 20px;
+}
+
+.search_bar {
+    height: 50px;
+    width: 75%;
+    color: rgb(38, 50, 56);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 1px;
+    background: #FFFDD0;
+    border-radius: 20px;
+    outline: none;
+    box-sizing: border-box;
+    border: 2px solid rgba(0, 0, 0, 0.02);
+    text-align: center;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.search_bar:focus {
+    border: 2px solid rgba(0, 0, 0, 0.18) !important;
+}
+
 .top_teams {
     display: inline-block;
     background-color: #FFFFFF;
     width: 400px;
     height: 400px;
-    margin: 5em;
+    margin-left: 200px;
+    margin-right: 50px;
     border-radius: 1.5em;
+    border: 1px solid #C4C4C4;
 }
 
 .teams_label {
-    padding-top: 35px;
+    padding-top: 25px;
     color: #B7410E;
     font-family: 'Ubuntu', sans-serif;
     font-weight: bold;
@@ -53,34 +79,24 @@ button {
     border-radius: 5em;
     color: #1644fa;
     background-color: #FFFFFF;
-    border: 0;
-    padding-left: 50px;
-    padding-right: 50px;
-    padding-bottom: 10px;
-    padding-top: 10px;
+    border: 1px solid #C4C4C4;
+    padding: 10px 50px;
     font-family: 'Ubuntu', sans-serif;
     margin-top: 20px;
     margin-left: 35%;
     font-size: 21px;
 }
 
-@media (max-width: 600px) {
-    .top_teams {
-        border-radius: 0px;
-    }
-}
-
 .map_space {
     display: inline-block;
-    background-color: #FFFFFF;
+    background-color: #D7FFBF;
     width: 600px;
     height: 600px;
-    margin: 6em;
-    border-radius: 1.5em;
+    border: 1px solid #5da82f;
 }
 
 .map_text {
-    padding-top: 40px;
+    padding-top: 35px;
     padding-left: 40px;
     color: #000000;
     font-family: 'Ubuntu', sans-serif;
