@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+
 # Create your models here.
 #Creates a field type the forces the characters to be lowercase. This helps
 #preserve uniqueness
@@ -14,6 +15,8 @@ class NameField(models.CharField):
 # Create your models here.
 class User(AbstractUser):
     teamName = models.TextField(20)
+    # Added mmr_score for home_page template, can be changed later
+    mmr_score = models.IntegerField(default=0)
 
     def authenticate(username, password):
         for user in User.objects.all():
