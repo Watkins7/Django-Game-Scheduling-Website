@@ -1,0 +1,70 @@
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'pick up app/style.css' %}">
+
+<!--Register-->
+<div class="container py-5">
+
+    <h1>Register</h1>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <!-- ######################################
+            Display Messages
+        ########################################### -->
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <!-- ######################################
+            Display Errors
+        ########################################### -->
+
+        {% if form.errors %}
+
+            {% for error in field.errors %}
+              <div class="alert alert-danger">
+                   <strong>{{ error|escape }}</strong>
+              </div>
+           {% endfor %}
+
+        {% endif %}
+
+        <!-- ######################################
+            Display Form
+        ########################################### -->
+        {{ form.non_field_errors }}
+        {% for field in form  %}
+            <div class="col-sm-6">
+             <b>{{ field.label_tag }}</b> {{ field }}
+            </div>
+        {% endfor %}
+
+
+        <!-- ######################################
+            Button
+        ########################################### -->
+		<button class="btn btn-primary" type="submit">Register</button>
+
+
+	</form>
+
+    <!-- ######################################
+        Redirect to '/login'
+    ########################################### -->
+    <p class="text-center">If you already have an account, <a href="/login">login</a> instead.</p>
+
+    <!-- ######################################
+        Redirect to '/'
+    ########################################### -->
+    <p class="text-center">Go back to <a href="/">main site</a> instead.</p>
+
+</div>
+{% endblock %}

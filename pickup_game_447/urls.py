@@ -15,8 +15,8 @@ Including another URLconf
 
 """
 from django.contrib import admin
-from django.urls import path
 from pick_up_app import views
+from django.urls import path, include
 
 app_name = 'pick_up_app'
 urlpatterns = [
@@ -24,4 +24,5 @@ urlpatterns = [
     path('save/', views.save, name='save'),
     path('admin/', admin.site.urls),
     path('check/', views.check, name='check'),
+    path('register/', include('pick_up_app.urls'))
 ]
