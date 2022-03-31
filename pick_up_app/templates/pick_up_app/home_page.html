@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+    ol {
+        padding:30px;
+        font-size:20px;
+    }
+
+    li {
+        font-size: 20px;
+    }
+    </style>
+    <title>Team Home Page</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+<body>
+<h1>Team Home Page</h1>
+
+<div class="container-sm p-3 my-3 border">
+<h2>Top 5 Teams</h2>
+{% if top_teams_list %}
+    <ol>
+        {% for team in top_teams_list %}
+            <li>{{ team.username }} -- {{ team.mmr_score}}</li>
+        {% endfor %}
+    </ol>
+{% else %}
+    <p>The top teams list is unavailable.</p>
+{% endif %}
+</div>
+
+</body>
+</html>
