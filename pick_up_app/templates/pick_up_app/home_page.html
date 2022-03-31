@@ -1,35 +1,27 @@
-<!DOCTYPE html>
+<!DOCTYPE html>{% load static %}
 <html lang="en">
+
+{% load static %}
 <head>
-    <style>
-    ol {
-        padding:30px;
-        font-size:20px;
-    }
-
-    li {
-        font-size: 20px;
-    }
-    </style>
+    <link rel="stylesheet" href={% static "css/style.css" %}>
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+{#    <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">#}
     <title>Team Home Page</title>
+</head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    </head>
 <body>
-<h1>Team Home Page</h1>
+<div class="top_teams">
+    <p class="teams_label" align="center">Top 5 Teams</p>
 
-<div class="container-sm p-3 my-3 border">
-<h2>Top 5 Teams</h2>
-{% if top_teams_list %}
-    <ol>
+    <table>
         {% for team in top_teams_list %}
-            <li>{{ team.username }} -- {{ team.mmr_score}}</li>
+        <tr>
+            <td>{{ team.teamName }}</td>
+            <td>{{ team.mmr_score}}</td>
+        </tr>
         {% endfor %}
-    </ol>
-{% else %}
-    <p>The top teams list is unavailable.</p>
-{% endif %}
+    </table>
 </div>
 
 </body>

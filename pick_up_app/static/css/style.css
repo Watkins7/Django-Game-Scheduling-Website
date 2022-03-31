@@ -1,0 +1,46 @@
+body {
+    background-color: #FAC898;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.top_teams {
+    background-color: #FFFFFF;
+    width: 400px;
+    height: 400px;
+    margin: 4em;
+    border-radius: 1.5em;
+}
+
+.teams_label {
+    padding-top: 40px;
+    color: #B7410E;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: bold;
+    font-size: 23px;
+}
+
+table {
+    counter-reset: rowNumber;
+    padding-left: 5em;
+}
+
+table tr::before {
+    display: table-cell;
+    counter-increment: rowNumber;
+    content: counter(rowNumber) ".";
+    padding-right: 1em;
+    text-align: left;
+    font-size: 22px;
+}
+
+td {
+    padding-right: 5em;
+    text-align: left;
+    font-size: 22px;
+}
+
+@media (max-width: 600px) {
+    .top_teams {
+        border-radius: 0px;
+    }
+}
