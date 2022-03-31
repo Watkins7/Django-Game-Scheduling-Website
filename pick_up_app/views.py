@@ -31,7 +31,7 @@ def register(request):
             #########################################
             try:
                 new_user = f.save()
-                new_user.save()
+
             except BaseException as E:
                 return HttpResponse('Error in f.save()...', E)
 
@@ -41,10 +41,14 @@ def register(request):
             try:
                 new_user.teamaccount = User.objects.create_user(username=new_user.teamname,
                                                                 email=new_user.email,
-                                                                password=new_user.password
-                                                                )
+                                                                password=new_user.password,)
             except BaseException as E:
                 return HttpResponse('Error in User.create_user()...', E)
+
+            try:
+                new_user.save()
+            except BaseException as E:
+                return HttpResponse('Failed new_user.save()...', E)
 
             # Send back success message
             messages.success(request, 'Registration submitted successfully! Welcome to PickupTeam')

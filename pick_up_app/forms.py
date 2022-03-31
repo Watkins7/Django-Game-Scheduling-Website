@@ -27,7 +27,7 @@ class NewPickupUserForm(ModelForm):
             'teamname': "New Team Name:",
             'email': "Registration Email:",
             'password': "Password:",
-            'checkpassword': "Password Conformation:",
+            'checkpassword': "Password Confirmation:",
             'longitude': "Longitude:",
             'latitude': "Latitude:",
         }
