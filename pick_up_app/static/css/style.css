@@ -4,19 +4,20 @@ body {
 }
 
 .top_teams {
+    display: inline-block;
     background-color: #FFFFFF;
     width: 400px;
     height: 400px;
-    margin: 4em;
+    margin: 5em;
     border-radius: 1.5em;
 }
 
 .teams_label {
-    padding-top: 40px;
+    padding-top: 35px;
     color: #B7410E;
     font-family: 'Ubuntu', sans-serif;
     font-weight: bold;
-    font-size: 23px;
+    font-size: 30px;
 }
 
 table {
@@ -30,6 +31,7 @@ table tr::before {
     content: counter(rowNumber) ".";
     padding-right: 1em;
     text-align: left;
+    font-weight: bold;
     font-size: 22px;
 }
 
@@ -39,8 +41,48 @@ td {
     font-size: 22px;
 }
 
+.redirect_buttons {
+    width: 500px;
+    height: 200px;
+    margin: 5em;
+}
+
+button {
+    width: 25%;
+    cursor: pointer;
+    border-radius: 5em;
+    color: #1644fa;
+    background-color: #FFFFFF;
+    border: 0;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    font-family: 'Ubuntu', sans-serif;
+    margin-top: 20px;
+    margin-left: 35%;
+    font-size: 21px;
+}
+
 @media (max-width: 600px) {
     .top_teams {
         border-radius: 0px;
     }
+}
+
+.map_space {
+    display: inline-block;
+    background-color: #FFFFFF;
+    width: 600px;
+    height: 600px;
+    margin: 6em;
+    border-radius: 1.5em;
+}
+
+.map_text {
+    padding-top: 40px;
+    padding-left: 40px;
+    color: #000000;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 25px;
 }

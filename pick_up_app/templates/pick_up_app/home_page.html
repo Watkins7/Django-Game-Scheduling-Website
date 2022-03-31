@@ -18,10 +18,24 @@
         {% for team in top_teams_list %}
         <tr>
             <td>{{ team.teamName }}</td>
-            <td>{{ team.mmr_score}}</td>
+            <td>{{ team.mmr_score }}</td>
         </tr>
         {% endfor %}
     </table>
+</div>
+
+<div class="map_space">
+    <p class="map_text">[Insert map here]</p>
+</div>
+
+<div class="redirect_button">
+    <button type="button">
+    <a class="login_button" align="center">Go to Login Page</a>
+    </button>
+
+    <button>
+    <a class="registry_button" align="center">Go to Team Registry</a>
+    </button>
 </div>
 
 </body>
