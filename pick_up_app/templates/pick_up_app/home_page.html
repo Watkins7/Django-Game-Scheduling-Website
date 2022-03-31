@@ -1,0 +1,45 @@
+<!DOCTYPE html>{% load static %}
+<html lang="en">
+
+{% load static %}
+<head>
+    <link rel="stylesheet" href={% static "css/style.css" %}>
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Team Home Page</title>
+</head>
+
+<body>
+<div class="search_area" align="center">
+    <input class="search_bar" type="text" align="center" placeholder="Enter Team Name or Coordinates">
+</div>
+
+<div class="top_teams">
+    <p class="teams_label" align="center">Top 5 Teams</p>
+
+    <table>
+        {% for team in top_teams_list %}
+        <tr>
+            <td>{{ team.teamName }}</td>
+            <td>{{ team.mmr_score }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="map_space">
+    <p class="map_text">[Insert map here]</p>
+</div>
+
+<div class="redirect_button">
+    <button type="button">
+    <a class="login_button" align="center">Go to Login Page</a>
+    </button>
+
+    <button>
+    <a class="registry_button" align="center">Go to Team Registry</a>
+    </button>
+</div>
+
+</body>
+</html>
