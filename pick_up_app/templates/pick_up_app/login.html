@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/stylelogin.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    <title>Sign in</title>
+</head>
+
+<body>
+    <div class="main">
+        <form action="{% url 'check'%}" method="post">
+            {% csrf_token %}
+            <p class="sign" align="center">Sign in</p>
+            <input class="user" type="username" name="username" align="center" placeholder="Enter User ID">
+            <input class="pass" type="password" name="password" align="center" placeholder="Enter Password">
+            <input class="login" type="submit" align="center" value="enter"> 
+            <!-- Note that the "#" just goes to top of page, we fix when we have those pages to go to-->
+            <p class="forgot" align="center"><a href="#">Forgot Username or Password?</a></p>  
+            <p class="newuser" align="center"><a href="#">New User? Register Your Team</a></p>  
+        </form>    
+    </div>
+</body>
+
+</html>
