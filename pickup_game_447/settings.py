@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-w3)5@f)ornut&_*jv=hk462_&*1uy*(7jkxdt=^k##4k9vkvw$
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+AUTH_USER_MODEL = 'pick_up_app.User'
 
 # Application definition
 

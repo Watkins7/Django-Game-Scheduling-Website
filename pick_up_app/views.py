@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from .forms import NewPickupUserForm
 
 # Models
-from django.contrib.auth.models import User
+from .models import User
 
 ##########################################
 # Create your views here.
