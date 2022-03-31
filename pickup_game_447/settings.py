@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-import pick_up_app.apps
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -33,15 +31,13 @@ AUTH_USER_MODEL = 'pick_up_app.User'
 # Application definition
 
 INSTALLED_APPS = [
+    'pick_up_app.apps.PickUpAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'pick_up_app.apps.PickUpAppConfig'
-
-
 ]
 
 MIDDLEWARE = [
@@ -59,7 +55,7 @@ ROOT_URLCONF = 'pickup_game_447.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'pick_up_app/templates']
+        'DIRS': [BASE_DIR / 'templates']
         ,
         'APP_DIRS': True,
         'OPTIONS': {
