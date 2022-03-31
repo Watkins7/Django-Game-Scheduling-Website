@@ -36,3 +36,26 @@ class PickupTeam(models.Model):
     latitude = models.FloatField(default=39.2543)
 
     teamaccount = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
+
+
+class Emails(models.Model):
+    team = models.ForeignKey(PickupTeam, on_delete=models.CASCADE)
+    email = models.EmailField()
+    is_captain = models.BooleanField()
+
+    # Constraint to check if each team only has one captain email address associated
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['team'], condition=models.Q(is_captain=True), name='One_Captain_Per_Team')
+        ]
+
+
+class MMR(models.Model):
+    team = models.OneToOneField(PickupTeam, on_delete=models.CASCADE)
+    MMR_rating = models.FloatField(default=0)
+
+    # Constraint to check if a team's MMR is positive
+    class Meta:
+        constraints = [
+            models.CheckConstraint(check=models.Q(MMR_rating__gte=0), name='Positive_MMR_Values')
+        ]
