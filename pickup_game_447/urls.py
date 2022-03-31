@@ -19,10 +19,10 @@ from pick_up_app import views
 from django.urls import path, include
 
 app_name = 'pick_up_app'
-urlpatterns = [
-    path('', views.index, name='index'),
+urlpatterns =[
+    path('login/', views.index, name='index'),
     path('save/', views.save, name='save'),
     path('admin/', admin.site.urls),
     path('check/', views.check, name='check'),
-    path('register/', include('pick_up_app.urls'))
+    path('register/', include('pick_up_app.urls')),
 ]

@@ -17,7 +17,7 @@ from .models import User
 def index(request):
     allUsers = User.objects.all()
     context = {'userList': allUsers}
-    return render(request, 'pick_up_app/index.html', context)
+    return render(request, 'pick_up_app/login.html', context)
 
 def save(request):
     newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
@@ -28,9 +28,9 @@ def save(request):
 def check(request):
     currUser = User.authenticate(request.POST['username'], request.POST['password'])
     if(currUser):
-        return HttpResponse("ya yo yaaaa yooooo")
+        return HttpResponse("logged in!")
     else:
-        return HttpResponse("y u like this")
+        return HttpResponse("not a user oop")
 
 
 ##########################################
