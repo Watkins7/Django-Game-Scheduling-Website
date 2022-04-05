@@ -6,6 +6,7 @@ cffi==1.15.0
 cryptography==36.0.2
 distlib==0.3.4
 Django==4.0.3
+django-google-maps==0.13.0
 django-registration==2.2
 filelock==3.6.0
 h11==0.13.0
