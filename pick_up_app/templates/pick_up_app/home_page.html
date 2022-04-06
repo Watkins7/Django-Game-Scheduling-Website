@@ -1,6 +1,18 @@
 <!DOCTYPE html>{% load static %}
 <html lang="en">
 
+    <script src=  
+    "https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">  
+        </script>  
+        
+        <script src=  
+    "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">  
+        </script>  
+
+<link href=  
+"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css"
+        rel="stylesheet" type="text/css" /> 
+
 {% load static %}
 <head>
 {# Load in the Ubuntu font stylesheet and the static CSS style.css file. #}
@@ -13,7 +25,16 @@
 <body>
 {# Adds the search bar at the top of the screen. #}
 <div class="search_area" align="center">
-    <input class="search_bar" type="text" align="center" placeholder="Enter Team Name or Coordinates">
+    <form method="POST" action="{% url 'team_search'%}">
+        {% csrf_token %}
+        
+        <input class="search_bar" type="search" align="center" placeholder="Enter Team Name or Coordinates" name="team_search", id="tags">
+        <script>
+            var x = {{ teams|safe }};
+            $( "#tags" ).autocomplete({source: x});
+        </script>
+    </form>
+    
 </div>
 
 {#Adds the Top 5 Teams label above the teams list table. #}
