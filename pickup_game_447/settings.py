@@ -40,10 +40,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'pick_up_app.apps.PickUpAppConfig',
-    'django_google_maps'
+    'django_google_maps',
+    'easy_maps'
 
 
 ]
+
+EASY_MAPS_GOOGLE_KEY = 'AIzaSyAi0G64iPArdDxTu1YfHjEiaqZ9XHD1_6A'
+EASY_MAPS_CENTER = (-41.3, 32)
 
 MAP_WIDGETS ={
     "GooglePointFieldWidget": (
