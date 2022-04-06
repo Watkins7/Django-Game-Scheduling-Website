@@ -45,6 +45,17 @@ INSTALLED_APPS = [
 
 ]
 
+MAP_WIDGETS ={
+    "GooglePointFieldWidget": (
+        ("zoom", 15),
+        ("mapCenterLocationName", "baltimore"),
+        ("GooglePlaceAutocompleteOptions", {'componentRestrictions': {'country': 'uk'}}),
+        ("markerFitZoom", 12),
+    ),
+
+    "GOOGLE_MAP_API_KEY": "<AIzaSyAi0G64iPArdDxTu1YfHjEiaqZ9XHD1_6A>"
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
