@@ -25,15 +25,20 @@
     });
 
 
-      // Makes multiple markers near the west coast of Africa
-      for (let i = 0; i < 5; i++) {
+      // Makes multiple markers FOR ALL TEAMS
+      {% for team in all_teams %}
 
-          const marker = new google.maps.Marker({
-              position: {lat: i, lng: i},
-              map: map,
-          });
+            var teamlat = {{ team.latitude }}
+            var teamlong = {{ team.longitude }}
+            var marked = new google.maps.Marker({
+            position: { lat: teamlat, lng: teamlong },
+            map: map,
+            title: '{{ team.teamname }}',
 
-      }
+        });
+
+
+        {% endfor %}
 
 
     // Display or load the map into the browser
