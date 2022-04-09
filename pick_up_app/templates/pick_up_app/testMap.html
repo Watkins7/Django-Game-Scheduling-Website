@@ -25,11 +25,15 @@
     });
 
 
-      // Test Marker, Australia
-      const marker = new google.maps.Marker({
-          position: { lat: -25.363, lng: 131.044 },
-          map: map,
-        });
+      // Makes multiple markers near the west coast of Africa
+      for (let i = 0; i < 5; i++) {
+
+          const marker = new google.maps.Marker({
+              position: {lat: i, lng: i},
+              map: map,
+          });
+
+      }
 
 
     // Display or load the map into the browser
