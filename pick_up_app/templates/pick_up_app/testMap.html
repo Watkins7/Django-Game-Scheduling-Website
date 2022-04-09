@@ -11,20 +11,33 @@
 </script>
 <script type="text/javascript">
 
+  // Kind of like a global map variable, while inside the script
   var map;
 
+  // Javascript initialize map function
   function initialize(all_teams) {
 
+      // Make a new map
       var map = new google.maps.Map(document.getElementById("googleMap"), {
       center: new google.maps.LatLng(39, 39),
       zoom: 12,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     });
 
+
+      // Test Marker, Australia
+      const marker = new google.maps.Marker({
+          position: { lat: -25.363, lng: 131.044 },
+          map: map,
+        });
+
+
+    // Display or load the map into the browser
     google.maps.event.addListenerOnce(map, 'load');
 
   }
 
+  // Create the map
   google.maps.event.addDomListener(window, 'load', initialize);
 </script>
 
