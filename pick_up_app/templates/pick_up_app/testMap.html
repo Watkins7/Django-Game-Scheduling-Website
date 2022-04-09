@@ -17,9 +17,13 @@
   // Javascript initialize map function
   function initialize(all_teams) {
 
+      // centered around chosen team
+      centered_long = {{centered_team.longitude}}
+      centered_lat = {{centered_team.latitude}}
+
       // Make a new map
       var map = new google.maps.Map(document.getElementById("googleMap"), {
-      center: new google.maps.LatLng(39, 39),
+      center: new google.maps.LatLng(centered_lat, centered_long),
       zoom: 12,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     });
