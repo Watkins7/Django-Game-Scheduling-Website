@@ -15,6 +15,10 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 import pick_up_app.apps
 
+# Used to hide hidden google maps key
+import environ
+import os
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -23,6 +27,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-w3)5@f)ornut&_*jv=hk462_&*1uy*(7jkxdt=^k##4k9vkvw$'
+GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,24 +47,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pick_up_app.apps.PickUpAppConfig',
     'django_google_maps',
-    'easy_maps'
 
 
 ]
-
-EASY_MAPS_GOOGLE_KEY = 'AIzaSyAi0G64iPArdDxTu1YfHjEiaqZ9XHD1_6A'
-EASY_MAPS_CENTER = (-41.3, 32)
-
-MAP_WIDGETS ={
-    "GooglePointFieldWidget": (
-        ("zoom", 15),
-        ("mapCenterLocationName", "baltimore"),
-        ("GooglePlaceAutocompleteOptions", {'componentRestrictions': {'country': 'uk'}}),
-        ("markerFitZoom", 12),
-    ),
-
-    "GOOGLE_MAP_API_KEY": "<AIzaSyAi0G64iPArdDxTu1YfHjEiaqZ9XHD1_6A>"
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
