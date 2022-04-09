@@ -37,7 +37,7 @@ def testMap(request):
         return HttpResponse("ERROR, Team does not exist")
 1
 def home_page(request, username):
-    top_teams_list = User.objects.order_by('-mmr_score')[:5]
+    top_teams_list = PickupTeam.objects.order_by('-mmr_score')[:5]
     context = {'top_teams_list': top_teams_list}
     return render(request, 'pick_up_app/home_page.html', context)
 

@@ -37,6 +37,8 @@ class PickupTeam(models.Model):
     checkpassword = models.CharField(max_length=50, default='')
     longitude = models.FloatField(default=-76.7100)
     latitude = models.FloatField(default=39.2543)
+    mmr_score = models.IntegerField(default=50)
+
 
     teamaccount = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
 

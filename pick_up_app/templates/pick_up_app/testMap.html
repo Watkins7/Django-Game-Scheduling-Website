@@ -34,19 +34,26 @@
 
             var teamlat = {{ team.latitude }}
             var teamlong = {{ team.longitude }}
-            var marked = new google.maps.Marker({
-            position: { lat: teamlat, lng: teamlong },
-            map: map,
-            title: '{{ team.teamname }}',
+            var teamurl = "/{{ team.teamname }}"
 
-        });
+            var marker = new google.maps.Marker({
+
+                position: { lat: teamlat, lng: teamlong },
+                url: teamurl,
+                map: map,
+                title: '{{ team.teamname }}',
+            });
+
+            // Display or load the map into the browser
+            marker.addListener('click', function() {
+                window.location.href = this.url;
+            })
 
 
         {% endfor %}
 
 
-    // Display or load the map into the browser
-    google.maps.event.addListenerOnce(map, 'load');
+
 
   }
 
