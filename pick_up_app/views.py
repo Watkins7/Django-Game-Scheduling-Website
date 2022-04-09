@@ -8,6 +8,10 @@ from .forms import NewPickupUserForm
 
 # Models
 from .models import User
+from .models import PickupTeam
+
+# Import settings and API keys
+from django.conf import settings
 
 
 ##########################################
@@ -18,8 +22,20 @@ def main_page(request):
     return HttpResponse("You're looking at the default main page.")
 
 def testMap(request):
-    return render(request, 'pick_up_app/testMap.html')
+    all_teams = PickupTeam.objects.order_by('teamname')
 
+    centered_team = PickupTeam.objects.get(teamname="sara")
+
+    context = {'all_teams': all_teams,
+               'centered_team': centered_team,
+               'api_key': settings.GOOGLE_MAPS_API_KEY}
+
+    if PickupTeam.objects.filter(teamname='sara').exists():
+        return render(request, 'pick_up_app/testMap.html', context)
+
+    else:
+        return HttpResponse("ERROR, Team does not exist")
+1
 def home_page(request, username):
     top_teams_list = User.objects.order_by('-mmr_score')[:5]
     context = {'top_teams_list': top_teams_list}
