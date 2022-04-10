@@ -1,8 +1,10 @@
 # HTTP libraries
 # from curses.ascii import HT
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
+from django.contrib.auth import login
+from django.urls import reverse
 
 import pick_up_app
 
@@ -29,13 +31,19 @@ def main_page(request):
 def home_page(request, username):
     # List of the top 5 teams in User model database to be displayed on the
     # team homepage.
-    top_teams_list = User.objects.order_by('-mmr_score')[:5]
-    teams =  User.objects.all()
-    teamNames = []
-    for i in range(len(teams)):
-        teamNames.append(teams[i].teamName)
-    context = {'top_teams_list': top_teams_list, "teams": teamNames}
-    return render(request, 'pick_up_app/home_page.html', context)
+    if(request.user.is_authenticated):
+        if(request.user.username != username):
+            return HttpResponse("You are trying to view a page that is not yours!")
+        else:
+            top_teams_list = User.objects.order_by('-mmr_score')[:5]
+            teams =  User.objects.all()
+            teamNames = []
+            for i in range(len(teams)):
+                teamNames.append(teams[i].teamName)
+            context = {'top_teams_list': top_teams_list, "teams": teamNames}
+            return render(request, 'pick_up_app/home_page.html', context)
+    else:
+         return HttpResponse("You are not logged in!")
 
 
 def index(request):
@@ -52,7 +60,8 @@ def save(request):
 def check(request):
     currUser = User.authenticate(request.POST['username'], request.POST['password'])
     if(currUser):
-        return HttpResponse("logged in!")
+        login(request, currUser)
+        return HttpResponseRedirect(reverse('home_page', args=(currUser.username,)))
     else:
         return HttpResponse("not a user oop")
 
