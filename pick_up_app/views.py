@@ -19,12 +19,14 @@ def main_page(request):
 
 
 def home_page(request, username):
-    # List of the top 5 teams in User model database to be displayed on the
-    # team homepage.
+    #Is the user logged in
     if(request.user.is_authenticated):
+        #Is the user at THEIR home page
         if(request.user.username != username):
             return HttpResponse("You are trying to view a page that is not yours!")
         else:
+            # List of the top 5 teams in User model database to be displayed on the
+            # team homepage.
             top_teams_list = User.objects.order_by('-mmr_score')[:5]
             teams =  User.objects.all()
             teamNames = []
