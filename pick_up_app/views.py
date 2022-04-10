@@ -6,22 +6,12 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.urls import reverse
 
-import pick_up_app
-
 
 # Forms
 from .forms import NewPickupUserForm
 
 # Models
 from .models import User
-
-def team_search(request):
-    if(request.method == "POST"):
-        team_search = request.POST['team_search']
-        teams = User.objects.filter(teamName__contains = team_search)
-        return render(request, 'pick_up_app/team_search.html', {"team_search": team_search, "teams": teams})
-    else:
-        return render(request, 'pick_up_app/team_search.html')
 
 def main_page(request):
     # This is just a message for the app's index view page, can be changed later.
