@@ -9,7 +9,7 @@
     <title>Team Home Page</title>
 </head>
 
-<body>
+<div>
 <div class="search_area" align="center">
     <input class="search_bar" type="text" align="center" placeholder="Enter Team Name or Coordinates">
 </div>
@@ -20,7 +20,7 @@
     <table>
         {% for team in top_teams_list %}
         <tr>
-            <td>{{ team.teamName }}</td>
+            <td>{{ team.teamname }}</td>
             <td>{{ team.mmr_score }}</td>
         </tr>
         {% endfor %}
@@ -28,12 +28,67 @@
 </div>
 
 <div class="map_space">
-    <p class="map_text">[Insert map here]</p>
+<div id="googleMap" style="position: center; width:100%; height:100%; ">
 
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAi0G64iPArdDxTu1YfHjEiaqZ9XHD1_6A&callback=initMap"></script>
 
+   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAi0G64iPArdDxTu1YfHjEiaqZ9XHD1_6A"></script>
+   <script type="text/javascript">
+
+  // Kind of like a global map variable, while inside the script
+  var map;
+
+  // Javascript initialize map function
+  function initialize(all_teams) {
+
+      // centered around chosen team
+      centered_long = {{centered_team.longitude}}
+      centered_lat = {{centered_team.latitude}}
+
+      // Make a new map
+      var map = new google.maps.Map(document.getElementById("googleMap"), {
+      center: new google.maps.LatLng(centered_lat, centered_long),
+      zoom: 12,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    });
+
+
+      // Makes multiple markers FOR ALL TEAMS
+      {% for team in all_teams %}
+
+            var teamlat = {{ team.latitude }}
+            var teamlong = {{ team.longitude }}
+            var teamurl = "/{{ team.teamname }}"
+
+            var marker = new google.maps.Marker({
+
+                position: { lat: teamlat, lng: teamlong },
+                url: teamurl,
+                map: map,
+                title: '{{ team.teamname }}',
+            });
+
+            // Add clickable listener on map
+            marker.addListener('click', function() {
+                window.location.href = this.url;
+            })
+
+        {% endfor %}
+
+
+
+
+
+  }
+
+  // Create the map
+  google.maps.event.addDomListener(window, 'load', initialize);
+
+
+</script>
 
 </div>
+</div>
+
 
 <div class="redirect_button">
     <button type="button">
