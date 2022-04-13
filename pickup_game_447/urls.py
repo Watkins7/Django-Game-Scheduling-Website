@@ -18,11 +18,8 @@ from django.contrib import admin
 from pick_up_app import views
 from django.urls import path, include
 
-app_name = 'pick_up_app'
-urlpatterns =[
-    path('login/', views.index, name='index'),
-    path('save/', views.save, name='save'),
+urlpatterns = [
+    path('pick_up_app/', include('pick_up_app.urls')),
     path('admin/', admin.site.urls),
-    path('check/', views.check, name='check'),
-    path('register/', include('pick_up_app.urls')),
 ]
+

@@ -1,0 +1,52 @@
+<!DOCTYPE html>{% load static %}
+<html lang="en">
+
+{% load static %}
+<head>
+{# Load in the Ubuntu font stylesheet and the static CSS style.css file. #}
+    <link rel="stylesheet" href={% static "css/style.css" %}>
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Team Home Page</title>
+</head>
+
+<body>
+{# Adds the search bar at the top of the screen. #}
+<div class="search_area" align="center">
+    <input class="search_bar" type="text" align="center" placeholder="Enter Team Name or Coordinates">
+</div>
+
+{#Adds the Top 5 Teams label above the teams list table. #}
+<div class="top_teams">
+    <p class="teams_label" align="center">Top 5 Teams</p>
+
+
+    <table>
+        {#Adds each value in top_teams_list into the table as a new row. #}
+        {% for team in top_teams_list %}
+        <tr>
+            <td>{{ team.teamName }}</td>
+            <td>{{ team.mmr_score }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{# Adds a box where the map API should go next to the map box. #}
+<div class="map_space">
+    <p class="map_text">[Insert map here]</p>
+</div>
+
+{# Adds a div where the redirect buttons should go. #}
+<div class="redirect_button">
+    <button type="button">
+    <a class="login_button" align="center">Go to Login Page</a>
+    </button>
+
+    <button>
+    <a class="registry_button" align="center">Go to Team Registry</a>
+    </button>
+</div>
+
+</body>
+</html>
