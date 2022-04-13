@@ -1,0 +1,135 @@
+/*body: Edits the style of the background of the home page itself.
+        The code below sets the background color to a pastel orange
+        and sets the font to 'Ubuntu'   */
+body {
+    background-color: #FAC898;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+/* .search_area: Sets the margin for this div that the search bar is in so
+                it is away from the top of the screen.  */
+.search_area{
+    margin: 20px;
+}
+
+/* .search_bar: Formats the size, placement, and the way the search bar looks.
+                Makes the background a cream color, makes the font color a
+                dark gray, and the corners rounded. */
+.search_bar {
+    height: 50px;
+    width: 75%; /* Makes the search bar 75% of the screen size */
+    color: rgb(38, 50, 56);  /* Changes the text color */
+    font-weight: 600;  /* Bolding of the font */
+    font-size: 16px;
+    letter-spacing: 1px;
+    background: #FFFDD0; /* Changes the color of the search bar to cream */
+    border-radius: 20px; /* Makes the corners rounded */
+    outline: none;
+    box-sizing: border-box;
+    border: 2px solid rgba(0, 0, 0, 0.02);
+    text-align: center;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+/* .search_bar:focus : This makes it so that when the user "focuses", in other
+                        words starts typing in the search bar, a darker border
+                        will appear to indicate that the user is typing. */
+.search_bar:focus {
+    border: 2px solid rgba(0, 0, 0, 0.18) !important;
+}
+
+/* .top__teams: This controls the formatting of the top_teams div which holds
+                the top teams list. This formats the size and placement of
+                the box, makes the background white, and rounds the corners. */
+.top_teams {
+    display: inline-block; /* Displays the div inline to put things beside it */
+    background-color: #FFFFFF;
+    width: 400px;
+    height: 400px;
+    margin-left: 200px;
+    margin-right: 50px;
+    border-radius: 1.5em; /* Rounds the corners */
+    border: 1px solid #C4C4C4;
+}
+
+/* .teams_label: This formats the size, placement, and style of the Top 5
+                 Teams label. */
+.teams_label {
+    padding-top: 25px; /* Adds space above the Top 5 Teams label */
+    color: #B7410E; /* Makes the title rust colored */
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+/* table: Formats the placement of the table used to display the top 5 teams.
+          Also adds a counter called row_number for enumerating the rows. */
+table {
+    counter-reset: row_number;
+    padding-left: 5em; /* Adds space to the left of the table */
+}
+
+/*table tr: This section enumerates the beginnings of the table rows for
+            however many are displayed if less than 5 teams are in the database.*/
+table tr::before {
+    display: table-cell;
+    counter-increment: row_number;
+    content: counter(row_number) ".";
+    padding-right: 1em; /* Adds space to the right of the row number */
+    text-align: left;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+/* td: Formats a standard data cell, in this case the cells that hold the name
+        and score of a team in the Top 5 Teams list.*/
+td {
+    padding-right: 5em; /* Adds space to the right of the cell value. */
+    text-align: left;
+    font-size: 22px;
+}
+
+/* .redirect_buttons: Formats the div that holds the redirect buttons at the
+                      bottom of the screen. */
+.redirect_buttons {
+    width: 500px;
+    height: 200px;
+    margin: 5em;
+}
+
+/* button: Formats the button itself by adjusting the placement, size, and other
+            stylistic choices like color, font color, corner rounding, etc. */
+button {
+    width: 25%; /* Is the width of 25% of the screen. */
+    cursor: pointer; /* Changes the look of the cursor when hovering over it */
+    border-radius: 5em; /* Adjusts the corner rounding */
+    color: #1644fa; /*  Makes the font color blue */
+    background-color: #FFFFFF;
+    border: 1px solid #C4C4C4;
+    padding: 10px 50px; /* Adjusts the size of the button inside the div */
+    font-family: 'Ubuntu', sans-serif;
+    margin-top: 20px; /* Adjusting placement of the button */
+    margin-left: 35%; /* Adjusting placement of the button */
+    font-size: 21px;
+}
+
+/* .map_space: Formats the space reserved for the map API. This current box
+                is next to the Top 5 Teams table and is green without rounded
+                corners. */
+.map_space {
+    display: inline-block; /* Makes it inline with the Top 5 Teams table */
+    background-color: #D7FFBF;
+    width: 600px;
+    height: 600px;
+    border: 1px solid #5da82f;
+}
+
+/* .map_text: Adjusts the style of the filler text on the map that says
+              "[Insert map here]". */
+.map_text {
+    padding-top: 35px;
+    padding-left: 40px;
+    color: #000000;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 25px;
+}
