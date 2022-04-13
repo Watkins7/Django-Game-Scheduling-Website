@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/styleteam.css' %}">
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+        <title>Team Name</title>
+    </head>
+
+    <body>
+        <div class = "mmr" align ="center">
+            <p class="mmr_score">[Insert MMR Score Here]</p>
+        </div>
+
+        <div class = "emails" align = "center">
+            <table>
+                {% for email in email_list %}
+                <tr>
+                    <td>{{ team.email }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="calendar">
+            <p class="insert_calendar ">[Insert calendar here]</p>
+        </div>
+
+        <div class="top_redirect_buttons">
+            <button type="button">
+            <a class="edit_page">Edit My Team Page</a>
+            </button>
+        
+            <button>
+            <a class="home_page" >Go To Home Page</a>
+            </button>
+        </div>
+
+        <div class = "bottom_redirect_buttons">
+            <button>
+            <a class="delete_team">Delete My Team</a>
+            </button>
+
+            <button type="button">
+            <a class="logout">Logout</a>
+            </button>
+        </div>
+    </body>
+</html>

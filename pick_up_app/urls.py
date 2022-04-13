@@ -12,5 +12,6 @@ urlpatterns = [
     path('save/', views.save, name='save'),
     path('check/', views.check, name='check'),
     path('<username>/', views.home_page, name='home_page'),
+    path('<username>/teampage/', views.team_page, name="team_page")
 ]
 

@@ -20,22 +20,29 @@ def main_page(request):
 
 def home_page(request, username):
     #Is the user logged in
-    if(request.user.is_authenticated):
+    #if(request.user.is_authenticated):
         #Is the user at THEIR home page
-        if(request.user.username != username):
-            return HttpResponse("You are trying to view a page that is not yours!")
-        else:
+    if(request.user.username != username):
+        return HttpResponse("You are trying to view a page that is not yours!")
+    else:
             # List of the top 5 teams in User model database to be displayed on the
             # team homepage.
-            top_teams_list = User.objects.order_by('-mmr_score')[:5]
-            teams =  User.objects.all()
-            teamNames = []
-            for i in range(len(teams)):
-                teamNames.append(teams[i].teamName)
-            context = {'top_teams_list': top_teams_list, "teams": teamNames}
-            return render(request, 'pick_up_app/home_page.html', context)
-    else:
-         return HttpResponse("You are not logged in!")
+        top_teams_list = User.objects.order_by('-mmr_score')[:5]
+        teams =  User.objects.all()
+        teamNames = []
+        for i in range(len(teams)):
+            teamNames.append(teams[i].teamName)
+        context = {'top_teams_list': top_teams_list, "teams": teamNames}
+        return render(request, 'pick_up_app/home_page.html', context)
+    #else:
+    #     return HttpResponse("You are not logged in!")
+
+
+def team_page(request, username):
+    #anyone can see a team page, they just have to be logged in
+    #if (request.user.is_authenticated):
+   
+    return render(request, 'pick_up_app/team_page.html')
 
 
 def index(request):
