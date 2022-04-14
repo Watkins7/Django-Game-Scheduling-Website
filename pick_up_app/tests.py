@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-# from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
 
 
 # Create your tests here.
@@ -136,8 +136,8 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         new_user = User(username="lime", password="lemon", teamName="citrus")
         new_user.save()
 
-        # Setup web driver
-        driver = webdriver.Chrome(executable_path="C:\\Users\\siann\\chromedriver.exe")
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
         driver.implicitly_wait(0.5)
         driver.maximize_window()
 
@@ -168,19 +168,21 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         :return: None
         """
 
-        # Setup web driver
-        driver = webdriver.Chrome(executable_path="C:\\Users\\siann\\chromedriver.exe")
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
         driver.implicitly_wait(0.5)
         driver.maximize_window()
 
         # Launch the team homepage URL
-        driver.get("http://127.0.0.1:8000/pick_up_app/home/")
+        driver.get(self.live_server_url + "/pick_up_app/home/")
 
         # Find the login page button and click it
         login_button = driver.find_element_by_xpath('//button[@type="button"][@class="login_button"]')
         login_button.click()
 
         actual_title = "Sign in"  # The actual title of the login page
+
+        driver.implicitly_wait(0.5)  # Wait to find the title
 
         self.assertEqual(actual_title, driver.title)  # Title of redirected page should match
 
