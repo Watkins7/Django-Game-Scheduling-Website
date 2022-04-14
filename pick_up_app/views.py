@@ -1,18 +1,19 @@
 # HTTP libraries
+# from curses.ascii import HT
 from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
-from django.http import HttpResponse
+from django.contrib.auth import login
+from django.urls import reverse
+
 
 # Forms
 from .forms import NewPickupUserForm
 
 # Models
+from . models import PickupTeam
 from .models import User
-from .models import PickupTeam
-
-# Import settings and API keys
 from django.conf import settings
-
 
 ##########################################
 # Create your views here.
@@ -21,42 +22,63 @@ def main_page(request):
     # This is just a message for the app's index view page, can be changed later.
     return HttpResponse("You're looking at the default main page.")
 
-def testMap(request):
-    all_teams = PickupTeam.objects.order_by('teamname')
 
-    centered_team = PickupTeam.objects.get(teamname="sara")
-
-    context = {'all_teams': all_teams,
-               'centered_team': centered_team,
-               'api_key': settings.GOOGLE_MAPS_API_KEY}
-
-    if PickupTeam.objects.filter(teamname='sara').exists():
-        return render(request, 'pick_up_app/testMap.html', context)
-
-    else:
-        return HttpResponse("ERROR, Team does not exist")
-1
 def home_page(request, username):
 
-    # Top Teams to be displayed
-    top_teams_list = PickupTeam.objects.order_by('-mmr_score')[:5]
+    #Is the user logged in
+    if(request.user.is_authenticated):
 
-    # All the teams to add markers
-    all_teams = PickupTeam.objects.order_by('teamname')
+        #Is the user at THEIR home page
+        if(request.user.username != username):
 
-    # Centered team "username"
-    try:
-        centered_team = PickupTeam.objects.get(teamname=username)
-    except Exception:
-        return HttpResponse("ERROR, Team does not exist")
+            return HttpResponse("You are trying to view a page that is not yours!")
 
-    context = {'top_teams_list': top_teams_list,
-               'all_teams': all_teams,
-               'centered_team': centered_team,
-               'api_key': settings.GOOGLE_MAPS_API_KEY
-               }
+        else:
+            # List of the top 5 teams in User model database to be displayed on the
+            # team homepage.
+            # Top Teams to be displayed
+            top_teams_list = PickupTeam.objects.order_by('-mmr_score')[:5]
 
-    return render(request, 'pick_up_app/home_page.html', context)
+            # All the teams to add markers
+            all_teams = PickupTeam.objects.order_by('teamname')
+
+            # Centered team "username"
+            try:
+                centered_team = PickupTeam.objects.get(teamname=username)
+            except Exception:
+                return HttpResponse("ERROR, Team does not exist")
+
+            context = {'top_teams_list': top_teams_list,
+                       'all_teams': all_teams,
+                       'centered_team': centered_team,
+                       'api_key': settings.GOOGLE_MAPS_API_KEY
+                       }
+
+            return render(request, 'pick_up_app/home_page.html', context)
+
+    else:
+         return HttpResponse("You are not logged in!")
+
+
+def index(request):
+    allUsers = User.objects.all()
+    context = {'userList': allUsers}
+    return render(request, 'pick_up_app/login.html', context)
+
+def save(request):
+    newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
+    print(newUser)
+    newUser.save()
+    return HttpResponse("New User Saved")
+
+def check(request):
+    currUser = User.authenticate(request.POST['username'], request.POST['password'])
+    if(currUser):
+        login(request, currUser)
+        return HttpResponseRedirect(reverse('home_page', args=(currUser.username,)))
+    else:
+        return HttpResponse("not a user oop")
+
 
 ##########################################
 # register
@@ -86,7 +108,7 @@ def register(request):
             try:
                 new_user.teamaccount = User.objects.create_user(username=new_user.teamname,
                                                                 email=new_user.email,
-                                                                password=new_user.password, )
+                                                                password=new_user.password,)
             except BaseException as E:
                 return HttpResponse('Error in User.create_user()...', E)
 
