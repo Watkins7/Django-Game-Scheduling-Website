@@ -11,5 +11,6 @@ urlpatterns = [
     path('login/', views.index, name='index'),
     path('save/', views.save, name='save'),
     path('check/', views.check, name='check'),
+    path('calendar/', views.TeamCalendarView.as_view(), name='calendar'),
     path('<username>/', views.home_page, name='home_page'),
 ]

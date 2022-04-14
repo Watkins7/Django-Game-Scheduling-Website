@@ -5,13 +5,18 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import login
 from django.urls import reverse
+import datetime
+from django.views import generic
+from django.utils.safestring import mark_safe
+from .utils import Calendar
+import calendar
 
 
 # Forms
 from .forms import NewPickupUserForm
 
 # Models
-from . models import PickupTeam
+from . models import PickupTeam, TimeSlot
 from .models import User
 from django.conf import settings
 
@@ -131,3 +136,52 @@ def register(request):
 
     # if form invalid or form valid, redisplay orginal form with errors/messages
     return render(request, 'pick_up_app/register.html', {'form': f})
+
+
+# Class View for a Team's calendar
+class TeamCalendarView(generic.ListView):
+    model = TimeSlot
+    template_name = 'pick_up_app/calendar.html'
+
+    # Custom implementation of get_context_data
+    # to provide additional information to the template
+    def get_context_data(self, **kwargs):
+
+        # Gets the initial base context data
+        context = super().get_context_data(**kwargs)
+
+        # Get a current date either from the request string or generate one
+        current_month = get_request_date(self.request.GET.get('month', None))
+
+        # Instantiate our calendar class with today's year and date
+        new_calendar = Calendar(current_month.year, current_month.month)
+
+        # Call the formatmonth method, which returns our calendar as a table
+        formatted_calendar = new_calendar.formatmonth()
+        context['calendar'] = mark_safe(formatted_calendar)
+        context['next_month'] = get_next_month(current_month)
+        context['last_month'] = get_last_month(current_month)
+        return context
+
+
+# Checks the request for a valid date and returns the formatted date
+def get_request_date(cur_month):
+
+    # Checks if there is a date in the request, if so re-format it to be used by date()
+    if cur_month:
+        year, month = (int(date_pair) for date_pair in cur_month.split('-'))
+        return datetime.date(year, month, day=1)
+    return datetime.datetime.today()
+
+
+# Gets the next month using the current date
+def get_next_month(cur_month):
+    num_days = calendar.monthrange(cur_month.year, cur_month.month)[1]
+    next_month = cur_month.replace(day=num_days) + datetime.timedelta(days=1)
+    return 'month=' + str(next_month.year) + '-' + str(next_month.month)
+
+
+# Gets the last month using the current date
+def get_last_month(cur_month):
+    previous_month = cur_month.replace(day=1) - datetime.timedelta(days=1)
+    return 'month=' + str(previous_month.year) + '-' + str(previous_month.month)
