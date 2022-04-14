@@ -9,42 +9,31 @@
     </head>
 
     <body>
-        <div class = "mmr" align ="center">
-            <p class="mmr_score">[Insert MMR Score Here]</p>
+        <div class = "team_name" align ="center">
+            <p class="team_name">[Insert Team Name Here]</p>
         </div>
 
-        <div class="emails">
-            {% for user in users %}
-            <div class="card" style="width: 18rem;">
-              <div class="card-body">
-                <h5 class="card-title">{ user.email }</h5>
-              </div>
-            </div>
-            {% endfor %}
+        <div class = "mmr" align ="center">
+            <p class="mmr_score">Team MMR Score: </p>
+        </div>
+
+        <div class = "emailList" align="center">
+            <p class="email">Team Member Email List</p>
+            <ul>
+                <li>for loop somewhere here for emails from database</li>
+            </ul>
         </div>
 
         <div class="calendar">
-            <p class="insert_calendar ">[Insert calendar here]</p>
+            <p class="insert_calendar" align="center">[Insert calendar here]</p>
         </div>
 
-        <div class="top_redirect_buttons">
-            <button type="button">
-            <a class="edit_page">Edit My Team Page</a>
-            </button>
-        
-            <button>
-            <a class="home_page" >Go To Home Page</a>
-            </button>
+        <div class="redirect_buttons" align="center">
+            <p class="edit_team_page" style="display:inline-block;"><a href="#">Edit Team Page</a></p> 
+            <p class="home_page" style="display:inline-block;"><a href="/pick_up_app/home_page/">Go to Home Page</a></p> 
+            <p class="delete_team" style="display:inline-block;"><a href="#">Delete Team</a></p> 
+            <p class="logout" style="display:inline-block;"><a href="/pick_up_app/login/">Logout</a></p> 
         </div>
 
-        <div class = "bottom_redirect_buttons">
-            <button>
-            <a class="delete_team">Delete My Team</a>
-            </button>
-
-            <button type="button">
-            <a class="logout">Logout</a>
-            </button>
-        </div>
     </body>
 </html>
