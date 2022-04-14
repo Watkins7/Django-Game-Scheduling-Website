@@ -11,6 +11,6 @@ urlpatterns = [
     path('login/', views.index, name='index'),
     path('save/', views.save, name='save'),
     path('check/', views.check, name='check'),
-    path('<username>/', views.home_page, name='home_page'),
+    path('home/', views.home_page, name='home_page'),
 ]
 

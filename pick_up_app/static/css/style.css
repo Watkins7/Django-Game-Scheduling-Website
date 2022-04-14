@@ -152,7 +152,7 @@ button {
     width: 25%; /* Is the width of 25% of the screen. */
     cursor: pointer; /* Changes the look of the cursor when hovering over it */
     border-radius: 5em; /* Adjusts the corner rounding */
-    color: #354157; /*  Makes the font color dark green */
+    color: #354157; /*  Changes font color */
     background-color: #FFFFFF;
     border: 1px solid #326b51;
     padding: 10px 50px; /* Adjusts the size of the button inside the div */
