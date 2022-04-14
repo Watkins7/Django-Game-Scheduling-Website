@@ -13,14 +13,14 @@
             <p class="mmr_score">[Insert MMR Score Here]</p>
         </div>
 
-        <div class = "emails" align = "center">
-            <table>
-                {% for email in email_list %}
-                <tr>
-                    <td>{{ team.email }}</td>
-                </tr>
-                {% endfor %}
-            </table>
+        <div class="emails">
+            {% for user in users %}
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">{ user.email }</h5>
+              </div>
+            </div>
+            {% endfor %}
         </div>
 
         <div class="calendar">
