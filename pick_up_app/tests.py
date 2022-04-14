@@ -1,26 +1,16 @@
 from django.test import TestCase
-from django.test import LiveServerTestCase
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
-# from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
-from pick_up_app import models
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-
-import os
 import time
-
-# Create your tests here.
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from selenium.webdriver.firefox.webdriver import WebDriver
+
 
 ################################################
 # Registration Tests
 ################################################
 from pick_up_app.models import PickupTeam
+from pick_up_app.models import User
 from pick_up_app.forms import NewPickupUserForm
 
 
@@ -132,6 +122,64 @@ class MySeleniumTests(StaticLiveServerTestCase):
     print("#                                                                    #")
     print("#                                                                    #")
     print("######################################################################")
+
+
+    #########################################################################
+    # Test of home page map
+    #########################################################################
+    def test_HomePageMap(self):
+
+        # Makes handler to FireFox
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+
+        #Create Test User
+        test_user = PickupTeam(teamname="ThisIsANewTeamName",
+                               password="password",
+                               email="testemail.email.com",
+                               checkpassword="password",
+                               longitude=22,
+                               latitude=22)
+        test_user.teamaccount = User.objects.create(username="ThisIsANewTeamName", password="password")
+
+        test_user.save()
+
+        # Make address of HTML
+        try:
+            driver.get(self.live_server_url + "/login")
+        except:
+            print("FAILED, could not get '/login'")
+
+        time.sleep(2)
+
+        # Path to test of where we should be naviagted to
+        testingPath = self.live_server_url + "/ThisIsANewTeamName/"
+
+        # get login elements
+        try:
+            user_id = driver.find_element_by_class_name("user")
+            user_id.send_keys("ThisIsANewTeamName")
+            pass_id = driver.find_element_by_class_name("pass")
+            pass_id.send_keys("password")
+            time.sleep(2)
+
+        except Exception:
+            print("FAILED, could not find USER or PASSWORD element on login screen")
+
+        try:
+            driver.find_element_by_class_name("login").submit()
+            time.sleep(2)
+            print("SUCCESS, was able to navigate to a home page")
+
+        except Exception:
+            print("FAILED, could not navigate to home page")
+
+        try:
+            find_map = driver.find_element_by_id("googleMap")
+            print("SUCCESS, found google map")
+        except Exception:
+            print("FAILED, could not find google map")
+
+        driver.quit()
 
     #########################################################################
     # Test of "/register" page
@@ -246,41 +294,4 @@ class MySeleniumTests(StaticLiveServerTestCase):
         print("#                                                                    #")
         print("#                                                                    #")
         print("######################################################################")
-
-    #########################################################################
-    # Test of home page map
-    #########################################################################
-    def test_HomePageMap(self):
-
-        # Makes handler to FireFox
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-
-        # make a home site
-        test_user = PickupTeam(teamname="eggs_and_cheese",
-                               password="pass",
-                               email="email@email.com",
-                               checkpassword="pass",
-                               longitude=23,
-                               latitude=23)
-
-        test_user.save()
-
-        # Make address of HTML
-        testingPath = self.live_server_url + "/eggs_and_cheese"
-
-        try:
-            driver.get(testingPath)
-            print("SUCCESS, was able to navigate to a home page")
-        except Exception:
-            print("FAILED, could not navigate to home page")
-
-        try:
-            find_map = driver.find_element_by_id("googleMap")
-            print("SUCCESS, found google map")
-        except Exception:
-            print("FAILED, could not find google map")
-
-        driver.quit()
-
-
 

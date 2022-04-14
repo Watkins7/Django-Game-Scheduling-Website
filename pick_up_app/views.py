@@ -102,13 +102,15 @@ def register(request):
             except BaseException as E:
                 return HttpResponse('Error in f.save()...', E)
 
+
             ##############################################################
             # Creates NEW 'User', ties User to ForeignKey in PickupTeam
             ##############################################################
             try:
-                new_user.teamaccount = User.objects.create_user(username=new_user.teamname,
-                                                                email=new_user.email,
-                                                                password=new_user.password,)
+                new_user.teamaccount = User.objects.create(username=new_user.teamname,
+                                             email=new_user.email,
+                                             password=new_user.password)
+
             except BaseException as E:
                 return HttpResponse('Error in User.create_user()...', E)
 
@@ -116,6 +118,9 @@ def register(request):
                 new_user.save()
             except BaseException as E:
                 return HttpResponse('Failed new_user.save()...', E)
+
+
+
 
             # Send back success message
             messages.success(request, 'Registration submitted successfully! Welcome to PickupTeam')
