@@ -58,9 +58,6 @@ def home_page(request, username):
 
     return render(request, 'pick_up_app/home_page.html', context)
 
-
-
-
 ##########################################
 # register
 ##########################################
