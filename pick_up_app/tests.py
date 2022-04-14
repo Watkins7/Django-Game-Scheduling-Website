@@ -1,8 +1,21 @@
 from django.test import TestCase
+from django.test import LiveServerTestCase
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+# from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
+
+from pick_up_app import models
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+
+import os
+import time
 
 # Create your tests here.
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from selenium.webdriver.firefox.webdriver import WebDriver
 
 ################################################
 # Registration Tests
@@ -13,16 +26,14 @@ from pick_up_app.forms import NewPickupUserForm
 
 class registrationTests(TestCase):
 
-
     ###############################################################
     # Setup for registration
     ###############################################################
     def register_setup(self):
-
         t_password = "pass"
         t_check_pass = "pass"
         t_teamname = "test"
-        t_email = "test.mail"
+        t_email = "test@mail.com"
         t_long = 7
         t_lat = 13
 
@@ -35,12 +46,10 @@ class registrationTests(TestCase):
 
         test_user.save()
 
-
     ###############################################################
     # Model testing for PickUpTeam
     ###############################################################
     def test_model_PickupTeam(self):
-
         # Model Setup
         self.register_setup()
 
@@ -53,12 +62,10 @@ class registrationTests(TestCase):
         # Model Teardown
         self.register_teardown()
 
-
     ###############################################################
     # Registration Form Test
     ###############################################################
     def test_pickupform(self):
-
         self.register_setup()
 
         ###############################################################
@@ -114,3 +121,166 @@ class registrationTests(TestCase):
     ###############################################################
     def register_teardown(self):
         PickupTeam.objects.filter(teamname="test").delete()
+
+
+# Static Testing Server Test Class
+class MySeleniumTests(StaticLiveServerTestCase):
+    print("######################################################################")
+    print("#                                                                    #")
+    print("#                                                                    #")
+    print("#                     Start of Selenium Tests                        #")
+    print("#                                                                    #")
+    print("#                                                                    #")
+    print("######################################################################")
+
+    #########################################################################
+    # Test of "/register" page
+    #########################################################################
+    def test_RegisterPage(self):
+
+        # Makes handler to FireFox
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+
+        # Make address of HTML
+        testingPath = self.live_server_url + "/register"
+
+        # Go to URL to test
+        driver.get(testingPath)
+
+        #########################################################################
+        # Search for known form HTML 'id' attributes
+        #########################################################################
+        try:
+            new_teamname = driver.find_element_by_id("id_teamname")
+            new_teamname.send_keys("ThisIsANewTeamName")
+            print("SUCCESS, found html element ''id_teamname")
+        except Exception:
+            print("FAILED, could not get 'id_teamname' from HTML page")
+
+        try:
+            new_email = driver.find_element_by_id("id_email")
+            new_email.send_keys("ThisIsANewEmail@umbc.edu")
+            print("SUCCESS, found html element ''id_email")
+        except Exception:
+            print("FAILED, could not get 'id_email' from HTML page")
+
+        try:
+            new_password = driver.find_element_by_id("id_password")
+            new_password.send_keys("password")
+            print("SUCCESS, found html element ''id_password")
+        except Exception:
+            print("FAILED, could not get 'id_password' from HTML page")
+
+        try:
+            new_checkpassword = driver.find_element_by_id("id_checkpassword")
+            new_checkpassword.send_keys("password")
+            print("SUCCESS, found html element ''id_checkpassword")
+        except Exception:
+            print("FAILED, could not get 'id_password' from HTML page")
+
+        try:
+            new_longitude = driver.find_element_by_id("id_longitude")
+            print("SUCCESS, found html element ''id_longitude")
+
+        except Exception:
+            print("FAILED, could not get 'id_checkpassword' from HTML page")
+
+        try:
+            new_latitude = driver.find_element_by_id("id_latitude")
+            print("SUCCESS, found html element ''id_latitude")
+        except Exception:
+            print("FAILED, could not get 'id_email' from HTML page")
+
+        # Test for an ID that does not exists
+        try:
+            assert driver.find_element_by_id("id_lafftitude")
+            print("FAILED, found invalid html element that should not exist on the page")
+        except Exception:
+            print("SUCCESS, failed to find invalid ID on '/register' ")
+
+        #########################################################################
+        # End of HTML 'id' search tests
+        #########################################################################
+
+        #########################################################################
+        # form submission
+        #########################################################################
+        time.sleep(2)
+        try:
+            button = driver.find_element_by_xpath("//button[text()='Register']")
+            button.click()
+            print("SUCCESS, submitted form")
+        except Exception:
+            print("FAILED, could not submit form")
+
+        # Quick visual to see that form submitted
+        time.sleep(2)
+
+
+        #########################################################################
+        # Redirect to '/login'
+        # Redirect to 'main_site'
+        #########################################################################
+
+        # look for site links
+        try:
+            lnks = driver.find_elements_by_tag_name("a")
+            print("SUCCESS, found following links on '/register'")
+
+            # for all links
+            for lnk in lnks:
+                print(lnk.get_attribute('href'))
+
+        # failed to find site links
+        except Exception:
+            print("FAILED, could not find any 'href'")
+
+
+        # tell handler to quit
+        driver.quit()
+
+        print("######################################################################")
+        print("#                                                                    #")
+        print("#                                                                    #")
+        print("#                     End of Selenium Tests                          #")
+        print("#                                                                    #")
+        print("#                                                                    #")
+        print("######################################################################")
+
+    #########################################################################
+    # Test of home page map
+    #########################################################################
+    def test_HomePageMap(self):
+
+        # Makes handler to FireFox
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+
+        # make a home site
+        test_user = PickupTeam(teamname="eggs_and_cheese",
+                               password="pass",
+                               email="email@email.com",
+                               checkpassword="pass",
+                               longitude=23,
+                               latitude=23)
+
+        test_user.save()
+
+        # Make address of HTML
+        testingPath = self.live_server_url + "/eggs_and_cheese"
+
+        try:
+            driver.get(testingPath)
+            print("SUCCESS, was able to navigate to a home page")
+        except Exception:
+            print("FAILED, could not navigate to home page")
+
+        try:
+            find_map = driver.find_element_by_id("googleMap")
+            print("SUCCESS, found google map")
+        except Exception:
+            print("FAILED, could not find google map")
+
+        driver.quit()
+
+
+
