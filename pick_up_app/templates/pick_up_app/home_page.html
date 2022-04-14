@@ -40,11 +40,13 @@
 {# Adds a div where the redirect buttons should go. #}
 <div class="redirect_button">
     <button type="button">
-    <a class="login_button" align="center">Go to Login Page</a>
+    <a class="login_button" align="center" href="{% url 'index' %}"
+       style="text-decoration: none; color: #354157">Go to Login Page</a>
     </button>
 
     <button>
-    <a class="registry_button" align="center">Go to Team Registry</a>
+    <a class="registry_button" align="center" href="#"
+       style="text-decoration: none; color: #354157">Go to Team Page</a>
     </button>
 </div>
 
