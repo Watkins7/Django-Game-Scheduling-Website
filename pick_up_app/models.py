@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-
 # Create your models here.
 #Creates a field type the forces the characters to be lowercase. This helps
 #preserve uniqueness
@@ -51,7 +50,6 @@ class Emails(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['team'], condition=models.Q(is_captain=True), name='One_Captain_Per_Team')
         ]
-
 
 class MMR(models.Model):
     team = models.OneToOneField(PickupTeam, on_delete=models.CASCADE)
