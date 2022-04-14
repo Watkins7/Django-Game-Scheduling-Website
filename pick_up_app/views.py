@@ -19,7 +19,7 @@ def main_page(request):
     return HttpResponse("You're looking at the default main page.")
 
 
-def home_page(request, username):
+def home_page(request):
     # List of the top 5 teams in User model database to be displayed on the
     # team homepage. Note: Uses a placeholder mmr_score in the User model,
     # will need to be properly implemented and tested later.
