@@ -33,16 +33,20 @@ def index(request):
     context = {'userList': allUsers}
     return render(request, 'pick_up_app/login.html', context)
 
+
 def save(request):
     newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
     print(newUser)
     newUser.save()
     return HttpResponse("New User Saved")
 
+
 def check(request):
     currUser = User.authenticate(request.POST['username'], request.POST['password'])
     if(currUser):
-        return HttpResponse("logged in!")
+        # Temporary redirection link/code, need to fix authentication
+        url = "http://127.0.0.1:8000/pick_up_app/home/"
+        return HttpResponseRedirect(url)
     else:
         return HttpResponse("not a user oop")
 

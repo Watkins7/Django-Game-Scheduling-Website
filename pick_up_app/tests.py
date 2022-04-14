@@ -1,6 +1,12 @@
 from django.test import TestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+# from webdriver_manager.firefox import GeckoDriverManager
+
 
 # Create your tests here.
 
@@ -9,6 +15,7 @@ from selenium.webdriver.common.keys import Keys
 ################################################
 from pick_up_app.models import PickupTeam
 from pick_up_app.forms import NewPickupUserForm
+from pick_up_app.models import User
 
 
 class registrationTests(TestCase):
@@ -114,3 +121,68 @@ class registrationTests(TestCase):
     ###############################################################
     def register_teardown(self):
         PickupTeam.objects.filter(teamname="test").delete()
+
+
+class RedirectLinkTests(StaticLiveServerTestCase):
+    def test_redirect_home_to_login_page(self):
+        """
+        This function tests that a successful login will redirect the user to
+        the home page by checking that the check view sends users to the page
+        titled "Team Home Page"
+        :return: None
+        """
+
+        # Add a new user
+        new_user = User(username="lime", password="lemon", teamName="citrus")
+        new_user.save()
+
+        # Setup web driver
+        driver = webdriver.Chrome(executable_path="C:\\Users\\siann\\chromedriver.exe")
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Send the username and password to the login page and hit enter to redirect
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+
+        actual_title = "Team Home Page"  # What the actual title should be
+
+        driver.find_element_by_xpath('//input[@class="login"][@type="submit"]').click()
+
+        driver.implicitly_wait(0.5)  # Wait to find the link
+
+        self.assertEqual(actual_title, driver.title)  # Title of redirected page should match
+
+        # Close browser
+        driver.quit()
+
+
+    def test_redirect_login_to_home_page(self):
+        """
+        This function tests that the login page button on the home page. it
+        will redirect the user to the login page by checking that the check
+        view sends users to the page titled "Sign in"
+        :return: None
+        """
+
+        # Setup web driver
+        driver = webdriver.Chrome(executable_path="C:\\Users\\siann\\chromedriver.exe")
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Launch the team homepage URL
+        driver.get("http://127.0.0.1:8000/pick_up_app/home/")
+
+        # Find the login page button and click it
+        login_button = driver.find_element_by_xpath('//button[@type="button"][@class="login_button"]')
+        login_button.click()
+
+        actual_title = "Sign in"  # The actual title of the login page
+
+        self.assertEqual(actual_title, driver.title)  # Title of redirected page should match
+
+        # Close browser
+        driver.quit()

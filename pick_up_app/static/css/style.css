@@ -46,8 +46,6 @@ body {
     flex-wrap: wrap;
     align-content: center;
     justify-content: center;
-    /*align-items: center;*/
-    /*height: 600px;*/
     width: 100%;
 }
 
@@ -148,7 +146,7 @@ td {
 /* button: Formats the button itself by adjusting the placement, size, and other
             stylistic choices like color, font color, corner rounding, etc. */
 button {
-    width: 25%; /* Is the width of 25% of the screen. */
+    width: 350px; /* Is the width of 25% of the screen. */
     cursor: pointer; /* Changes the look of the cursor when hovering over it */
     border-radius: 5em; /* Adjusts the corner rounding */
     color: #354157; /*  Changes font color */
@@ -159,5 +157,4 @@ button {
     margin-top: 20px; /* Adjusting placement of the button */
     margin-left: 35%; /* Adjusting placement of the button */
     font-size: 21px;
-
 }
