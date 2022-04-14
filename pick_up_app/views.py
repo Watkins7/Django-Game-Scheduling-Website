@@ -37,8 +37,25 @@ def testMap(request):
         return HttpResponse("ERROR, Team does not exist")
 1
 def home_page(request, username):
+
+    # Top Teams to be displayed
     top_teams_list = PickupTeam.objects.order_by('-mmr_score')[:5]
-    context = {'top_teams_list': top_teams_list}
+
+    # All the teams to add markers
+    all_teams = PickupTeam.objects.order_by('teamname')
+
+    # Centered team "username"
+    try:
+        centered_team = PickupTeam.objects.get(teamname=username)
+    except Exception:
+        return HttpResponse("ERROR, Team does not exist")
+
+    context = {'top_teams_list': top_teams_list,
+               'all_teams': all_teams,
+               'centered_team': centered_team,
+               'api_key': settings.GOOGLE_MAPS_API_KEY
+               }
+
     return render(request, 'pick_up_app/home_page.html', context)
 
 
