@@ -15,6 +15,10 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 import pick_up_app.apps
 
+# Used to hide hidden google maps key
+import environ
+import os
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -23,6 +27,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-w3)5@f)ornut&_*jv=hk462_&*1uy*(7jkxdt=^k##4k9vkvw$'
+GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,7 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'pick_up_app.apps.PickUpAppConfig'
+    'pick_up_app.apps.PickUpAppConfig',
+    'django_google_maps',
 
 
 ]
