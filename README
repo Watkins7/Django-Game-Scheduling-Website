@@ -16,7 +16,7 @@ Pickup App Readme
   Terminal should display the IP address of the server, click on that to get to the home page
   
 3) How to run test suite
-  - In terminal type "python manage.py tests"
+  - In terminal type "python manage.py test"
   
 4) URLS currently supported
   - "pick_up_app/"
