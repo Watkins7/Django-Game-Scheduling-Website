@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 from .utils import Calendar
 import calendar
 
-
+import pick_up_app
 # Forms
 from .forms import NewPickupUserForm
 
@@ -23,6 +23,15 @@ from django.conf import settings
 ##########################################
 # Create your views here.
 ##########################################
+
+def team_search(request):
+    if(request.method == "POST"):
+        team_search = request.POST['team_search']
+        teams = User.objects.filter(teamName__contains = team_search)
+        return render(request, 'pick_up_app/team_search.html', {"team_search": team_search, "teams": teams})
+    else:
+        return render(request, 'pick_up_app/team_search.html')
+
 def main_page(request):
     # This is just a message for the app's index view page, can be changed later.
     return HttpResponse("You're looking at the default main page.")
@@ -48,15 +57,19 @@ def home_page(request, username):
             all_teams = PickupTeam.objects.order_by('teamname')
 
             # Centered team "username"
-            try:
-                centered_team = PickupTeam.objects.get(teamname=username)
-            except Exception:
-                return HttpResponse("ERROR, Team does not exist")
+            #THIS MUST BE FIXED NEXT ITERATION. THIS IS NOT A GOOD SOLUTION
+            centered_team = PickupTeam(teamname = request.user.username, password = request.user.password, email = request.user.email, longitude = -76.7100, latitude = 39.2543)
+
+            teams =  User.objects.all()
+            teamNames = []
+            for i in range(len(teams)):
+                teamNames.append(teams[i].teamName)
 
             context = {'top_teams_list': top_teams_list,
                        'all_teams': all_teams,
                        'centered_team': centered_team,
-                       'api_key': settings.GOOGLE_MAPS_API_KEY
+                       'api_key': settings.GOOGLE_MAPS_API_KEY,
+                       "teams": teamNames,
                        }
 
             return render(request, 'pick_up_app/home_page.html', context)

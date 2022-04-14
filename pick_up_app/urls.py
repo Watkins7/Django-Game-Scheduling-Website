@@ -13,4 +13,5 @@ urlpatterns = [
     path('check/', views.check, name='check'),
     path('calendar/', views.TeamCalendarView.as_view(), name='calendar'),
     path('<username>/', views.home_page, name='home_page'),
+    path('team_search', views.team_search, name='team_search'),
 ]
