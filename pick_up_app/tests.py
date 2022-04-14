@@ -145,14 +145,14 @@ class MySeleniumTests(StaticLiveServerTestCase):
 
         # Make address of HTML
         try:
-            driver.get(self.live_server_url + "/login")
+            driver.get(self.live_server_url + "/pick_up_app/login")
         except:
-            print("FAILED, could not get '/login'")
+            print("FAILED, could not get '/pick_up_app/login'")
 
         time.sleep(2)
 
         # Path to test of where we should be naviagted to
-        testingPath = self.live_server_url + "/ThisIsANewTeamName/"
+        testingPath = self.live_server_url + "/pick_up_app/ThisIsANewTeamName/"
 
         # get login elements
         try:
@@ -190,7 +190,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
 
         # Make address of HTML
-        testingPath = self.live_server_url + "/register"
+        testingPath = self.live_server_url + "/pick_up_app/register"
 
         # Go to URL to test
         driver.get(testingPath)
@@ -244,7 +244,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
             assert driver.find_element_by_id("id_lafftitude")
             print("FAILED, found invalid html element that should not exist on the page")
         except Exception:
-            print("SUCCESS, failed to find invalid ID on '/register' ")
+            print("SUCCESS, failed to find invalid ID on '/pick_up_app/register' ")
 
         #########################################################################
         # End of HTML 'id' search tests
@@ -273,7 +273,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
         # look for site links
         try:
             lnks = driver.find_elements_by_tag_name("a")
-            print("SUCCESS, found following links on '/register'")
+            print("SUCCESS, found following links on '/pick_up_app/register'")
 
             # for all links
             for lnk in lnks:
