@@ -2,7 +2,7 @@
         The code below sets the background color to a pastel orange
         and sets the font to 'Ubuntu'   */
 body {
-    background-color: #FAC898;
+    background-color: #C1D9B4;
     font-family: 'Ubuntu', sans-serif;
 }
 
@@ -22,11 +22,11 @@ body {
     font-weight: 600;  /* Bolding of the font */
     font-size: 16px;
     letter-spacing: 1px;
-    background: #FFFDD0; /* Changes the color of the search bar to cream */
+    background: #FFFFFF; /* Changes the color of the search bar to cream */
     border-radius: 20px; /* Makes the corners rounded */
     outline: none;
     box-sizing: border-box;
-    border: 2px solid rgba(0, 0, 0, 0.02);
+    border: 1px solid #326b51;
     text-align: center;
     font-family: 'Ubuntu', sans-serif;
 }
@@ -35,7 +35,7 @@ body {
                         words starts typing in the search bar, a darker border
                         will appear to indicate that the user is typing. */
 .search_bar:focus {
-    border: 2px solid rgba(0, 0, 0, 0.18) !important;
+    border: 2px solid #326b51 !important;
 }
 
 
@@ -44,6 +44,11 @@ body {
 .row {
     display: flex;
     flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    /*align-items: center;*/
+    /*height: 600px;*/
+    width: 100%;
 }
 
 /* .top_teams: This controls the formatting of the top_teams div which holds
@@ -51,7 +56,7 @@ body {
                 the box, makes the background white, and rounds the corners. */
 .top_teams {
     display: block;
-    background-color: #FFFFFF;
+    background-color: #214f3a;
     width: 20%;
     height: 500px;
     min-width: 500px;
@@ -60,13 +65,14 @@ body {
     margin-bottom: 20px;
     border-radius: 1.5em;
     border: 1px solid #C4C4C4;
-    float: left;
+    /*float: left;*/
+    position: relative;
 }
 
 /* .teams_label: This formats the size, placement, and style of the Top 5
                  Teams label. */
 .teams_label {
-    color: #B7410E; /* Makes the title rust colored */
+    color: #FFFFFF; /* Makes the title black */
     font-family: 'Ubuntu', sans-serif;
     font-weight: bold;
     font-size: 30px;
@@ -80,6 +86,8 @@ body {
 table {
     counter-reset: row_number;
     padding-left: 5em; /* Adds space to the left of the table */
+    color: #FFFFFF;
+    position: relative;
 }
 
 /*table tr: This section enumerates the beginnings of the table rows for
@@ -101,6 +109,7 @@ td {
     text-align: left;
     word-wrap: break-word;
     font-size: 22px;
+    color: #FFFFFF;
 }
 
 
@@ -135,7 +144,6 @@ td {
 .redirect_buttons {
     width: fit-content;
     height: 200px;
-    margin: 5em;
 }
 
 /* button: Formats the button itself by adjusting the placement, size, and other
@@ -144,12 +152,13 @@ button {
     width: 25%; /* Is the width of 25% of the screen. */
     cursor: pointer; /* Changes the look of the cursor when hovering over it */
     border-radius: 5em; /* Adjusts the corner rounding */
-    color: #1644fa; /*  Makes the font color blue */
+    color: #354157; /*  Makes the font color dark green */
     background-color: #FFFFFF;
-    border: 1px solid #C4C4C4;
+    border: 1px solid #326b51;
     padding: 10px 50px; /* Adjusts the size of the button inside the div */
     font-family: 'Ubuntu', sans-serif;
     margin-top: 20px; /* Adjusting placement of the button */
     margin-left: 35%; /* Adjusting placement of the button */
     font-size: 21px;
+
 }
