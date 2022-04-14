@@ -1,8 +1,10 @@
 # HTTP libraries
 # from curses.ascii import HT
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
+from django.urls import reverse
+from django.shortcuts import redirect
 
 
 # Forms
@@ -19,7 +21,8 @@ def main_page(request):
 
 def home_page(request, username):
     # List of the top 5 teams in User model database to be displayed on the
-    # team homepage.
+    # team homepage. Note: Uses a placeholder mmr_score in the User model,
+    # will need to be properly implemented and tested later.
     top_teams_list = User.objects.order_by('-mmr_score')[:5]
     context = {'top_teams_list': top_teams_list}
     return render(request, 'pick_up_app/home_page.html', context)

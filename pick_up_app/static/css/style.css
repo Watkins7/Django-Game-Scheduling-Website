@@ -38,28 +38,41 @@ body {
     border: 2px solid rgba(0, 0, 0, 0.18) !important;
 }
 
-/* .top__teams: This controls the formatting of the top_teams div which holds
+
+/* .row: Holds the top_teams div and the map_space div to allow for more
+         flexible rendering with winder resizing. */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* .top_teams: This controls the formatting of the top_teams div which holds
                 the top teams list. This formats the size and placement of
                 the box, makes the background white, and rounds the corners. */
 .top_teams {
-    display: inline-block; /* Displays the div inline to put things beside it */
+    display: block;
     background-color: #FFFFFF;
-    width: 400px;
-    height: 400px;
-    margin-left: 200px;
+    width: 20%;
+    height: 500px;
+    min-width: 500px;
+    margin-left: 50px;
     margin-right: 50px;
-    border-radius: 1.5em; /* Rounds the corners */
+    margin-bottom: 20px;
+    border-radius: 1.5em;
     border: 1px solid #C4C4C4;
+    float: left;
 }
 
 /* .teams_label: This formats the size, placement, and style of the Top 5
                  Teams label. */
 .teams_label {
-    padding-top: 25px; /* Adds space above the Top 5 Teams label */
     color: #B7410E; /* Makes the title rust colored */
     font-family: 'Ubuntu', sans-serif;
     font-weight: bold;
     font-size: 30px;
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 30px;
 }
 
 /* table: Formats the placement of the table used to display the top 5 teams.
@@ -86,13 +99,41 @@ table tr::before {
 td {
     padding-right: 5em; /* Adds space to the right of the cell value. */
     text-align: left;
+    word-wrap: break-word;
     font-size: 22px;
 }
+
+
+/* .map_space: Formats the space reserved for the map API. This current box
+                is next to the Top 5 Teams table and is green without rounded
+                corners. */
+.map_space {
+    /*display: inline-block; !* Makes it inline with the Top 5 Teams table *!*/
+    background-color: #D7FFBF;
+    width: 45%;
+    min-width: 550px;
+    height: 550px;
+    border: 1px solid #5da82f;
+    float: right;
+    margin-right: 50px;
+    margin-left: 50px;
+}
+
+/* .map_text: Adjusts the style of the filler text on the map that says
+              "[Insert map here]". */
+.map_text {
+    padding-top: 35px;
+    padding-left: 40px;
+    color: #000000;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 25px;
+}
+
 
 /* .redirect_buttons: Formats the div that holds the redirect buttons at the
                       bottom of the screen. */
 .redirect_buttons {
-    width: 500px;
+    width: fit-content;
     height: 200px;
     margin: 5em;
 }
@@ -111,25 +152,4 @@ button {
     margin-top: 20px; /* Adjusting placement of the button */
     margin-left: 35%; /* Adjusting placement of the button */
     font-size: 21px;
-}
-
-/* .map_space: Formats the space reserved for the map API. This current box
-                is next to the Top 5 Teams table and is green without rounded
-                corners. */
-.map_space {
-    display: inline-block; /* Makes it inline with the Top 5 Teams table */
-    background-color: #D7FFBF;
-    width: 600px;
-    height: 600px;
-    border: 1px solid #5da82f;
-}
-
-/* .map_text: Adjusts the style of the filler text on the map that says
-              "[Insert map here]". */
-.map_text {
-    padding-top: 35px;
-    padding-left: 40px;
-    color: #000000;
-    font-family: 'Ubuntu', sans-serif;
-    font-size: 25px;
 }

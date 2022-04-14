@@ -16,25 +16,25 @@
     <input class="search_bar" type="text" align="center" placeholder="Enter Team Name or Coordinates">
 </div>
 
-{#Adds the Top 5 Teams label above the teams list table. #}
-<div class="top_teams">
-    <p class="teams_label" align="center">Top 5 Teams</p>
+<div class="row">
+    {#Adds the Top 5 Teams label above the teams list table. #}
+    <div class="top_teams">
+        <div class="teams_label">Top 5 Teams</div>
+        <table>
+            {#Adds each value in top_teams_list into the table as a new row. #}
+            {% for team in top_teams_list %}
+            <tr>
+                <td>{{ team.teamName }}</td>
+                <td>{{ team.mmr_score }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 
-
-    <table>
-        {#Adds each value in top_teams_list into the table as a new row. #}
-        {% for team in top_teams_list %}
-        <tr>
-            <td>{{ team.teamName }}</td>
-            <td>{{ team.mmr_score }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-
-{# Adds a box where the map API should go next to the map box. #}
-<div class="map_space">
-    <p class="map_text">[Insert map here]</p>
+    {# Adds a box where the map API should go next to the map box. #}
+    <div class="map_space" align="center">
+        <p class="map_text">[Insert map here]</p>
+    </div>
 </div>
 
 {# Adds a div where the redirect buttons should go. #}
