@@ -123,6 +123,51 @@ class registrationTests(TestCase):
         PickupTeam.objects.filter(teamname="test").delete()
 
 
+class HomePageHTMLTests(StaticLiveServerTestCase):
+    def test_home_page_rendering(self):
+        """
+        This function tests that all the necessary objects are added to
+        the home page.
+
+        :return: None
+        """
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Launch the team homepage URL
+        driver.get(self.live_server_url + "/pick_up_app/home/")
+
+        driver.implicitly_wait(0.5)  # Wait to find the title
+
+        # Try to find all of the template items on the home page
+        try:
+            # Try to find all of the elements of the Top 5 Teams box
+            driver.find_element_by_class_name("top_teams")
+            driver.find_element_by_class_name("teams_label")
+            driver.find_element_by_xpath('//table')
+
+            # Try to find the map space
+            driver.find_element_by_class_name("map_space")
+
+            # Try to find the redirect buttons
+            driver.find_element_by_class_name("redirect_button")
+            driver.find_element_by_class_name("login_button")
+            driver.find_element_by_class_name("team_button")
+        # If any items not found, print fail message
+        except Exception:
+            print("FAILED, did not find all of the home page template items")
+
+        # Check that home page title is correct
+        home_title = "Team Home Page"  # The actual title of the home page
+        self.assertEqual(home_title, driver.title)
+
+        # Close browser
+        driver.quit()
+
+
 class RedirectLinkTests(StaticLiveServerTestCase):
     def test_redirect_home_to_login_page(self):
         """
