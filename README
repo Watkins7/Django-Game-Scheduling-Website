@@ -16,5 +16,10 @@ Pickup App Readme
   - In terminal type "python manage.py tests"
   
 4) URLS currently supported
-  - ""
-  - "/register"
+  - "pick_up_app/"
+  - "admin/"
+  - "pick_up_app/register/"
+  - "pick_up_app/login/"
+  - "pick_up_app/save/"
+  - "pick_up_app/check/"
+  - "pick_up_app/<username>/"

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 
 
 # Create your models here.
@@ -35,8 +36,10 @@ class PickupTeam(models.Model):
     email = models.EmailField(max_length=100, default='')
     password = models.CharField(max_length=50,default='')
     checkpassword = models.CharField(max_length=50, default='')
-    longitude = models.FloatField(default=76.7100)
+    longitude = models.FloatField(default=-76.7100)
     latitude = models.FloatField(default=39.2543)
+    mmr_score = models.IntegerField(default=50)
+
 
     teamaccount = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
 
@@ -62,3 +65,35 @@ class MMR(models.Model):
         constraints = [
             models.CheckConstraint(check=models.Q(MMR_rating__gte=0), name='Positive_MMR_Values')
         ]
+
+
+class TimeSlot(models.Model):
+    team = models.ForeignKey(PickupTeam, on_delete=models.CASCADE)
+    game = models.ForeignKey(Games, on_delete=models.CASCADE)
+    slot_start = models.DateTimeField('Start date/time available')
+    slot_end = models.DateTimeField('End date/time available')
+
+    # Checks whether the slot date is in the future or not
+    def is_advanced_date(self):
+        return self.slot_start > timezone.now()
+
+    # Checks the duration of a slot
+    def slot_duration(self):
+        return self.slot_end - self.slot_start
+
+    # Checks if the start of a slot is on the same day as the end of a slot
+    def is_slot_same_day(self):
+        return self.slot_start.day == self.slot_end.day
+
+    class Meta:
+        constraints = [
+            # Constraint to check that a team picks unique slot date-times
+            models.UniqueConstraint(
+                name='%(app_label)s_%(class)s_unique_team_slot',
+                fields=['team', 'slot_start', 'slot_end']),
+            # Constraint to check that the start of a slot is before the end
+            models.CheckConstraint(
+                name='%(app_label)s_%(class)s_slotstart_lte_slotend',
+                check=models.Q(slot_start__lte=models.F('slot_end')))
+        ]
+
