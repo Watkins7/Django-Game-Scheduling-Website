@@ -13,7 +13,7 @@ import calendar
 
 import pick_up_app
 # Forms
-from .forms import NewPickupUserForm
+from .forms import NewPickupUserForm, GameDropDown
 
 # Models
 from .models import User, PickupTeam, TimeSlot
@@ -65,11 +65,14 @@ def home_page(request, username):
             for i in range(len(teams)):
                 teamNames.append(teams[i].teamName)
 
+            game_choice = GameDropDown(request.POST)
+
             context = {'top_teams_list': top_teams_list,
                        'all_teams': all_teams,
                        'centered_team': centered_team,
                        'api_key': settings.GOOGLE_MAPS_API_KEY,
                        "teams": teamNames,
+                       'game_dropdown': game_choice,
                        }
 
             return render(request, 'pick_up_app/home_page.html', context)

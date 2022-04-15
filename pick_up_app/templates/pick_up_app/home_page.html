@@ -119,11 +119,7 @@
 
                   google.maps.event.addListener(marker, 'click', infoCallback(infowindow, marker));
 
-
                 {% endfor %}
-
-
-
 
         }
 
@@ -136,6 +132,18 @@
         </script>
 
         </div>
+    </div>
+
+    <div class="game_dropdown">
+        <form method="POST">
+            {% csrf_token %}
+            {{ 'game_dropdown' }}
+            <input class="game_button" type="submit_game" align="center" value="Submit">
+        </form>
+
+        {% for my_game in game_dropdown %}
+            <p>{{my_game.game}}</p>
+        {% endfor %}
     </div>
 </div>
 

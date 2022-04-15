@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm
 
 # Team Table
-from .models import PickupTeam
+from .models import PickupTeam, Games
 
 # Error Handling
 from django.core.exceptions import ValidationError
@@ -65,3 +65,7 @@ class NewPickupUserForm(ModelForm):
         # validate longitude
         if longitude < -180 or longitude > 180:
             raise ValidationError("ERROR: Longitude must be within -180 to 180")
+
+
+class GameDropDown(forms.ModelForm):
+    game = forms.CharField(label='Choose game: ', widget=forms.Select(my_games=Games.objects.all()))
