@@ -16,8 +16,7 @@ import pick_up_app
 from .forms import NewPickupUserForm
 
 # Models
-from . models import PickupTeam, TimeSlot
-from .models import User
+from .models import User, PickupTeam, TimeSlot
 from django.conf import settings
 
 ##########################################
@@ -49,7 +48,8 @@ def home_page(request, username):
 
         else:
             # List of the top 5 teams in User model database to be displayed on the
-            # team homepage.
+            # team homepage.Note: Uses a placeholder mmr_score in the User model,
+            # will need to be properly implemented and tested later.
             # Top Teams to be displayed
             top_teams_list = PickupTeam.objects.order_by('-mmr_score')[:5]
 
@@ -83,11 +83,13 @@ def index(request):
     context = {'userList': allUsers}
     return render(request, 'pick_up_app/login.html', context)
 
+
 def save(request):
     newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
     print(newUser)
     newUser.save()
     return HttpResponse("New User Saved")
+
 
 def check(request):
     currUser = User.authenticate(request.POST['username'], request.POST['password'])
@@ -120,7 +122,6 @@ def register(request):
             except BaseException as E:
                 return HttpResponse('Error in f.save()...', E)
 
-
             ##############################################################
             # Creates NEW 'User', ties User to ForeignKey in PickupTeam
             ##############################################################
@@ -136,9 +137,6 @@ def register(request):
                 new_user.save()
             except BaseException as E:
                 return HttpResponse('Failed new_user.save()...', E)
-
-
-
 
             # Send back success message
             messages.success(request, 'Registration submitted successfully! Welcome to PickupTeam')
