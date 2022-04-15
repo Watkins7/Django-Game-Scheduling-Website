@@ -77,6 +77,8 @@ def home_page(request, username):
     else:
          return HttpResponse("You are not logged in!")
 
+def team_page(request):
+    return render(request, 'pick_up_app/team.html')
 
 def index(request):
     allUsers = User.objects.all()
