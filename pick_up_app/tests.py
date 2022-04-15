@@ -1,10 +1,21 @@
+from atexit import register
 from django.test import TestCase
+from django.test import LiveServerTestCase
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
-import time
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from pick_up_app import models
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
+import os
+import time
+
+# Create your tests here.
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from selenium.webdriver.firefox.webdriver import WebDriver
 
 ################################################
 # Registration Tests
@@ -12,9 +23,60 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from pick_up_app.models import PickupTeam, User
 from pick_up_app.forms import NewPickupUserForm
 
+"""
+class loginSeleniumTests(StaticLiveServerTestCase):
+    def test_LoginPage(self):
+        ###This test just makes sure that it finds the username and password###
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+
+        # Make address of HTML
+        testingPath = self.live_server_url + "/pick_up_app/login"
+
+        # Go to URL to test
+        driver.get(testingPath)
+
+        #test to find the username
+        try:
+            username = driver.find_element_by_id("id_teamname")
+            username.send_keys("ThisIsTheUsername")
+            print("SUCCESS, found html element ''username")
+        except Exception:
+            print("FAILED, could not get 'username' from HTML page")
+
+        #test to find password
+        try:
+            password = driver.find_element_by_id("id_password")
+            password.send_keys("ThisIsThePassword")
+            print("SUCCESS, found html element ''password")
+        except Exception:
+            print("FAILED, could not get 'password' from HTML page")
+
+        time.sleep(2)
+
+    def test_RegisterRedirect(self):
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        testingPath = self.live_server_url + "/pick_up_app/login"
+
+        registerButton = driver.find_element_by_class_name('newuser')
+        registerButton.click()
+
+        print("yay found redirect for register")
+
+        driver.quit()
+
+    def test_ForgotRedirect(self):
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        testingPath = self.live_server_url + "/pick_up_app/login"
+
+        registerButton = driver.find_element_by_class_name('forgot')
+        registerButton.click()
+
+        print("Yay found the redirect for forgot pw")
+
+        driver.quit()
+"""
 
 class registrationTests(TestCase):
-
 
     ###############################################################
     # Setup for registration
