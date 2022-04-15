@@ -20,8 +20,7 @@ from selenium.webdriver.firefox.webdriver import WebDriver
 ################################################
 # Registration Tests
 ################################################
-from pick_up_app.models import PickupTeam
-from pick_up_app.models import User
+from pick_up_app.models import PickupTeam, User
 from pick_up_app.forms import NewPickupUserForm
 
 """
@@ -78,6 +77,7 @@ class loginSeleniumTests(StaticLiveServerTestCase):
 """
 
 class registrationTests(TestCase):
+
     ###############################################################
     # Setup for registration
     ###############################################################
@@ -98,6 +98,7 @@ class registrationTests(TestCase):
 
         test_user.save()
 
+
     ###############################################################
     # Model testing for PickUpTeam
     ###############################################################
@@ -113,6 +114,7 @@ class registrationTests(TestCase):
 
         # Model Teardown
         self.register_teardown()
+
 
     ###############################################################
     # Registration Form Test
@@ -211,7 +213,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
         except:
             print("FAILED, could not get '/pick_up_app/login'")
 
-        time.sleep(2)
+        time.sleep(1)
 
         # Path to test of where we should be naviagted to
         testingPath = self.live_server_url + "/pick_up_app/ThisIsANewTeamName/"
@@ -222,14 +224,14 @@ class MySeleniumTests(StaticLiveServerTestCase):
             user_id.send_keys("ThisIsANewTeamName")
             pass_id = driver.find_element_by_class_name("pass")
             pass_id.send_keys("password")
-            time.sleep(2)
+            time.sleep(1)
 
         except Exception:
             print("FAILED, could not find USER or PASSWORD element on login screen")
 
         try:
             driver.find_element_by_class_name("login").submit()
-            time.sleep(2)
+            time.sleep(1)
             print("SUCCESS, was able to navigate to a home page")
 
         except Exception:
@@ -315,7 +317,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
         #########################################################################
         # form submission
         #########################################################################
-        time.sleep(2)
+        time.sleep(1)
         try:
             button = driver.find_element_by_xpath("//button[text()='Register']")
             button.click()
@@ -324,7 +326,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
             print("FAILED, could not submit form")
 
         # Quick visual to see that form submitted
-        time.sleep(2)
+        time.sleep(1)
 
 
         #########################################################################
@@ -349,6 +351,152 @@ class MySeleniumTests(StaticLiveServerTestCase):
         # tell handler to quit
         driver.quit()
 
+
+class HomePageHTMLTests(StaticLiveServerTestCase):
+    def test_home_page_rendering(self):
+        """
+        This function tests that all the necessary objects are added to
+        the home page.
+
+        :return: None
+        """
+
+        # Add a new user
+        new_user = User(username="lime", password="lemon", teamName="citrus")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Send the username and password to the login page and hit enter to redirect
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+
+        actual_title = "Team Home Page"  # What the actual title should be
+
+        login_button = driver.find_element_by_class_name("login")
+        login_button.click()
+
+        driver.implicitly_wait(0.5)  # Wait to find the title
+
+        # Try to find all the template items on the home page
+        try:
+            # Try to find all the elements of the Top 5 Teams box
+            driver.find_element_by_class_name("top_teams")
+            driver.find_element_by_class_name("teams_label")
+            driver.find_element_by_xpath('//table')
+
+            print("SUCCESS, found top 5 teams template items")
+        except Exception:
+            print("FAILED, did not find top 5 teams template items")
+
+        try:
+            # Try to find the map space
+            driver.find_element_by_class_name("map_space")
+            print("SUCCESS, found map space")
+        except Exception:
+            print("FAILED, did not find map space")
+
+        try:
+            # Try to find the redirect buttons
+            driver.find_element_by_class_name("login_button")
+            driver.find_element_by_class_name("team_button")
+
+            print("SUCCESS, found redirect buttons")
+        except Exception:
+            print("FAILED, did not find redirect buttons")
+
+        # Check that home page title is correct
+        home_title = "Team Home Page"  # The actual title of the home page
+        self.assertEqual(home_title, driver.title)
+
+        # Close browser
+        driver.quit()
+
+
+class RedirectLinkTests(StaticLiveServerTestCase):
+    def test_redirect_login_to_home_page(self):
+        """
+        This function tests that a successful login will redirect the user to
+        the home page by checking that the 'check' view sends users to the page
+        titled "Team Home Page"
+        :return: None
+        """
+
+        # Add a new test user
+        new_user = User(username="lime", password="lemon", teamName="citrus")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Send the username and password to the login page
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+
+        # Hit the enter/submit button to login and redirect
+        driver.find_element_by_xpath('//input[@class="login"][@type="submit"]').click()
+
+        driver.implicitly_wait(0.5)  # Wait before finding title
+
+        curr_title = driver.title  # Gets the title of the current page
+        actual_title = "Team Home Page"  # What the actual title should be
+
+        self.assertEqual(actual_title, curr_title)  # Title of redirected page should match
+
+        # Close browser
+        driver.quit()
+
+
+    def test_redirect_home_to_login_page(self):
+        """
+        This function tests the login page button on the home page. It will
+        redirect the user to the login page by checking that the check view
+        sends users to the page titled "Sign in"
+        :return: None
+        """
+
+        # Add a new tes user
+        new_user = User(username="lime", password="lemon", teamName="citrus")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        # Find and click the login button
+        driver.find_element_by_class_name("login_button").click()
+
+        driver.implicitly_wait(0.5)  # Wait before finding the title
+
+        curr_title = driver.title  # Gets the title of the current page
+        actual_title = "Sign in"  # The actual title of the login page
+
+        self.assertEqual(actual_title, curr_title)  # Title of redirected page should match
+
+        # Close browser
+        driver.quit()
+
+
         print("######################################################################")
         print("#                                                                    #")
         print("#                                                                    #")
@@ -356,4 +504,3 @@ class MySeleniumTests(StaticLiveServerTestCase):
         print("#                                                                    #")
         print("#                                                                    #")
         print("######################################################################")
-

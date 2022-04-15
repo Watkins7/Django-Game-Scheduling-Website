@@ -17,6 +17,8 @@ class User(AbstractUser):
     teamName = models.TextField(20)
     # Added mmr_score for home_page template, can be changed later
     mmr_score = models.IntegerField(default=0)
+    #Added email for team page
+    email = models.TextField(50)
 
     def authenticate(username, password):
         for user in User.objects.all():
@@ -94,4 +96,3 @@ class TimeSlot(models.Model):
                 name='%(app_label)s_%(class)s_slotstart_lte_slotend',
                 check=models.Q(slot_start__lte=models.F('slot_end')))
         ]
-
