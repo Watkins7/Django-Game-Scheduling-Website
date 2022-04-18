@@ -29,6 +29,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-w3)5@f)ornut&_*jv=hk462_&*1uy*(7jkxdt=^k##4k9vkvw$'
 GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
 
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
