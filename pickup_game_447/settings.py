@@ -31,7 +31,7 @@ GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['pickup-game-447.herokuapp.com', '127.0.0.1']
 AUTH_USER_MODEL = 'pick_up_app.User'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 

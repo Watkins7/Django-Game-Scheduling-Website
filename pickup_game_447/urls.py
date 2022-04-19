@@ -19,7 +19,6 @@ from pick_up_app import views
 from django.urls import path, include
 
 urlpatterns = [
-    path('pick_up_app/', include('pick_up_app.urls')),
-    path('admin/', admin.site.urls),
+    path('', views.register, name='register')
 ]
 
