@@ -13,7 +13,7 @@ import calendar
 
 
 # Forms
-from .forms import NewPickupUserForm
+from .forms import NewUserForm
 
 # Models
 from . models import PickupTeam, TimeSlot
@@ -34,7 +34,7 @@ def home_page(request, username):
     if(request.user.is_authenticated):
 
         #Is the user at THEIR home page
-        if(request.user.username != username):
+        if(request.user.teamname != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
@@ -42,14 +42,14 @@ def home_page(request, username):
             # List of the top 5 teams in User model database to be displayed on the
             # team homepage.
             # Top Teams to be displayed
-            top_teams_list = PickupTeam.objects.order_by('-mmr_score')[:5]
+            top_teams_list = User.objects.order_by('-mmr_score')[:5]
 
             # All the teams to add markers
-            all_teams = PickupTeam.objects.order_by('teamname')
+            all_teams = User.objects.order_by('teamname')
 
             # Centered team "username"
             try:
-                centered_team = PickupTeam.objects.get(teamname=username)
+                centered_team = User.objects.get(teamname=username)
             except Exception:
                 return HttpResponse("ERROR, Team does not exist")
 
@@ -93,7 +93,7 @@ def register(request):
     if request.method == 'POST':
 
         # Post Registration Form in browser
-        f = NewPickupUserForm(request.POST)
+        f = NewUserForm(request.POST)
 
         # Form RETURNED is valid
         if f.is_valid():
@@ -102,7 +102,7 @@ def register(request):
             # form creates NEW 'PickupTeam'
             #########################################
             try:
-                new_user = f.save()
+                f.save()
 
             except BaseException as E:
                 return HttpResponse('Error in f.save()...', E)
@@ -111,18 +111,6 @@ def register(request):
             ##############################################################
             # Creates NEW 'User', ties User to ForeignKey in PickupTeam
             ##############################################################
-            try:
-                new_user.teamaccount = User.objects.create(username=new_user.teamname,
-                                             email=new_user.email,
-                                             password=new_user.password)
-
-            except BaseException as E:
-                return HttpResponse('Error in User.create_user()...', E)
-
-            try:
-                new_user.save()
-            except BaseException as E:
-                return HttpResponse('Failed new_user.save()...', E)
 
 
 
@@ -132,7 +120,7 @@ def register(request):
 
     # GET request
     else:
-        f = NewPickupUserForm()
+        f = NewUserForm()
 
     # if form invalid or form valid, redisplay orginal form with errors/messages
     return render(request, 'pick_up_app/register.html', {'form': f})
