@@ -1,1 +1,1 @@
-web: gunicorn pickup_game_447
+web: gunicorn pickup_game_447.wsgi
