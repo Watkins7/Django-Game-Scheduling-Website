@@ -11,18 +11,26 @@ from django.utils.safestring import mark_safe
 from .utils import Calendar
 import calendar
 
-
+import pick_up_app
 # Forms
 from .forms import NewUserForm
 
 # Models
-from . models import PickupTeam, TimeSlot
-from .models import User
+from .models import User, PickupTeam, TimeSlot
 from django.conf import settings
 
 ##########################################
 # Create your views here.
 ##########################################
+
+def team_search(request):
+    if(request.method == "POST"):
+        team_search = request.POST['team_search']
+        teams = User.objects.filter(teamName__contains = team_search)
+        return render(request, 'pick_up_app/team_search.html', {"team_search": team_search, "teams": teams})
+    else:
+        return render(request, 'pick_up_app/team_search.html')
+
 def main_page(request):
     # This is just a message for the app's index view page, can be changed later.
     return HttpResponse("You're looking at the default main page.")
@@ -40,7 +48,8 @@ def home_page(request, username):
 
         else:
             # List of the top 5 teams in User model database to be displayed on the
-            # team homepage.
+            # team homepage.Note: Uses a placeholder mmr_score in the User model,
+            # will need to be properly implemented and tested later.
             # Top Teams to be displayed
             top_teams_list = User.objects.order_by('-mmr_score')[:5]
 
@@ -56,7 +65,8 @@ def home_page(request, username):
             context = {'top_teams_list': top_teams_list,
                        'all_teams': all_teams,
                        'centered_team': centered_team,
-                       'api_key': settings.GOOGLE_MAPS_API_KEY
+                       'api_key': settings.GOOGLE_MAPS_API_KEY,
+                       "teams": teamNames,
                        }
 
             return render(request, 'pick_up_app/home_page.html', context)
@@ -64,17 +74,21 @@ def home_page(request, username):
     else:
          return HttpResponse("You are not logged in!")
 
+def team_page(request):
+    return render(request, 'pick_up_app/team.html')
 
 def index(request):
     allUsers = User.objects.all()
     context = {'userList': allUsers}
     return render(request, 'pick_up_app/login.html', context)
 
+
 def save(request):
     newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
     print(newUser)
     newUser.save()
     return HttpResponse("New User Saved")
+
 
 def check(request):
     currUser = User.authenticate(request.POST['username'], request.POST['password'])
@@ -107,13 +121,9 @@ def register(request):
             except BaseException as E:
                 return HttpResponse('Error in f.save()...', E)
 
-
             ##############################################################
             # Creates NEW 'User', ties User to ForeignKey in PickupTeam
             ##############################################################
-
-
-
 
             # Send back success message
             messages.success(request, 'Registration submitted successfully! Welcome to PickupTeam')
