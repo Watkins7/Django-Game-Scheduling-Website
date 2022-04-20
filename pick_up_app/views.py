@@ -11,12 +11,11 @@ from django.utils.safestring import mark_safe
 from .utils import Calendar
 import calendar
 
-import pick_up_app
 # Forms
-from .forms import NewPickupUserForm
+from .forms import NewUserForm
 
 # Models
-from .models import User, PickupTeam, TimeSlot
+from .models import User, TimeSlot
 from django.conf import settings
 
 ##########################################
@@ -26,7 +25,7 @@ from django.conf import settings
 def team_search(request):
     if(request.method == "POST"):
         team_search = request.POST['team_search']
-        teams = User.objects.filter(teamName__contains = team_search)
+        teams = User.objects.filter(teamname__contains = team_search)
         return render(request, 'pick_up_app/team_search.html', {"team_search": team_search, "teams": teams})
     else:
         return render(request, 'pick_up_app/team_search.html')
@@ -42,7 +41,7 @@ def home_page(request, username):
     if(request.user.is_authenticated):
 
         #Is the user at THEIR home page
-        if(request.user.username != username):
+        if(request.user.teamname != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
@@ -51,19 +50,21 @@ def home_page(request, username):
             # team homepage.Note: Uses a placeholder mmr_score in the User model,
             # will need to be properly implemented and tested later.
             # Top Teams to be displayed
-            top_teams_list = PickupTeam.objects.order_by('-mmr_score')[:5]
+            top_teams_list = User.objects.order_by('-mmr_score')[:5]
 
             # All the teams to add markers
-            all_teams = PickupTeam.objects.order_by('teamname')
+            all_teams = User.objects.order_by('teamname')
 
             # Centered team "username"
-            #THIS MUST BE FIXED NEXT ITERATION. THIS IS NOT A GOOD SOLUTION
-            centered_team = PickupTeam(teamname = request.user.username, password = request.user.password, email = request.user.email, longitude = -76.7100, latitude = 39.2543)
+            try:
+                centered_team = User.objects.get(teamname=username)
+            except Exception:
+                return HttpResponse("ERROR, Team does not exist")
 
             teams =  User.objects.all()
             teamNames = []
             for i in range(len(teams)):
-                teamNames.append(teams[i].teamName)
+                teamNames.append(teams[i].teamname)
 
             context = {'top_teams_list': top_teams_list,
                        'all_teams': all_teams,
@@ -77,8 +78,17 @@ def home_page(request, username):
     else:
          return HttpResponse("You are not logged in!")
 
-def team_page(request):
-    return render(request, 'pick_up_app/team.html')
+def team_page(request, teamname):
+     #Is the user logged in
+    if(request.user.is_authenticated):
+
+        #Is the user at THEIR home page
+        if(request.user.teamname != teamname):
+
+            return HttpResponse("You are trying to view a page that is not yours!")
+
+        else:
+            return render(request, 'pick_up_app/team.html')
 
 def index(request):
     allUsers = User.objects.all()
@@ -97,7 +107,7 @@ def check(request):
     currUser = User.authenticate(request.POST['username'], request.POST['password'])
     if(currUser):
         login(request, currUser)
-        return HttpResponseRedirect(reverse('home_page', args=(currUser.username,)))
+        return HttpResponseRedirect(reverse('home_page', args=(currUser.teamname,)))
     else:
         return HttpResponse("not a user oop")
 
@@ -110,7 +120,7 @@ def register(request):
     if request.method == 'POST':
 
         # Post Registration Form in browser
-        f = NewPickupUserForm(request.POST)
+        f = NewUserForm(request.POST)
 
         # Form RETURNED is valid
         if f.is_valid():
@@ -119,7 +129,7 @@ def register(request):
             # form creates NEW 'PickupTeam'
             #########################################
             try:
-                new_user = f.save()
+                f.save()
 
             except BaseException as E:
                 return HttpResponse('Error in f.save()...', E)
@@ -127,25 +137,13 @@ def register(request):
             ##############################################################
             # Creates NEW 'User', ties User to ForeignKey in PickupTeam
             ##############################################################
-            try:
-                new_user.teamaccount = User.objects.create(username=new_user.teamname,
-                                             email=new_user.email,
-                                             password=new_user.password)
-
-            except BaseException as E:
-                return HttpResponse('Error in User.create_user()...', E)
-
-            try:
-                new_user.save()
-            except BaseException as E:
-                return HttpResponse('Failed new_user.save()...', E)
 
             # Send back success message
             messages.success(request, 'Registration submitted successfully! Welcome to PickupTeam')
 
     # GET request
     else:
-        f = NewPickupUserForm()
+        f = NewUserForm()
 
     # if form invalid or form valid, redisplay orginal form with errors/messages
     return render(request, 'pick_up_app/register.html', {'form': f})
