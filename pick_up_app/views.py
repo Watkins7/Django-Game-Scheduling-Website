@@ -26,7 +26,7 @@ from django.conf import settings
 def team_search(request):
     if(request.method == "POST"):
         team_search = request.POST['team_search']
-        teams = User.objects.filter(teamName__contains = team_search)
+        teams = User.objects.filter(teamname__contains = team_search)
         return render(request, 'pick_up_app/team_search.html', {"team_search": team_search, "teams": teams})
     else:
         return render(request, 'pick_up_app/team_search.html')
@@ -62,6 +62,11 @@ def home_page(request, username):
             except Exception:
                 return HttpResponse("ERROR, Team does not exist")
 
+            teams =  User.objects.all()
+            teamNames = []
+            for i in range(len(teams)):
+                teamNames.append(teams[i].teamname)
+
             context = {'top_teams_list': top_teams_list,
                        'all_teams': all_teams,
                        'centered_team': centered_team,
@@ -74,8 +79,17 @@ def home_page(request, username):
     else:
          return HttpResponse("You are not logged in!")
 
-def team_page(request):
-    return render(request, 'pick_up_app/team.html')
+def team_page(request, teamname):
+     #Is the user logged in
+    if(request.user.is_authenticated):
+
+        #Is the user at THEIR home page
+        if(request.user.teamname != teamname):
+
+            return HttpResponse("You are trying to view a page that is not yours!")
+
+        else:
+            return render(request, 'pick_up_app/team.html')
 
 def index(request):
     allUsers = User.objects.all()
@@ -94,7 +108,7 @@ def check(request):
     currUser = User.authenticate(request.POST['username'], request.POST['password'])
     if(currUser):
         login(request, currUser)
-        return HttpResponseRedirect(reverse('home_page', args=(currUser.username,)))
+        return HttpResponseRedirect(reverse('home_page', args=(currUser.teamname,)))
     else:
         return HttpResponse("not a user oop")
 
