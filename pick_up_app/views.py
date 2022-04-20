@@ -11,12 +11,11 @@ from django.utils.safestring import mark_safe
 from .utils import Calendar
 import calendar
 
-import pick_up_app
 # Forms
 from .forms import NewUserForm
 
 # Models
-from .models import User, PickupTeam, TimeSlot
+from .models import User, TimeSlot
 from django.conf import settings
 
 ##########################################
