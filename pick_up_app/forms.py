@@ -16,7 +16,6 @@ class NewUserForm(ModelForm):
         # These are the attributes to be stored
         fields = (
             'username',
-            'mmrScore',
             'teamname',
             'email',
             'password',
