@@ -15,20 +15,22 @@ import calendar
 from .forms import NewUserForm
 
 # Models
-from .models import User, TimeSlot
+from .models import User, TimeSlot, Games
 from django.conf import settings
+
 
 ##########################################
 # Create your views here.
 ##########################################
 
 def team_search(request):
-    if(request.method == "POST"):
+    if (request.method == "POST"):
         team_search = request.POST['team_search']
-        teams = User.objects.filter(teamname__contains = team_search)
+        teams = User.objects.filter(teamname__contains=team_search)
         return render(request, 'pick_up_app/team_search.html', {"team_search": team_search, "teams": teams})
     else:
         return render(request, 'pick_up_app/team_search.html')
+
 
 def main_page(request):
     # This is just a message for the app's index view page, can be changed later.
@@ -36,12 +38,11 @@ def main_page(request):
 
 
 def home_page(request, username):
+    # Is the user logged in
+    if (request.user.is_authenticated):
 
-    #Is the user logged in
-    if(request.user.is_authenticated):
-
-        #Is the user at THEIR home page
-        if(request.user.teamname != username):
+        # Is the user at THEIR home page
+        if (request.user.teamname != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
@@ -61,7 +62,7 @@ def home_page(request, username):
             except Exception:
                 return HttpResponse("ERROR, Team does not exist")
 
-            teams =  User.objects.all()
+            teams = User.objects.all()
             teamNames = []
             for i in range(len(teams)):
                 teamNames.append(teams[i].teamname)
@@ -76,19 +77,21 @@ def home_page(request, username):
             return render(request, 'pick_up_app/home_page.html', context)
 
     else:
-         return HttpResponse("You are not logged in!")
+        return HttpResponse("You are not logged in!")
+
 
 def team_page(request, teamname):
-     #Is the user logged in
-    if(request.user.is_authenticated):
+    # Is the user logged in
+    if (request.user.is_authenticated):
 
-        #Is the user at THEIR home page
-        if(request.user.teamname != teamname):
+        # Is the user at THEIR home page
+        if (request.user.teamname != teamname):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
         else:
             return render(request, 'pick_up_app/team.html')
+
 
 def index(request):
     allUsers = User.objects.all()
@@ -97,7 +100,8 @@ def index(request):
 
 
 def save(request):
-    newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
+    newUser = User(username=request.POST['username'], password=request.POST['password'],
+                   teamName=request.POST['teamName'])
     print(newUser)
     newUser.save()
     return HttpResponse("New User Saved")
@@ -105,7 +109,7 @@ def save(request):
 
 def check(request):
     currUser = User.authenticate(request.POST['username'], request.POST['password'])
-    if(currUser):
+    if (currUser):
         login(request, currUser)
         return HttpResponseRedirect(reverse('home_page', args=(currUser.teamname,)))
     else:
@@ -157,7 +161,6 @@ class TeamCalendarView(generic.ListView):
     # Custom implementation of get_context_data
     # to provide additional information to the template
     def get_context_data(self, **kwargs):
-
         # Gets the initial base context data
         context = super().get_context_data(**kwargs)
 
@@ -177,7 +180,6 @@ class TeamCalendarView(generic.ListView):
 
 # Checks the request for a valid date and returns the formatted date
 def get_request_date(cur_month):
-
     # Checks if there is a date in the request, if so re-format it to be used by date()
     if cur_month:
         year, month = (int(date_pair) for date_pair in cur_month.split('-'))
@@ -196,3 +198,24 @@ def get_next_month(cur_month):
 def get_last_month(cur_month):
     previous_month = cur_month.replace(day=1) - datetime.timedelta(days=1)
     return 'month=' + str(previous_month.year) + '-' + str(previous_month.month)
+
+
+def add_game(request):
+    all_games = Games.objects.all()
+    context = {'game_list': all_games}
+    return render(request, 'pick_up_app/new_game.html', context)
+
+
+def save_game(request, curr_game):
+    new_game = Games(game=request.POST['new_game_name'], gameType=request.POST['new_game_type'])
+    new_game.save()
+    return HttpResponse("New game added.")
+
+
+def check_game_list(request):
+    curr_game = Games.verify(request.POST['new_game_name'], request.POST['new_game_type'])
+    if curr_game:
+        save_game(request, curr_game)
+        return HttpResponseRedirect(reverse('home_page'))
+    else:
+        return HttpResponse("Game could not be added")

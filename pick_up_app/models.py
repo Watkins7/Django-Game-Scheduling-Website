@@ -33,6 +33,12 @@ class Games(models.Model):
     game = NameField(max_length = 30, unique=True)
     gameType = models.TextField(20)
 
+    def verify(game, gameType):
+        for my_game in Games.objects.all():
+            if my_game.game == game and my_game.gameType == gameType:
+                return None
+        return my_game
+
 
 
 class Emails(models.Model):
