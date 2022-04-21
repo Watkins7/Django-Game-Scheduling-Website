@@ -1,20 +1,82 @@
+from atexit import register
 from django.test import TestCase
+from django.test import LiveServerTestCase
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
-import time
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from pick_up_app import models
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
+import os
+import time
+
+# Create your tests here.
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from selenium.webdriver.firefox.webdriver import WebDriver
 
 ################################################
 # Registration Tests
 ################################################
-from pick_up_app.models import PickupTeam, User
-from pick_up_app.forms import NewPickupUserForm
+from pick_up_app.models import User
+from pick_up_app.forms import NewUserForm
 
+"""
+class loginSeleniumTests(StaticLiveServerTestCase):
+    def test_LoginPage(self):
+        ###This test just makes sure that it finds the username and password###
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+
+        # Make address of HTML
+        testingPath = self.live_server_url + "/pick_up_app/login"
+
+        # Go to URL to test
+        driver.get(testingPath)
+
+        #test to find the username
+        try:
+            username = driver.find_element_by_id("id_teamname")
+            username.send_keys("ThisIsTheUsername")
+            print("SUCCESS, found html element ''username")
+        except Exception:
+            print("FAILED, could not get 'username' from HTML page")
+
+        #test to find password
+        try:
+            password = driver.find_element_by_id("id_password")
+            password.send_keys("ThisIsThePassword")
+            print("SUCCESS, found html element ''password")
+        except Exception:
+            print("FAILED, could not get 'password' from HTML page")
+
+        time.sleep(2)
+
+    def test_RegisterRedirect(self):
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        testingPath = self.live_server_url + "/pick_up_app/login"
+
+        registerButton = driver.find_element_by_class_name('newuser')
+        registerButton.click()
+
+        print("yay found redirect for register")
+
+        driver.quit()
+
+    def test_ForgotRedirect(self):
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        testingPath = self.live_server_url + "/pick_up_app/login"
+
+        registerButton = driver.find_element_by_class_name('forgot')
+        registerButton.click()
+
+        print("Yay found the redirect for forgot pw")
+
+        driver.quit()
+"""
 
 class registrationTests(TestCase):
-
 
     ###############################################################
     # Setup for registration
@@ -27,7 +89,7 @@ class registrationTests(TestCase):
         t_long = 7
         t_lat = 13
 
-        test_user = PickupTeam(teamname=t_teamname,
+        test_user = User(teamname=t_teamname,
                                password=t_password,
                                email=t_email,
                                checkpassword=t_check_pass,
@@ -38,17 +100,17 @@ class registrationTests(TestCase):
 
 
     ###############################################################
-    # Model testing for PickUpTeam
+    # Model testing for User
     ###############################################################
-    def test_model_PickupTeam(self):
+    def test_model_User(self):
         # Model Setup
         self.register_setup()
 
         # Known Teamname exists
-        self.assertTrue(PickupTeam.objects.filter(teamname="test").exists())
+        self.assertTrue(User.objects.filter(teamname="test").exists())
 
         # Known Teamname does not exists
-        self.assertFalse(PickupTeam.objects.filter(teamname="testbananasbananasasasfasfasf").exists())
+        self.assertFalse(User.objects.filter(teamname="testbananasbananasasasfasfasf").exists())
 
         # Model Teardown
         self.register_teardown()
@@ -63,7 +125,7 @@ class registrationTests(TestCase):
         ###############################################################
         # Test Invalid Latitude
         ###############################################################
-        form_1 = NewPickupUserForm(data=None)
+        form_1 = NewUserForm(data=None)
         form_1.fields["latitude"] = 91
         self.assertFalse(form_1.is_valid())
 
@@ -112,7 +174,7 @@ class registrationTests(TestCase):
     # Setup for registration
     ###############################################################
     def register_teardown(self):
-        PickupTeam.objects.filter(teamname="test").delete()
+        User.objects.filter(teamname="test").delete()
 
 
 # Static Testing Server Test Class
@@ -135,7 +197,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
 
         #Create Test User
-        test_user = PickupTeam(teamname="ThisIsANewTeamName",
+        test_user = User(teamname="ThisIsANewTeamName",
                                password="password",
                                email="testemail.email.com",
                                checkpassword="password",
@@ -300,7 +362,7 @@ class HomePageHTMLTests(StaticLiveServerTestCase):
         """
 
         # Add a new user
-        new_user = User(username="lime", password="lemon", teamName="citrus")
+        new_user = User(username="lime", password="lemon", teamname="citrus")
         new_user.save()
 
         # Setup Firefox web driver
@@ -367,7 +429,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         """
 
         # Add a new test user
-        new_user = User(username="lime", password="lemon", teamName="citrus")
+        new_user = User(username="lime", password="lemon", teamname="citrus")
         new_user.save()
 
         # Setup Firefox web driver
@@ -405,7 +467,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         """
 
         # Add a new tes user
-        new_user = User(username="lime", password="lemon", teamName="citrus")
+        new_user = User(username="lime", password="lemon", teamname="citrus")
         new_user.save()
 
         # Setup Firefox web driver

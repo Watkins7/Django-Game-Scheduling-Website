@@ -1,5 +1,5 @@
 body {
-    background-color: #F3EBF6;
+    background: #c1d9b4;
     font-family: 'Ubuntu', sans-serif;
 }
 
@@ -7,17 +7,59 @@ body {
     background-color: #FFFFFF;
     width: 400px;
     height: 400px;
-    margin: 7em auto;
-    border-radius: 1.5em;
+    margin-top: 10em;
+    margin-left: 30em;
+    border-radius: 2em;
     box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
+}
+
+.top-waves {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    transform: rotate(180deg);
+}
+
+.top-waves svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 250px;
+}
+
+.top-waves .shape-fill {
+    fill: #4C5E4B;
 }
 
 .sign {
     padding-top: 40px;
-    color: #8C55AA;
+    color: black;
     font-family: 'Ubuntu', sans-serif;
     font-weight: bold;
     font-size: 23px;
+}
+
+.bottom-waves {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.bottom-waves svg {
+    position: relative;
+    display: block;
+    width: calc(135% + 1.3px);
+    height: 250px;
+}
+
+.bottom-waves .shape-fill {
+    fill: #4C5E4B;
 }
 
 .user {
@@ -74,7 +116,7 @@ form.form1 {
     cursor: pointer;
     border-radius: 5em;
     color: #fff;
-    background: linear-gradient(to right, #9C27B0, #E040FB);
+    background: #628760;
     border: 0;
     padding-left: 40px;
     padding-right: 40px;
@@ -88,19 +130,19 @@ form.form1 {
 
 .forgot {
     text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-    color: #E1BEE7;
+    color: #354157;
     padding-top: 15px;
 }
 
 .newuser {
     text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-    color: #E1BEE7;
+    color: #354157;
     padding-top: 15px;
 }
 
 a {
     text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-    color: #E1BEE7;
+    color: #354157;
     text-decoration: none
 }
 
