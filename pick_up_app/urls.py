@@ -15,4 +15,5 @@ urlpatterns = [
     path('calendar/', views.TeamCalendarView.as_view(), name='calendar'),
     path('<username>/', views.home_page, name='home_page'),
     path('team_search', views.team_search, name='team_search'),
+    path('new_game', views.new_game, name='new_game'),
 ]

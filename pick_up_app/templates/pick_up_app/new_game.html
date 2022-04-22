@@ -1,0 +1,45 @@
+<!DOCTYPE html>{% load static %}
+<html lang="en">
+<meta charset="UTF-8">
+{% load static %}
+<head>
+    {# Load in the Ubuntu font stylesheet and the static CSS style.css file. #}
+    <link rel="stylesheet" href={% static "css/style_new_game.css" %}>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Add New Game</title>
+</head>
+
+<body>
+
+    <div class="overlay">
+        <div class="new_game">
+            <div class=close_icon">
+                <button class="btn"><i class="fa fa-close"></i></button>
+            </div>
+
+            <div class="header_container" style="justify-content: center"><h3> Add New Game </h3></div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="container">
+                    <label>Game Name</label>
+                    <input type="text" class="input_text" id="new_game_name" placeholder="Enter Game Name">
+                </div>
+
+                <div class="container">
+                    <label>Game Type</label>
+                    <input type="text" class="input_text" id="new_game_type" placeholder="Enter Game Type">
+                </div>
+
+                <div class="container">
+                    <input class="game_button" type="submit" align="center" value="Add Game">
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</body>
+</html>
