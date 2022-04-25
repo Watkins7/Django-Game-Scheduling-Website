@@ -2,19 +2,20 @@ from django import forms
 from django.forms import ModelForm
 
 # Team Table
-from .models import PickupTeam
+from .models import User
 
 # Error Handling
 from django.core.exceptions import ValidationError
 
 
 # Registration Form
-class NewPickupUserForm(ModelForm):
+class NewUserForm(ModelForm):
     class Meta:
-        model = PickupTeam
+        model = User
 
         # These are the attributes to be stored
         fields = (
+            'username',
             'teamname',
             'email',
             'password',
@@ -24,6 +25,7 @@ class NewPickupUserForm(ModelForm):
 
         # This is what the form displays them as
         labels = {
+            'username': "New username",
             'teamname': "New Team Name:",
             'email': "Registration Email:",
             'password': "Password:",
@@ -51,11 +53,11 @@ class NewPickupUserForm(ModelForm):
             raise ValidationError("ERROR: Passwords are mismatched")
 
         # validate register email
-        if PickupTeam.objects.filter(email=f.get("email")):
+        if User.objects.filter(email=f.get("email")):
             raise ValidationError("ERROR: A Team Captain has already registered this email address")
 
         # validate teamname
-        if PickupTeam.objects.filter(teamname=f.get("teamname")):
+        if User.objects.filter(teamname=f.get("teamname")):
             raise ValidationError("ERROR: This team name has already been taken")
 
         # validate latitude

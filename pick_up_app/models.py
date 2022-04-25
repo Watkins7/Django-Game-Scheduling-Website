@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
-
 # Create your models here.
 #Creates a field type the forces the characters to be lowercase. This helps
 #preserve uniqueness
@@ -15,9 +14,14 @@ class NameField(models.CharField):
 
 # Create your models here.
 class User(AbstractUser):
-    teamName = models.TextField(20)
-    # Added mmr_score for home_page template, can be changed later
     mmr_score = models.IntegerField(default=0)
+    teamname = models.CharField(max_length=50,default='')
+    email = models.EmailField(max_length=100, default='')
+    checkpassword = models.CharField(max_length=50, default='')
+    longitude = models.FloatField(default=-76.7100)
+    latitude = models.FloatField(default=39.2543)
+    mmrScore = models.IntegerField(default=50)
+
 
     def authenticate(username, password):
         for user in User.objects.all():
@@ -30,22 +34,9 @@ class Games(models.Model):
     gameType = models.TextField(20)
 
 
-class PickupTeam(models.Model):
-
-    teamname = models.CharField(max_length=50,default='')
-    email = models.EmailField(max_length=100, default='')
-    password = models.CharField(max_length=50,default='')
-    checkpassword = models.CharField(max_length=50, default='')
-    longitude = models.FloatField(default=-76.7100)
-    latitude = models.FloatField(default=39.2543)
-    mmr_score = models.IntegerField(default=50)
-
-
-    teamaccount = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
-
 
 class Emails(models.Model):
-    team = models.ForeignKey(PickupTeam, on_delete=models.CASCADE)
+    team = models.ForeignKey(User, on_delete=models.CASCADE)
     email = models.EmailField()
     is_captain = models.BooleanField()
 
@@ -55,9 +46,8 @@ class Emails(models.Model):
             models.UniqueConstraint(fields=['team'], condition=models.Q(is_captain=True), name='One_Captain_Per_Team')
         ]
 
-
 class MMR(models.Model):
-    team = models.OneToOneField(PickupTeam, on_delete=models.CASCADE)
+    team = models.OneToOneField(User, on_delete=models.CASCADE)
     MMR_rating = models.FloatField(default=0)
 
     # Constraint to check if a team's MMR is positive
@@ -68,7 +58,7 @@ class MMR(models.Model):
 
 
 class TimeSlot(models.Model):
-    team = models.ForeignKey(PickupTeam, on_delete=models.CASCADE)
+    team = models.ForeignKey(User, on_delete=models.CASCADE)
     game = models.ForeignKey(Games, on_delete=models.CASCADE)
     slot_start = models.DateTimeField('Start date/time available')
     slot_end = models.DateTimeField('End date/time available')
@@ -96,4 +86,3 @@ class TimeSlot(models.Model):
                 name='%(app_label)s_%(class)s_slotstart_lte_slotend',
                 check=models.Q(slot_start__lte=models.F('slot_end')))
         ]
-
