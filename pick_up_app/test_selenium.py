@@ -23,59 +23,6 @@ from selenium.webdriver.firefox.webdriver import WebDriver
 from pick_up_app.models import User
 from pick_up_app.forms import NewUserForm
 
-"""
-class loginSeleniumTests(StaticLiveServerTestCase):
-    def test_LoginPage(self):
-        ###This test just makes sure that it finds the username and password###
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-
-        # Make address of HTML
-        testingPath = self.live_server_url + "/pick_up_app/login"
-
-        # Go to URL to test
-        driver.get(testingPath)
-
-        #test to find the username
-        try:
-            username = driver.find_element_by_id("id_teamname")
-            username.send_keys("ThisIsTheUsername")
-            print("SUCCESS, found html element ''username")
-        except Exception:
-            print("FAILED, could not get 'username' from HTML page")
-
-        #test to find password
-        try:
-            password = driver.find_element_by_id("id_password")
-            password.send_keys("ThisIsThePassword")
-            print("SUCCESS, found html element ''password")
-        except Exception:
-            print("FAILED, could not get 'password' from HTML page")
-
-        time.sleep(2)
-
-    def test_RegisterRedirect(self):
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        testingPath = self.live_server_url + "/pick_up_app/login"
-
-        registerButton = driver.find_element_by_class_name('newuser')
-        registerButton.click()
-
-        print("yay found redirect for register")
-
-        driver.quit()
-
-    def test_ForgotRedirect(self):
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        testingPath = self.live_server_url + "/pick_up_app/login"
-
-        registerButton = driver.find_element_by_class_name('forgot')
-        registerButton.click()
-
-        print("Yay found the redirect for forgot pw")
-
-        driver.quit()
-"""
-
 class registrationTests(TestCase):
 
     ###############################################################
@@ -349,6 +296,57 @@ class MySeleniumTests(StaticLiveServerTestCase):
 
 
         # tell handler to quit
+        driver.quit()
+
+class loginSeleniumTests(StaticLiveServerTestCase):
+    def test_LoginPage(self):
+        ###This test just makes sure that it finds the username and password###
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+
+        # Make address of HTML
+        testingPath = self.live_server_url + "/pick_up_app/login"
+
+        # Go to URL to test
+        driver.get(testingPath)
+
+        #make new user
+        new_user = User(username="user", password="pw", teamname="team")
+        new_user.save()
+
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("user")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("pw")
+
+        try:
+            driver.find_element_by_class_name("main")
+            driver.find_element_by_class_name("user")
+            driver.find_element_by_class_name("pass")
+            driver.find_element_by_class_name("login")
+            print("SUCCESS, found the classes")
+        except Exception:
+            print("FAILED, couldn't find the classes")
+
+    def test_RegisterRedirect(self):
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        testingPath = self.live_server_url + "/pick_up_app/login"
+        try:
+            # Try to find the redirect buttons
+            driver.find_element_by_class_name("newuser")
+            print("SUCCESS, found new user redirect button")
+        except Exception:
+            print("FAILED, did not find user redirect button")
+
+        driver.quit()
+
+    def test_ForgotRedirect(self):
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        testingPath = self.live_server_url + "/pick_up_app/login"
+        try:
+            # Try to find the redirect buttons
+            driver.find_element_by_class_name("forgot")
+            print("SUCCESS, found forgot user redirect buttons")
+        except Exception:
+            print("FAILED, did not find forgot user redirect buttons")
+
         driver.quit()
 
 
