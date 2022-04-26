@@ -1,6 +1,6 @@
 # HTTP libraries
 # from curses.ascii import HT
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import login
@@ -12,7 +12,7 @@ from .utils import Calendar
 import calendar
 
 # Forms
-from .forms import NewUserForm
+from .forms import NewUserForm, TimeSlotForm
 
 # Models
 from .models import User, TimeSlot
@@ -154,10 +154,16 @@ class TeamCalendarView(generic.ListView):
     model = TimeSlot
     template_name = 'pick_up_app/calendar.html'
 
+    # Ensures only logged-in users can view calendars
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return super(TeamCalendarView, self).dispatch(request, *args, **kwargs)
+        else:
+            return HttpResponse("Only logged in users may view another team's calendar")
+
     # Custom implementation of get_context_data
     # to provide additional information to the template
     def get_context_data(self, **kwargs):
-
         # Gets the initial base context data
         context = super().get_context_data(**kwargs)
 
@@ -167,8 +173,14 @@ class TeamCalendarView(generic.ListView):
         # Instantiate our calendar class with today's year and date
         new_calendar = Calendar(current_month.year, current_month.month)
 
+        # Gets the team currently making the request and the team of the calendar being viewed
+        viewing_team = User.objects.get(teamname=self.kwargs['teamname'])
+        cur_team = self.request.user.teamname
+
         # Call the formatmonth method, which returns our calendar as a table
-        formatted_calendar = new_calendar.formatmonth()
+        formatted_calendar = new_calendar.formatmonth(viewing_team, cur_team)
+        context['viewing_team'] = viewing_team.teamname
+        context['current_team'] = cur_team
         context['calendar'] = mark_safe(formatted_calendar)
         context['next_month'] = get_next_month(current_month)
         context['last_month'] = get_last_month(current_month)
@@ -196,3 +208,38 @@ def get_next_month(cur_month):
 def get_last_month(cur_month):
     previous_month = cur_month.replace(day=1) - datetime.timedelta(days=1)
     return 'month=' + str(previous_month.year) + '-' + str(previous_month.month)
+
+
+# View to add/update a team's timeslot information
+def timeslot(request, teamname, timeslot_id=None):
+    # Ensures only authenticated team can edit timeslot data
+    if request.user.is_authenticated:
+        if request.user.teamname != teamname:
+            return HttpResponse("You are trying to view a page that is not yours!")
+        else:
+            cur_team = User.objects.get(teamname=teamname)
+
+            # If a timeslot ID is in the URL, get that timeslot object to be edited
+            if timeslot_id:
+                instance = get_object_or_404(TimeSlot, pk=timeslot_id)
+            else:
+                instance = TimeSlot(team=cur_team)
+
+            timeslot_form = TimeSlotForm(request.POST or None, instance=instance)
+
+            # If the request is a post and the form has been cleaned either save the form or delete the timeslot
+            if request.POST:
+                if request.POST.get('delete'):
+                    instance.delete()
+                    return HttpResponseRedirect(reverse('calendar', args=(teamname,)))
+                else:
+                    if timeslot_form.is_valid():
+                        timeslot_form.save()
+                        return HttpResponseRedirect(reverse('calendar', args=(teamname,)))
+
+            context = {'timeslot_form': timeslot_form,
+                       'current_team': cur_team.teamname,
+                       'timeslot_id': timeslot_id}
+            return render(request, 'pick_up_app/timeslot.html', context)
+    else:
+        return HttpResponse("You are not logged in!")
