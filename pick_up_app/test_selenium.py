@@ -1,4 +1,5 @@
 from atexit import register
+from threading import Thread
 from django.test import TestCase
 from django.test import LiveServerTestCase
 from selenium import webdriver
@@ -486,7 +487,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         # Find and click the login button
         driver.find_element_by_class_name("login_button").click()
 
-        driver.implicitly_wait(0.5)  # Wait before finding the title
+        driver.implicitly_wait(2)  # Wait before finding the title
 
         curr_title = driver.title  # Gets the title of the current page
         actual_title = "Sign in"  # The actual title of the login page
@@ -495,6 +496,59 @@ class RedirectLinkTests(StaticLiveServerTestCase):
 
         # Close browser
         driver.quit()
+
+
+    def test_search_bar(self):
+        """
+        This function tests the login page button on the home page. It will
+        redirect the user to the login page by checking that the check view
+        sends users to the page titled "Sign in"
+        :return: None
+        """
+
+        # Add a new tes user
+        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user.save()
+        new_user = User(username="lime1", password="lemon1", teamname="cream")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(2)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        # Find and click the login button
+        searchBar = driver.find_element_by_class_name("search_bar")
+
+        driver.implicitly_wait(2)  # Wait before finding the title
+        try:
+            searchBar.send_keys("c")
+            driver.implicitly_wait(2)
+            webList = driver.find_elements_by_class_name("ui-menu-item")
+            optionsList = []
+            for i in webList:
+                optionsList.append(i.text)
+            if("citrus" in optionsList and "cream" in optionsList):
+                print("SUCCESS, both citrus and cream teams found")
+            webList[0].click()
+            searchBar.send_keys(Keys.RETURN)
+        except Exception as e:
+            print("FAILURE, cannot find teams in search bar")
+            print(e)
+
+        driver.implicitly_wait(2)
+        self.assertEqual(driver.title, "Team Home Page")
+
+
+        # Close browser
 
 
         print("######################################################################")
