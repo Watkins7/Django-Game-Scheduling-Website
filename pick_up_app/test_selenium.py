@@ -83,6 +83,7 @@ class registrationTests(TestCase):
     # Setup for registration
     ###############################################################
     def register_setup(self):
+        t_username = "nuck"
         t_password = "pass"
         t_check_pass = "pass"
         t_teamname = "test"
@@ -90,7 +91,8 @@ class registrationTests(TestCase):
         t_long = 7
         t_lat = 13
 
-        test_user = User(teamname=t_teamname,
+        test_user = User(username = t_username,
+                                teamname=t_teamname,
                                password=t_password,
                                email=t_email,
                                checkpassword=t_check_pass,
@@ -106,6 +108,9 @@ class registrationTests(TestCase):
     def test_model_User(self):
         # Model Setup
         self.register_setup()
+
+        # Known Usernname exists
+        self.assertTrue(User.objects.filter(username="nuck").exists())
 
         # Known Teamname exists
         self.assertTrue(User.objects.filter(teamname="test").exists())
@@ -198,14 +203,12 @@ class MySeleniumTests(StaticLiveServerTestCase):
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
 
         #Create Test User
-        test_user = User(teamname="ThisIsANewTeamName",
+        test_user = User(username="nuck", teamname="ThisIsANewTeamName",
                                password="password",
                                email="testemail.email.com",
                                checkpassword="password",
                                longitude=22,
                                latitude=22)
-        test_user.teamaccount = User.objects.create(username="ThisIsANewTeamName", password="password")
-
         test_user.save()
 
         # Make address of HTML
@@ -222,7 +225,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
         # get login elements
         try:
             user_id = driver.find_element_by_class_name("user")
-            user_id.send_keys("ThisIsANewTeamName")
+            user_id.send_keys("nuck")
             pass_id = driver.find_element_by_class_name("pass")
             pass_id.send_keys("password")
             time.sleep(1)
@@ -231,7 +234,8 @@ class MySeleniumTests(StaticLiveServerTestCase):
             print("FAILED, could not find USER or PASSWORD element on login screen")
 
         try:
-            driver.find_element_by_class_name("login").submit()
+            login_button = driver.find_element_by_class_name("login")
+            login_button.click()
             time.sleep(1)
             print("SUCCESS, was able to navigate to a home page")
 
@@ -239,12 +243,15 @@ class MySeleniumTests(StaticLiveServerTestCase):
             print("FAILED, could not navigate to home page")
 
         try:
+            driver.implicitly_wait(2)
             find_map = driver.find_element_by_id("googleMap")
             print("SUCCESS, found google map")
-        except Exception:
+        except Exception as e:
             print("FAILED, could not find google map")
+            print(e)
 
         driver.quit()
+
 
     #########################################################################
     # Test of "/register" page
@@ -263,6 +270,12 @@ class MySeleniumTests(StaticLiveServerTestCase):
         #########################################################################
         # Search for known form HTML 'id' attributes
         #########################################################################
+        try:
+            new_username = driver.find_element_by_id("id_username")
+            new_username.send_keys("newUsername")
+            print("SUCCESS, found html element ''id_teamname")
+        except Exception:
+            print("FAILED, could not get 'id_teamname' from HTML page")
         try:
             new_teamname = driver.find_element_by_id("id_teamname")
             new_teamname.send_keys("ThisIsANewTeamName")
@@ -525,11 +538,12 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
         driver.find_element_by_class_name("login").click()
 
-        # Find and click the login button
+        #Get the search bar
         searchBar = driver.find_element_by_class_name("search_bar")
 
-        driver.implicitly_wait(2)  # Wait before finding the title
+        driver.implicitly_wait(2)  # Wait
         try:
+            #type c into the search bar and look for the autocomplete results
             searchBar.send_keys("c")
             driver.implicitly_wait(2)
             webList = driver.find_elements_by_class_name("ui-menu-item")
@@ -549,7 +563,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
 
 
         # Close browser
-
+        driver.quit()
 
         print("######################################################################")
         print("#                                                                    #")
