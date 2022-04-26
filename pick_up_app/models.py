@@ -86,3 +86,4 @@ class TimeSlot(models.Model):
                 name='%(app_label)s_%(class)s_slotstart_lte_slotend',
                 check=models.Q(slot_start__lte=models.F('slot_end')))
         ]
+        
