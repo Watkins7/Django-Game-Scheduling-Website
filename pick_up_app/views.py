@@ -217,7 +217,6 @@ def check_game_list(request):
     curr_game = Games.verify(request.POST['game_name'], request.POST['game_type'])
     if curr_game:
         save_game(request)
-        # return HttpResponse("New game added successfully!")
-        return HttpResponseRedirect(reverse('new_game'))
     else:
-        return HttpResponse("Game could not be added")
+        messages.error(request, 'Game could not be added.')
+    return HttpResponseRedirect(reverse('new_game'))

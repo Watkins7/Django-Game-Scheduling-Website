@@ -20,7 +20,7 @@ from selenium.webdriver.firefox.webdriver import WebDriver
 ################################################
 # Registration Tests
 ################################################
-from pick_up_app.models import User
+from pick_up_app.models import User, Games
 from pick_up_app.forms import NewUserForm
 
 """
@@ -466,7 +466,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         :return: None
         """
 
-        # Add a new tes user
+        # Add a new test user
         new_user = User(username="lime", password="lemon", teamname="citrus")
         new_user.save()
 
@@ -497,10 +497,48 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         driver.quit()
 
 
-        print("######################################################################")
-        print("#                                                                    #")
-        print("#                                                                    #")
-        print("#                     End of Selenium Tests                          #")
-        print("#                                                                    #")
-        print("#                                                                    #")
-        print("######################################################################")
+class NewGamePageTests(StaticLiveServerTestCase):
+    def test_new_game_adds_to_database_successfully(self):
+        """
+        This function tests that a game added via the new_game page actually
+        adds it to the database
+        :return: None
+        """
+
+        # Add a new test user
+        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Find and click the new game link
+        driver.find_element_by_class_name("new_game_link").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Enter new game info
+        driver.find_element_by_xpath('//input[@type="text"][@name="game_name"]').send_keys("yahtzee")
+        driver.find_element_by_xpath('//input[@type="text"][@name="game_type"]').send_keys("dice")
+
+        # Find and click the game submit button
+        driver.find_element_by_class_name("game_button").click()
+
+        driver.implicitly_wait(0.5)  # Wait before finding the title
+
+        self.assertTrue(Games.objects.filter(game='yahtzee', gameType='dice'))
+
+        # Close browser
+        driver.quit()
