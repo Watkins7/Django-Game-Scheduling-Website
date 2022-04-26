@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
@@ -13,6 +14,8 @@ from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 import os
 import time
+import datetime
+from django.utils import timezone
 
 # Create your tests here.
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -21,7 +24,7 @@ from selenium.webdriver.firefox.webdriver import WebDriver
 ################################################
 # Registration Tests
 ################################################
-from pick_up_app.models import User
+from pick_up_app.models import User, TimeSlot, Games
 from pick_up_app.forms import NewUserForm
 
 """
@@ -510,7 +513,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         # Close browser
         driver.quit()
 
-
+    #Test the search bar functionality
     def test_search_bar(self):
         """
         This function tests the login page button on the home page. It will
@@ -565,6 +568,238 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         # Close browser
         driver.quit()
 
+# Set of selenium tests for the Calendar Page
+class CalendarHTMLTests(StaticLiveServerTestCase):
+
+    # Tests that all elements on the calendar page are properly rendered when loaded
+    def test_calendar_rendering(self):
+        # Creates two users & respective timeslots to be tested
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        test_team = "test_team"
+        test_team2 = "test_team2"
+        test_user = User(username="test", password="pass", teamname=test_team)
+        test_user2 = User(username="test2", password="pass2", teamname=test_team2)
+        test_game = Games(game="newgame", gameType="testing")
+        test_timeslot = TimeSlot(team=test_user,
+                                 game=test_game,
+                                 slot_start=timezone.now() + datetime.timedelta(minutes=1),
+                                 slot_end=timezone.now() + datetime.timedelta(minutes=30))
+        test_timeslot2 = TimeSlot(team=test_user2,
+                                  game=test_game,
+                                  slot_start=timezone.now() + datetime.timedelta(minutes=1),
+                                  slot_end=timezone.now() + datetime.timedelta(minutes=30))
+        test_game.save()
+        test_user.save()
+        test_user2.save()
+        test_timeslot.save()
+        test_timeslot2.save()
+
+        # Performs Log-in for the first test user
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+        driver.find_element(by=By.XPATH, value='//input[@class="user"][@type="username"]').send_keys("test")
+        driver.find_element(by=By.XPATH, value='//input[@class="pass"][@type="password"]').send_keys("pass")
+        login_button = driver.find_element(by=By.CLASS_NAME, value="login")
+        login_button.click()
+        driver.implicitly_wait(0.5)
+        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team)
+
+        # Try to find all the button elements which should be on the first test user's calendar
+        try:
+            driver.find_element(by=By.CLASS_NAME, value="previous_month_btn")
+            driver.find_element(by=By.CLASS_NAME, value="new_timeslot_btn")
+            driver.find_element(by=By.CLASS_NAME, value="next_month_btn")
+            driver.find_element(by=By.CLASS_NAME, value="home_btn")
+            print("SUCCESS, found logged-in user's redirection buttons")
+        except Exception:
+            print("FAILED, did not find logged-in user's redirection buttons")
+
+        # Try to find the first test user's calendar element
+        try:
+            driver.find_element(by=By.CLASS_NAME, value="calendar")
+            print("SUCCESS, found logged-in user's calendar")
+        except Exception:
+            print("FAILED, did not find logged-in user's calendar")
+
+        # Try to find a listed timeslot on the first test user's calendar
+        try:
+            driver.find_element(by=By.CLASS_NAME, value="listed_timeslot")
+            print("SUCCESS, found logged-in user's timeslot")
+        except Exception:
+            print("FAILED, did not find logged-in user's timeslot")
+
+        # Redirect to the other team's calendar while logged in as the first test user
+        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team2)
+
+        # Try to find new timeslot button while viewing another team's calendar
+        try:
+            driver.find_element(by=By.CLASS_NAME, value="new_timeslot_btn")
+            print("FAILED, found new timeslot button while viewing another team's calendar")
+        except Exception:
+            print("SUCCESS, did not find new timeslot button while viewing another team's calendar")
+
+        # Try to find a listed timeslot while viewing the second test user's calendar
+        try:
+            driver.find_element(by=By.CLASS_NAME, value="listed_timeslot")
+            print("SUCCESS, found timeslot while viewing another team's calendar")
+        except Exception:
+            print("FAILED, did not find timeslot while viewing another team's calendar")
+
+        driver.quit()
+
+    # Tests the redirect links on the calendar work as intended
+    def test_calendar_redirection(self):
+        # Performs user log-in to be used by other tests
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        test_team = "test_team"
+        test_user = User(username="test", password="pass", teamname=test_team)
+        test_game = Games(game="newgame", gameType="testing")
+        test_timeslot = TimeSlot(team=test_user,
+                                 game=test_game,
+                                 slot_start=timezone.now() + datetime.timedelta(minutes=1),
+                                 slot_end=timezone.now() + datetime.timedelta(minutes=30))
+        test_game.save()
+        test_user.save()
+        test_timeslot.save()
+
+        # Performs Log-in for the first test user
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+        driver.find_element(by=By.XPATH, value='//input[@class="user"][@type="username"]').send_keys("test")
+        driver.find_element(by=By.XPATH, value='//input[@class="pass"][@type="password"]').send_keys("pass")
+        login_button = driver.find_element(by=By.CLASS_NAME, value="login")
+        login_button.click()
+        driver.implicitly_wait(0.5)
+        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team)
+
+        # Tests redirection from the Calendar page to the Home Page using the home button
+        driver.find_element(by=By.CLASS_NAME, value="home_btn").click()
+        cur_title = driver.title
+        actual_title = "Team Home Page"
+        self.assertEqual(actual_title, cur_title)
+
+        # Tests redirection from the Calendar page to the Timeslot page using the new timeslot button
+        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team)
+        driver.find_element(by=By.CLASS_NAME, value="new_timeslot_btn").click()
+        driver.implicitly_wait(0.5)
+        cur_title = driver.title
+        actual_title = "Timeslot Page"
+        self.assertEqual(actual_title, cur_title)
+
+        # Tests redirection from the Calendar page to a future month using the next month button
+        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team)
+        driver.find_element(by=By.CLASS_NAME, value="next_month_btn").click()
+        cur_url = driver.current_url
+        actual_url = self.live_server_url+"/pick_up_app/calendar/"+test_team
+        actual_url += "/?month="+str(timezone.now().year)+"-"+str(timezone.now().month + 1)
+        self.assertEqual(cur_url, actual_url)
+
+        # Tests redirection from the Calendar page to a previous month using the previous month button
+        driver.find_element(by=By.CLASS_NAME, value="previous_month_btn").click()
+        cur_url = driver.current_url
+        actual_url = self.live_server_url + "/pick_up_app/calendar/" + test_team
+        actual_url += "/?month=" + str(timezone.now().year) + "-" + str(timezone.now().month)
+        self.assertEqual(cur_url, actual_url)
+
+        driver.quit()
+
+
+# Set of Selenium tests for the Timeslot Page
+class TimeslotHTMLTests(StaticLiveServerTestCase):
+    # Tests a new timeslot can be added and removed from the calendar
+    def test_timeslot_submission(self):
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        cur_time = timezone.now().date() + datetime.timedelta(days=1)
+        test_time = str(cur_time.month)+str(cur_time.day)+str(cur_time.year)
+        test_team = "test_team"
+        test_user = User(username="test", password="pass", teamname=test_team)
+        test_game = Games(game="newgame", gameType="testing")
+        test_game.save()
+        test_user.save()
+
+        # Performs Log-in for the first test user
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+        driver.find_element(by=By.XPATH, value='//input[@class="user"][@type="username"]').send_keys("test")
+        driver.find_element(by=By.XPATH, value='//input[@class="pass"][@type="password"]').send_keys("pass")
+        login_button = driver.find_element(by=By.CLASS_NAME, value="login")
+        login_button.click()
+        driver.implicitly_wait(0.5)
+        driver.get(self.live_server_url + "/pick_up_app/timeslot/new/" + test_team)
+
+        # Try to find submission location for game choice
+        try:
+            select_element = driver.find_element(by=By.ID, value="id_game")
+            select_object = Select(select_element)
+            select_object.select_by_index(1)
+            print("SUCCESS, found element id_game")
+        except Exception:
+            print("FAILED, could not find element id_game")
+
+        # Try to find submission location for start of a timeslot
+        try:
+            driver.find_element(by=By.ID, value="id_slot_start").send_keys(test_time)
+            driver.find_element(by=By.ID, value="id_slot_start").send_keys(Keys.TAB)
+            driver.find_element(by=By.ID, value="id_slot_start").send_keys("0245PM")
+            print("SUCCESS, found element id_slot_start")
+        except Exception:
+            print("FAILED, could not find element id_slot_start")
+
+        # Try to find submission location for end of a timeslot
+        try:
+            driver.find_element(by=By.ID, value="id_slot_end").send_keys(test_time)
+            driver.find_element(by=By.ID, value="id_slot_end").send_keys(Keys.TAB)
+            driver.find_element(by=By.ID, value="id_slot_end").send_keys("0345PM")
+            print("SUCCESS, found element id_slot_end")
+        except Exception:
+            print("FAILED, could not find element id_slot_end")
+
+        # Try to submit the newly created timeslot
+        try:
+            driver.find_element(by=By.NAME, value="add").click()
+            driver.implicitly_wait(0.5)
+            print("SUCCESS, submitted timeslot form")
+        except Exception:
+            print("FAILED, could not submit timeslot form")
+
+        # Tests the submission button redirects from the Timeslot Page to the Calendar Page
+        cur_title = driver.title
+        actual_title = test_team + " Team Calendar"
+        self.assertEqual(actual_title, cur_title)
+
+        # Try to delete the newly created timeslot
+        driver.find_element(by=By.CLASS_NAME, value="listed_timeslot").click()
+        try:
+            driver.find_element(by=By.NAME, value="delete").click()
+            print("SUCCESS, deleted timeslot")
+        except Exception:
+            print("FAILED, could not delete timeslot")
+
+        driver.quit()
+
+    def test_timeslot_redirection(self):
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        cur_time = timezone.now().date() + datetime.timedelta(days=1)
+        test_time = str(cur_time.month) + str(cur_time.day) + str(cur_time.year)
+        test_team = "test_team"
+        test_user = User(username="test", password="pass", teamname=test_team)
+        test_game = Games(game="newgame", gameType="testing")
+        test_game.save()
+        test_user.save()
+
+        # Performs Log-in for the first test user
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+        driver.find_element(by=By.XPATH, value='//input[@class="user"][@type="username"]').send_keys("test")
+        driver.find_element(by=By.XPATH, value='//input[@class="pass"][@type="password"]').send_keys("pass")
+        login_button = driver.find_element(by=By.CLASS_NAME, value="login")
+        login_button.click()
+        driver.implicitly_wait(0.5)
+        driver.get(self.live_server_url + "/pick_up_app/timeslot/new/" + test_team)
+
+        # Tests redirection from the Timeslot page to the Calendar using the calendar button
+        driver.find_element(by=By.CLASS_NAME, value="calendar_btn").click()
+        cur_title = driver.title
+        actual_title = test_team + " Team Calendar"
+        self.assertEqual(actual_title, cur_title)
+
+        driver.quit()
         print("######################################################################")
         print("#                                                                    #")
         print("#                                                                    #")

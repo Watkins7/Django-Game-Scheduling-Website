@@ -12,7 +12,10 @@ urlpatterns = [
     path('save/', views.save, name='save'),
     path('check/', views.check, name='check'),
     path('teampage/<teamname>', views.team_page, name="team_page"),
-    path('calendar/', views.TeamCalendarView.as_view(), name='calendar'),
+    path('calendar/<teamname>/', views.TeamCalendarView.as_view(), name='calendar'),
+    path('timeslot/new/<teamname>', views.timeslot, name="timeslot_new"),
+    path('timeslot/edit/<teamname>/int:<timeslot_id>', views.timeslot, name="timeslot_edit"),
+    path('timeslot/delete/<teamname>/int:<timeslot_id>', views.timeslot, name="timeslot_delete"),
     path('<username>/', views.home_page, name='home_page'),
     path('team_search', views.team_search, name='team_search'),
 ]
