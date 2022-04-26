@@ -32,7 +32,7 @@ def team_search(request):
 
 def main_page(request):
     # This is just a message for the app's index view page, can be changed later.
-    return HttpResponse("You're looking at the default main page.")
+    return render(request, 'pick_up_app/mainpage.html')
 
 
 def home_page(request, username):
