@@ -21,16 +21,25 @@
 
             <div class="header_container" style="justify-content: center"><h3> Add New Game </h3></div>
 
-            <form method="POST">
+            <form action="{% url 'check_game_list' %}" method="POST">
                 {% csrf_token %}
+
+                {#  Display messages if any #}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+
+
                 <div class="container">
                     <label>Game Name</label>
-                    <input type="text" class="input_text" id="new_game_name" placeholder="Enter Game Name">
+                    <input type="text" class="input_text" name="game_name" placeholder="Enter Game Name">
                 </div>
 
                 <div class="container">
                     <label>Game Type</label>
-                    <input type="text" class="input_text" id="new_game_type" placeholder="Enter Game Type">
+                    <input type="text" class="input_text" name="game_type" placeholder="Enter Game Type">
                 </div>
 
                 <div class="container">

@@ -200,22 +200,24 @@ def get_last_month(cur_month):
     return 'month=' + str(previous_month.year) + '-' + str(previous_month.month)
 
 
-def add_game(request):
+def new_game(request):
     all_games = Games.objects.all()
     context = {'game_list': all_games}
     return render(request, 'pick_up_app/new_game.html', context)
 
 
-def save_game(request, curr_game):
-    new_game = Games(game=request.POST['new_game_name'], gameType=request.POST['new_game_type'])
-    new_game.save()
-    return HttpResponse("New game added.")
+def save_game(request):
+    curr_game = Games(game=request.POST['game_name'], gameType=request.POST['game_type'])
+    curr_game.save()
+    messages.success(request, 'New game added successfully!')
+    return HttpResponse("New game saved.")
 
 
 def check_game_list(request):
-    curr_game = Games.verify(request.POST['new_game_name'], request.POST['new_game_type'])
+    curr_game = Games.verify(request.POST['game_name'], request.POST['game_type'])
     if curr_game:
-        save_game(request, curr_game)
-        return HttpResponseRedirect(reverse('home_page'))
+        save_game(request)
+        # return HttpResponse("New game added successfully!")
+        return HttpResponseRedirect(reverse('new_game'))
     else:
         return HttpResponse("Game could not be added")

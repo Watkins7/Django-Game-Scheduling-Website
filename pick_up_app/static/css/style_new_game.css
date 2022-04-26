@@ -59,6 +59,12 @@ h3 {
     text-align: center;
 }
 
+p {
+    color: #228b22;
+    margin-left: 10%;
+    font-family: 'Ubuntu', sans-serif;
+}
+
 form label {
     font-family: 'Ubuntu', sans-serif;
 }

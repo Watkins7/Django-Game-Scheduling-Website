@@ -29,16 +29,24 @@ class User(AbstractUser):
                 return user
         return None
 
+
 class Games(models.Model):
-    game = NameField(max_length = 30, unique=True)
+    game = NameField(max_length=30, unique=True)
     gameType = models.TextField(20)
 
     def verify(game, gameType):
+        # This function checks that the new game is not already in the database
+        new_game = Games(game, gameType)
+        # If game exists, return None; otherwise, return the new game
         for my_game in Games.objects.all():
             if my_game.game == game and my_game.gameType == gameType:
                 return None
-        return my_game
+        return new_game
 
+
+    def __str__(self):
+        # This function controls how this model is displayed in query set
+        return self.game
 
 
 class Emails(models.Model):
@@ -51,6 +59,7 @@ class Emails(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['team'], condition=models.Q(is_captain=True), name='One_Captain_Per_Team')
         ]
+
 
 class MMR(models.Model):
     team = models.OneToOneField(User, on_delete=models.CASCADE)
