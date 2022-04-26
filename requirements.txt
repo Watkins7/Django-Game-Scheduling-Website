@@ -7,6 +7,7 @@ charset-normalizer==2.0.12
 chromedriver==2.24.1
 cryptography==36.0.2
 distlib==0.3.4
+dj-database-url==0.5.0
 Django==4.0.3
 django-appconf==1.0.5
 django-classy-tags==3.0.1
@@ -23,6 +24,7 @@ h11==0.13.0
 idna==3.3
 outcome==1.1.0
 platformdirs==2.5.1
+psycopg2==2.9.3
 pycparser==2.21
 pyOpenSSL==22.0.0
 PySocks==1.7.1
