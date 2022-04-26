@@ -29,10 +29,16 @@ class User(AbstractUser):
                 return user
         return None
 
+    def __str__(self):
+        return self.teamname
+
+
 class Games(models.Model):
     game = NameField(max_length = 30, unique=True)
     gameType = models.TextField(20)
 
+    def __str__(self):
+        return self.game
 
 
 class Emails(models.Model):
