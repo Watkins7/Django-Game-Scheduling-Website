@@ -351,6 +351,60 @@ class MySeleniumTests(StaticLiveServerTestCase):
         # tell handler to quit
         driver.quit()
 
+# Tests mainpage
+class HomePageHTMLTests(StaticLiveServerTestCase):
+    def test_home_page_rendering(self):
+        # Makes handler to FireFox
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+
+        # Make address of HTML
+        testingPath = self.live_server_url
+
+        driver.get(testingPath)
+        time.sleep(1)
+
+        # Find the heading
+        try:
+            driver.find_element_by_class("heading")
+        except Exception as E:
+            print(E)
+            return -1
+
+        # Find the the main box
+        try:
+            driver.find_element_by_class("main")
+        except Exception as E:
+            print(E)
+            return -1
+
+        # find the about us box
+        try:
+            driver.find_element_by_class("box")
+        except Exception as E:
+            print(E)
+            return -1
+
+        # find all the images
+        try:
+            images = driver.find_elements_by_tag_name('img')
+        except Exception as E:
+            print(E)
+            return -1
+
+        # count to make sure that the number of images is 5
+        count = 0
+        for image in images:
+            print(image.get_attribute('src'))
+            count+=1
+
+        if count != 5:
+            print("FAILED, Number of images on the page is not correct")
+            return -1
+
+
+
+
+
 
 class HomePageHTMLTests(StaticLiveServerTestCase):
     def test_home_page_rendering(self):

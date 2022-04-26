@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
     '0.0.0.0',
     'pickup-game-447.herokuapp.com',
     '127.0.0.1',
+    '.localhost'
 
 ]
 AUTH_USER_MODEL = 'pick_up_app.User'
@@ -153,3 +154,8 @@ MEDIA_URL = '/media/'
 if 'DATABASE_URL' in os.environ:
     import dj_database_url
     DATABASES = {'default': dj_database_url.config()}
+
+# not tested, for potential heroku and CI
+if 'HEROKU' in os.environ:
+    import django_heroku
+    django_heroku.settings(locals())
