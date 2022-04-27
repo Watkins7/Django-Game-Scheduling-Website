@@ -20,6 +20,7 @@ from django.utils import timezone
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.webdriver.firefox.webdriver import WebDriver
 
+
 ################################################
 # Registration Tests
 ################################################
@@ -200,15 +201,9 @@ class MySeleniumTests(StaticLiveServerTestCase):
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
 
         #Create Test User
-        test_user = User(teamname="ThisIsANewTeamName",
-                               password="password",
-                               email="testemail.email.com",
-                               checkpassword="password",
-                               longitude=22,
-                               latitude=22)
-        test_user.teamaccount = User.objects.create(username="ThisIsANewTeamName", password="password")
-
-        test_user.save()
+        new_user = User(username="lime", password="lemon", teamname="citrus",
+                        latitude=-76.71, longitude=39.2543)
+        new_user.save()
 
         # Make address of HTML
         try:
@@ -216,7 +211,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
         except:
             print("FAILED, could not get '/pick_up_app/login'")
 
-        time.sleep(1)
+        time.sleep(3)
 
         # Path to test of where we should be naviagted to
         testingPath = self.live_server_url + "/pick_up_app/ThisIsANewTeamName/"
@@ -224,17 +219,17 @@ class MySeleniumTests(StaticLiveServerTestCase):
         # get login elements
         try:
             user_id = driver.find_element_by_class_name("user")
-            user_id.send_keys("ThisIsANewTeamName")
+            user_id.send_keys("lime")
             pass_id = driver.find_element_by_class_name("pass")
-            pass_id.send_keys("password")
-            time.sleep(1)
+            pass_id.send_keys("lemon")
+            time.sleep(3)
 
         except Exception:
             print("FAILED, could not find USER or PASSWORD element on login screen")
 
         try:
             driver.find_element_by_class_name("login").submit()
-            time.sleep(1)
+            time.sleep(3)
             print("SUCCESS, was able to navigate to a home page")
 
         except Exception:
