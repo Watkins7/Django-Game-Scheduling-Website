@@ -177,12 +177,12 @@ class TeamCalendarView(generic.ListView):
         new_calendar = Calendar(current_month.year, current_month.month)
 
         # Gets the team currently making the request and the team of the calendar being viewed
-        viewing_team = User.objects.get(teamname=self.kwargs['teamname'])
-        cur_team = self.request.user.teamname
+        viewing_team = User.objects.get(username=self.kwargs['username'])
+        cur_team = self.request.user.username
 
         # Call the formatmonth method, which returns our calendar as a table
         formatted_calendar = new_calendar.formatmonth(viewing_team, cur_team)
-        context['viewing_team'] = viewing_team.teamname
+        context['viewing_team'] = viewing_team.username
         context['current_team'] = cur_team
         context['calendar'] = mark_safe(formatted_calendar)
         context['next_month'] = get_next_month(current_month)
@@ -214,13 +214,13 @@ def get_last_month(cur_month):
 
 
 # View to add/update a team's timeslot information
-def timeslot(request, teamname, timeslot_id=None):
+def timeslot(request, username, timeslot_id=None):
     # Ensures only authenticated team can edit timeslot data
     if request.user.is_authenticated:
-        if request.user.teamname != teamname:
+        if request.user.username != username:
             return HttpResponse("You are trying to view a page that is not yours!")
         else:
-            cur_team = User.objects.get(teamname=teamname)
+            cur_team = User.objects.get(username=username)
 
             # If a timeslot ID is in the URL, get that timeslot object to be edited
             if timeslot_id:
@@ -234,14 +234,14 @@ def timeslot(request, teamname, timeslot_id=None):
             if request.POST:
                 if request.POST.get('delete'):
                     instance.delete()
-                    return HttpResponseRedirect(reverse('calendar', args=(teamname,)))
+                    return HttpResponseRedirect(reverse('calendar', args=(username,)))
                 else:
                     if timeslot_form.is_valid():
                         timeslot_form.save()
-                        return HttpResponseRedirect(reverse('calendar', args=(teamname,)))
+                        return HttpResponseRedirect(reverse('calendar', args=(username,)))
 
             context = {'timeslot_form': timeslot_form,
-                       'current_team': cur_team.teamname,
+                       'current_team': cur_team.username,
                        'timeslot_id': timeslot_id}
             return render(request, 'pick_up_app/timeslot.html', context)
     else:

@@ -8,7 +8,7 @@ import datetime
 class TimeSlotFormTests(TestCase):
     # Creates a user and game to be used in subsequent tests
     def create_user_and_game(self):
-        test_user = User(username="test", password="pass", teamname="test_team")
+        test_user = User(username="test", password="pass")
         test_game = Games(game="newgame", gameType="testing")
         test_user.save()
         test_game.save()

@@ -61,7 +61,7 @@ class Calendar(HTMLCalendar):
 # Gets a specific url to be listed on the calendar
 def get_slot_url(slot, viewing_team, cur_team):
     # If a team is viewing their own calendar the url links to the edit timeslot page
-    if cur_team == viewing_team.teamname:
+    if cur_team == viewing_team.username:
         url = reverse('timeslot_edit', args=(cur_team, slot.id,))
     # If a team is viewing another team's calendar, the url links to the challenge page
     else:
