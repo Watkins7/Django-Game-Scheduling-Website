@@ -66,7 +66,6 @@ def home_page(request, username):
             for i in range(len(teams)):
                 teamNames.append(teams[i].username)
 
-            print("this is keyyy!!!!:", )
             key = str(settings.GOOGLE_MAPS_API_KEY)
 
             context = {'top_teams_list': top_teams_list,
