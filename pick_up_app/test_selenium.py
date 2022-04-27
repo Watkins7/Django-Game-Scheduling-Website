@@ -1,4 +1,5 @@
 from atexit import register
+from threading import Thread
 from django.test import TestCase
 from django.test import LiveServerTestCase
 from selenium import webdriver
@@ -85,6 +86,7 @@ class registrationTests(TestCase):
     # Setup for registration
     ###############################################################
     def register_setup(self):
+        t_username = "nuck"
         t_password = "pass"
         t_check_pass = "pass"
         t_teamname = "test"
@@ -92,7 +94,8 @@ class registrationTests(TestCase):
         t_long = 7
         t_lat = 13
 
-        test_user = User(teamname=t_teamname,
+        test_user = User(username = t_username,
+                                teamname=t_teamname,
                                password=t_password,
                                email=t_email,
                                checkpassword=t_check_pass,
@@ -108,6 +111,9 @@ class registrationTests(TestCase):
     def test_model_User(self):
         # Model Setup
         self.register_setup()
+
+        # Known Usernname exists
+        self.assertTrue(User.objects.filter(username="nuck").exists())
 
         # Known Teamname exists
         self.assertTrue(User.objects.filter(teamname="test").exists())
@@ -200,14 +206,12 @@ class MySeleniumTests(StaticLiveServerTestCase):
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
 
         #Create Test User
-        test_user = User(teamname="ThisIsANewTeamName",
+        test_user = User(username="nuck", teamname="ThisIsANewTeamName",
                                password="password",
                                email="testemail.email.com",
                                checkpassword="password",
                                longitude=22,
                                latitude=22)
-        test_user.teamaccount = User.objects.create(username="ThisIsANewTeamName", password="password")
-
         test_user.save()
 
         # Make address of HTML
@@ -224,7 +228,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
         # get login elements
         try:
             user_id = driver.find_element_by_class_name("user")
-            user_id.send_keys("ThisIsANewTeamName")
+            user_id.send_keys("nuck")
             pass_id = driver.find_element_by_class_name("pass")
             pass_id.send_keys("password")
             time.sleep(1)
@@ -233,7 +237,8 @@ class MySeleniumTests(StaticLiveServerTestCase):
             print("FAILED, could not find USER or PASSWORD element on login screen")
 
         try:
-            driver.find_element_by_class_name("login").submit()
+            login_button = driver.find_element_by_class_name("login")
+            login_button.click()
             time.sleep(1)
             print("SUCCESS, was able to navigate to a home page")
 
@@ -241,12 +246,15 @@ class MySeleniumTests(StaticLiveServerTestCase):
             print("FAILED, could not navigate to home page")
 
         try:
+            driver.implicitly_wait(2)
             find_map = driver.find_element_by_id("googleMap")
             print("SUCCESS, found google map")
-        except Exception:
+        except Exception as e:
             print("FAILED, could not find google map")
+            print(e)
 
         driver.quit()
+
 
     #########################################################################
     # Test of "/register" page
@@ -265,6 +273,12 @@ class MySeleniumTests(StaticLiveServerTestCase):
         #########################################################################
         # Search for known form HTML 'id' attributes
         #########################################################################
+        try:
+            new_username = driver.find_element_by_id("id_username")
+            new_username.send_keys("newUsername")
+            print("SUCCESS, found html element ''id_teamname")
+        except Exception:
+            print("FAILED, could not get 'id_teamname' from HTML page")
         try:
             new_teamname = driver.find_element_by_id("id_teamname")
             new_teamname.send_keys("ThisIsANewTeamName")
@@ -489,7 +503,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         # Find and click the login button
         driver.find_element_by_class_name("login_button").click()
 
-        driver.implicitly_wait(0.5)  # Wait before finding the title
+        driver.implicitly_wait(2)  # Wait before finding the title
 
         curr_title = driver.title  # Gets the title of the current page
         actual_title = "Sign in"  # The actual title of the login page
@@ -499,6 +513,60 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         # Close browser
         driver.quit()
 
+    #Test the search bar functionality
+    def test_search_bar(self):
+        """
+        This function tests the login page button on the home page. It will
+        redirect the user to the login page by checking that the check view
+        sends users to the page titled "Sign in"
+        :return: None
+        """
+
+        # Add a new tes user
+        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user.save()
+        new_user = User(username="lime1", password="lemon1", teamname="cream")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(2)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        #Get the search bar
+        searchBar = driver.find_element_by_class_name("search_bar")
+
+        driver.implicitly_wait(2)  # Wait
+        try:
+            #type c into the search bar and look for the autocomplete results
+            searchBar.send_keys("c")
+            driver.implicitly_wait(2)
+            webList = driver.find_elements_by_class_name("ui-menu-item")
+            optionsList = []
+            for i in webList:
+                optionsList.append(i.text)
+            if("citrus" in optionsList and "cream" in optionsList):
+                print("SUCCESS, both citrus and cream teams found")
+            webList[0].click()
+            searchBar.send_keys(Keys.RETURN)
+        except Exception as e:
+            print("FAILURE, cannot find teams in search bar")
+            print(e)
+
+        driver.implicitly_wait(2)
+        self.assertEqual(driver.title, "Team Home Page")
+
+
+        # Close browser
+        driver.quit()
 
 # Set of selenium tests for the Calendar Page
 class CalendarHTMLTests(StaticLiveServerTestCase):
