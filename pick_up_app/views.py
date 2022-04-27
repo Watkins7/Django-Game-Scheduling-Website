@@ -200,12 +200,14 @@ def get_last_month(cur_month):
     return 'month=' + str(previous_month.year) + '-' + str(previous_month.month)
 
 
+# View where user can add a new game
 def new_game(request):
     all_games = Games.objects.all()
     context = {'game_list': all_games}
     return render(request, 'pick_up_app/new_game.html', context)
 
 
+# Save the new game that was added by the new game page
 def save_game(request):
     curr_game = Games(game=request.POST['game_name'], gameType=request.POST['game_type'])
     curr_game.save()
@@ -213,6 +215,7 @@ def save_game(request):
     return HttpResponse("New game saved.")
 
 
+# Check that the new game given is not in the database yet
 def check_game_list(request):
     curr_game = Games.verify(request.POST['game_name'], request.POST['game_type'])
     if curr_game:
@@ -220,3 +223,9 @@ def check_game_list(request):
     else:
         messages.error(request, 'Game could not be added.')
     return HttpResponseRedirect(reverse('new_game'))
+
+
+def edit_team(request, username, teamname):
+    curr_team = User.objects.filter(username=username, teamname=teamname)
+    context = {'team_info': curr_team}
+    return render(request, 'pick_up_app/edit_team.html', context)

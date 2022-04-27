@@ -1,4 +1,6 @@
 from atexit import register
+
+from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.test import LiveServerTestCase
 from selenium import webdriver
@@ -517,7 +519,7 @@ class NewGamePageTests(StaticLiveServerTestCase):
         # Open the login page URL
         driver.get(self.live_server_url + "/pick_up_app/login/")
 
-        # Login user
+        # Login user so we can access new_game page
         driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
         driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
         driver.find_element_by_class_name("login").click()
@@ -539,6 +541,65 @@ class NewGamePageTests(StaticLiveServerTestCase):
         driver.implicitly_wait(0.5)  # Wait before finding the title
 
         self.assertTrue(Games.objects.filter(game='yahtzee', gameType='dice'))
+
+        # Close browser
+        driver.quit()
+
+
+    def test_new_game_trying_to_add_duplicate_game(self):
+        """
+        This function tests that a game already in the database will not be
+        added again.
+        :return: None
+        """
+
+        # Add a new test user
+        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user.save()
+
+        # Add a test game to test adding an existing game
+        new_game = Games(game="poker", gameType="cards")
+        new_game.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user so we can access new_game page
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Find and click the new game link
+        driver.find_element_by_class_name("new_game_link").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Enter new game info
+        driver.find_element_by_xpath('//input[@type="text"][@name="game_name"]').send_keys("poker")
+        driver.find_element_by_xpath('//input[@type="text"][@name="game_type"]').send_keys("cards")
+
+        # Find and click the game submit button
+        driver.find_element_by_class_name("game_button").click()
+        time.sleep(2)
+
+        driver.implicitly_wait(0.5)  # Wait before finding the title
+
+        # Get error message from messages
+        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        expected_message = "Game could not be added."
+        message_text = ""  # Primes variable for the message (if one exists)
+        for message in messages_found:
+            message_text = message.text
+
+        # Compare error message (if any) to the expected message string
+        self.assertTrue(message_text == expected_message)
 
         # Close browser
         driver.quit()

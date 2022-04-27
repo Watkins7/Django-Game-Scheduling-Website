@@ -7,7 +7,7 @@
     left: 0;
     justify-content: center;
     align-items: center;
-    background-color: transparent;
+    background-color: #C1D9B4;
     opacity: 1.0;
     z-index: 3000;
 }
@@ -54,7 +54,7 @@
 }
 
 h3 {
-    font-size: 25px;
+    font-size: 2em;
     font-family: 'Ubuntu', sans-serif;
     text-align: center;
 }
@@ -66,6 +66,7 @@ p {
 }
 
 form label {
+    font-size: 1.25em;
     font-family: 'Ubuntu', sans-serif;
 }
 
@@ -80,14 +81,14 @@ form label {
     font-weight: 400;
     line-height: 1.5;
     color: #212529;
-    background-color: #fff;
-    margin-top: 5px;
+    background-color: #f5f5f5;
+    margin-top: 7px;
 }
 
 .container {
     box-sizing: border-box;
     display: block;
-    margin-top: 15px;
+    margin-bottom: 10px;
     margin-left: 12%;
     position: relative;
 }

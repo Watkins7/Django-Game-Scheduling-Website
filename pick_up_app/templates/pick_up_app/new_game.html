@@ -27,7 +27,8 @@
                 {#  Display messages if any #}
                 {% if messages %}
                     {% for message in messages %}
-                        <p>{{ message }}</p>
+                        {# Sets message tag as class for class referent #}
+                        <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
                     {% endfor %}
                 {% endif %}
 
