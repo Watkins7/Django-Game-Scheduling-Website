@@ -16,6 +16,15 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from pick_up_app.models import User, TimeSlot, Games
 from pick_up_app.forms import NewUserForm
 
+print("\n\n######################################################################")
+print("#                                                                    #")
+print("#                                                                    #")
+print("#                     Start of Selenium Tests                        #")
+print("#                                                                    #")
+print("#                                                                    #")
+print("######################################################################")
+
+
 """
 class loginSeleniumTests(StaticLiveServerTestCase):
     def test_LoginPage(self):
@@ -172,21 +181,13 @@ class registrationTests(TestCase):
 
 # Static Testing Server Test Class
 class MySeleniumTests(StaticLiveServerTestCase):
-    print("######################################################################")
-    print("#                                                                    #")
-    print("#                                                                    #")
-    print("#                     Start of Selenium Tests                        #")
-    print("#                                                                    #")
-    print("#                                                                    #")
-    print("######################################################################")
-
 
     #########################################################################
     # Test of home page map
     #########################################################################
     def test_HomePageMap(self):
 
-        print("######################################################################")
+        print("\n######################################################################")
         print("#                     Home Page Selenium Test                        #")
         print("######################################################################")
 
@@ -241,7 +242,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
     #########################################################################
     def test_RegisterPage(self):
 
-        print("######################################################################")
+        print("\n######################################################################")
         print("#                     Register Page Selenium Test                    #")
         print("######################################################################")
 
@@ -350,7 +351,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
 class HomePageHTMLTests(StaticLiveServerTestCase):
     def test_main_page_rendering(self):
 
-        print("######################################################################")
+        print("\n######################################################################")
         print("#                     Main Page Rendering Selenium Test              #")
         print("######################################################################")
 
@@ -367,29 +368,30 @@ class HomePageHTMLTests(StaticLiveServerTestCase):
         try:
             driver.find_element_by_class_name("heading")
         except Exception as E:
-            print(E)
-            return -1
+            driver.quit()
+            self.fail(E)
 
         # Find the the main box
         try:
             driver.find_element_by_class_name("main")
         except Exception as E:
-            print(E)
-            return -1
+            driver.quit()
+            self.fail(E)
+
 
         # find the about us box
         try:
             driver.find_element_by_class_name("box")
         except Exception as E:
-            print(E)
-            return -1
+            driver.quit()
+            self.fail(E)
 
         # find all the images
         try:
             images = driver.find_elements_by_tag_name('img')
         except Exception as E:
-            print(E)
-            return -1
+            driver.quit()
+            self.fail(E)
 
         # count to make sure that the number of images is 5
         count = 0
@@ -397,10 +399,11 @@ class HomePageHTMLTests(StaticLiveServerTestCase):
             print("Image", count, ":", image.get_attribute('src'))
             count+=1
 
-        if count != 5:
-            print("FAILED, Number of images on the page is not correct")
-            return -1
+        if count != 6:
+            driver.quit()
+            self.fail("FAILED, Number of images on the page is not correct")
 
+        print("All tested in HOME page passed")
         driver.quit()
 
 
@@ -408,7 +411,7 @@ class HomePageHTMLTests(StaticLiveServerTestCase):
 class SecondHomePageHTMLTests(StaticLiveServerTestCase):
     def second_test_home_page_rendering(self):
 
-        print("######################################################################")
+        print("\n######################################################################")
         print("#                     Home Page Rendering Selenium Test              #")
         print("######################################################################")
 
@@ -473,8 +476,8 @@ class SecondHomePageHTMLTests(StaticLiveServerTestCase):
 class RedirectLinkTests(StaticLiveServerTestCase):
     def test_redirect_login_to_home_page(self):
 
-        print("######################################################################")
-        print("#                     Redirect Login to Home Selenium Test            #")
+        print("\n######################################################################")
+        print("#                     Redirect Login to Home Selenium Test           #")
         print("######################################################################")
 
         # Add a new test user
@@ -515,7 +518,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         :return: None
         """
 
-        print("######################################################################")
+        print("\n######################################################################")
         print("#                     Home to Login Redirection  Selenium Test       #")
         print("######################################################################")
 
@@ -556,7 +559,7 @@ class CalendarHTMLTests(StaticLiveServerTestCase):
     # Tests that all elements on the calendar page are properly rendered when loaded
     def test_calendar_rendering(self):
 
-        print("\n######################################################################")
+        print("\n########################################################################")
         print("#                     Calendar Rendering Selenium Test                 #")
         print("########################################################################")
 
@@ -707,7 +710,7 @@ class TimeslotHTMLTests(StaticLiveServerTestCase):
     # Tests a new timeslot can be added and removed from the calendar
     def test_timeslot_submission(self):
 
-        print("######################################################################")
+        print("\n######################################################################")
         print("#                     Timeslot Selenium Test                         #")
         print("######################################################################")
 
@@ -781,7 +784,7 @@ class TimeslotHTMLTests(StaticLiveServerTestCase):
 
     def test_timeslot_redirection(self):
 
-        print("######################################################################")
+        print("\n######################################################################")
         print("#                     Time Slot Redirection Selenium Test            #")
         print("######################################################################")
 
@@ -810,10 +813,15 @@ class TimeslotHTMLTests(StaticLiveServerTestCase):
         self.assertEqual(actual_title, cur_title)
 
         driver.quit()
-        print("######################################################################")
-        print("#                                                                    #")
-        print("#                                                                    #")
-        print("#                     End of Selenium Tests                          #")
-        print("#                                                                    #")
-        print("#                                                                    #")
-        print("######################################################################")
+
+
+"""
+print("######################################################################")
+print("#                                                                    #")
+print("#                                                                    #")
+print("#                     End of Selenium Tests                          #")
+print("#                                                                    #")
+print("#                                                                    #")
+print("######################################################################")
+"""
+
