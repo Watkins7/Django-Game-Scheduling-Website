@@ -743,6 +743,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
                         checkpassword="tommy", email="tim@gmail.com")
         new_user.save()
 
+        # Expected messages for submitting duplicate data
         expected_message_1 = "The username given is already this team's username."
         expected_message_2 = "The team name given is already this team's team name."
         expected_message_3 = "The password given is already this team's password."
@@ -768,7 +769,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
 
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
-        # Enter new username info and save changes
+        # Enter same username info and save changes
         driver.find_element_by_xpath('//input[@type="text"][@name="new_username"]').send_keys("tim")
         driver.find_element_by_class_name("my_save_button").click()
 
@@ -782,43 +783,44 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         # Compare error message (if any) to the expected message string
         self.assertTrue(message_text == expected_message_1)
 
-        # Enter new team name info and save changes
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_team_name"]').send_keys("limeade")
+        # Enter same team name info and save changes
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_team_name"]').send_keys("timtom")
         driver.find_element_by_class_name("my_save_button").click()
 
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
         messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
-        message_text = ""  # Primes variable for the message (if one exists)
+        message_text = ""  # Reset message text to empty
         for message in messages_found:
             message_text = message.text
         # Compare error message (if any) to the expected message string
         self.assertTrue(message_text == expected_message_2)
 
-        # Enter password and confirm password and save changes
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_password"]').send_keys("lemon")
-        driver.find_element_by_xpath('//input[@type="text"][@name="confirm_password"]').send_keys("lemon")
+        # Enter same password and confirm password and save changes
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_password"]').send_keys("tommy")
+        driver.find_element_by_xpath('//input[@type="text"][@name="confirm_password"]').send_keys("tommy")
         driver.find_element_by_class_name("my_save_button").click()
 
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
         messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
-        message_text = ""  # Primes variable for the message (if one exists)
+        message_text = ""  # Reset message text to empty
         for message in messages_found:
             message_text = message.text
         # Compare error message (if any) to the expected message string
         self.assertTrue(message_text == expected_message_3)
 
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_email"]').send_keys("lime@gmail.com")
+        # Enter same email address
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_email"]').send_keys("tim@gmail.com")
         driver.find_element_by_class_name("my_save_button").click()
 
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
         messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
-        message_text = ""  # Primes variable for the message (if one exists)
+        message_text = ""  # Reset message text to empty
         for message in messages_found:
             message_text = message.text
         # Compare error message (if any) to the expected message string
