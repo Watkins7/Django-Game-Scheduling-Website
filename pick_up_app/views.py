@@ -229,3 +229,52 @@ def edit_team(request, username):
     curr_team = User.objects.filter(username=username)
     context = {'team_info': curr_team}
     return render(request, 'pick_up_app/edit_team.html', context)
+
+
+def check_team_changes(request, username):
+    my_user = User.objects.get(username=username)
+
+    new_username = request.POST['new_username']
+    new_team_name = request.POST['new_team_name']
+    new_password = request.POST['new_password']
+    confirm_password = request.POST['confirm_password']
+    new_email = request.POST['new_email']
+
+    if new_username:
+        if my_user.username == new_username:
+            messages.error(request, "The username given is already this team's username.")
+        else:
+            is_unique = True
+            for check_user in User.objects.all():
+                if check_user.username == new_username and my_user.id != check_user.id:
+                    is_unique = False
+            if is_unique:
+                my_user.username = new_username
+                messages.success(request, "Username changed successfully.")
+            else:
+                messages.error(request, "This username is already taken.")
+
+    if new_team_name:
+        if my_user.teamname == new_team_name:
+            messages.error(request, "The team name given is already this team's team name.")
+        else:
+            my_user.teamname = new_team_name
+            messages.success(request, "Team name changed successfully.")
+    if new_password:
+        if my_user.password == new_password:
+            messages.error(request, "The password given is already this team's password.")
+        else:
+            if new_password == confirm_password:
+                my_user.password = new_password
+                my_user.checkpassword = confirm_password
+                messages.success(request, "Password changed successfully.")
+            else:
+                messages.error(request, "The new password and password confirmation do not match.")
+    if new_email:
+        if my_user.email == new_email:
+            messages.error(request, "The email given is already this team's email.")
+        else:
+            my_user.email = new_email
+            messages.success(request, "Team email changed successfully.")
+    my_user.save()
+    return HttpResponseRedirect(reverse('edit_team'))
