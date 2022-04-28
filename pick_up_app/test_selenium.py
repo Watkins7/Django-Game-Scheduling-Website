@@ -354,6 +354,25 @@ class MySeleniumTests(StaticLiveServerTestCase):
         # tell handler to quit
         driver.quit()
 
+class TeamPageHTMLTests(StaticLiveServerTestCase):
+    def test_teamPage(self):
+        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+         # Send the username and password to the login page and hit enter to redirect
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+
+        
+
 
 class HomePageHTMLTests(StaticLiveServerTestCase):
     def test_home_page_rendering(self):
@@ -498,7 +517,6 @@ class RedirectLinkTests(StaticLiveServerTestCase):
 
         # Close browser
         driver.quit()
-
 
 # Set of selenium tests for the Calendar Page
 class CalendarHTMLTests(StaticLiveServerTestCase):
