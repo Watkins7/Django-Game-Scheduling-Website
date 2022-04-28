@@ -225,7 +225,7 @@ def check_game_list(request):
     return HttpResponseRedirect(reverse('new_game'))
 
 
-def edit_team(request, username, teamname):
-    curr_team = User.objects.filter(username=username, teamname=teamname)
+def edit_team(request, username):
+    curr_team = User.objects.filter(username=username)
     context = {'team_info': curr_team}
     return render(request, 'pick_up_app/edit_team.html', context)

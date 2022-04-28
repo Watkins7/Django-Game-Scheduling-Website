@@ -1,0 +1,65 @@
+<!DOCTYPE html>{% load static %}
+<html lang="en">
+<meta charset="UTF-8">
+{% load static %}
+<head>
+    {# Load in the Ubuntu font stylesheet and the static CSS style.css file. #}
+    <link rel="stylesheet" href={% static "css/style_edit_team.css" %}>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Team Info</title>
+</head>
+
+<body>
+
+<div class="overlay">
+    <div class="edit_box">
+
+        <div class="header_container" style="justify-content: center"><h3> Edit Team Info </h3></div>
+        <p>Please fill in the field(s) you would like to change.</p>
+        <form action="{% url 'check_team_changes' username=curr_team.username %}" method="POST">
+            {% csrf_token %}
+
+            {#  Display messages if any #}
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="message">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+
+
+            <div class="container">
+                <label>Edit Username</label>
+                <input type="text" class="input_text" name="new_username" placeholder="Enter New Username">
+            </div>
+
+            <div class="container">
+                <label>Edit Team Name</label>
+                <input type="text" class="input_text" name="new_team_name" placeholder="Enter New Team Name">
+            </div>
+
+            <div class="container">
+                <label>Edit Password</label>
+                <input type="text" class="input_text" name="new_password" placeholder="Enter New Password">
+            </div>
+            <div class="container">
+                <label>Confirm New Password</label>
+                <input type="text" class="input_text" name="confirm_password" placeholder="Confirm New Password">
+            </div>
+
+            <div class="container">
+                <label>Edit Email</label>
+                <input type="text" class="input_text" name="new_email" placeholder="Enter New Email">
+            </div>
+
+            <div class="container">
+                <input class="my_save_button" type="submit" align="center" value="Save Changes">
+            </div>
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>

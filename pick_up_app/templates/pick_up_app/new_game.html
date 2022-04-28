@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 {% load static %}
 <head>
-    {# Load in the Ubuntu font stylesheet and the static CSS style.css file. #}
+    {# Load in the Ubuntu font stylesheet and the static CSS style_new_game.css file. #}
     <link rel="stylesheet" href={% static "css/style_new_game.css" %}>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
@@ -35,7 +35,7 @@
 
                 <div class="container">
                     <label>Game Name</label>
-                    <input type="text" class="input_text" name="game_name" placeholder="Enter Game Name">
+                    <input type="text" class="input_text" name="game_name" placeholder="{{ curr_team.username }}">
                 </div>
 
                 <div class="container">
