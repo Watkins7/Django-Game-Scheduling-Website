@@ -12,15 +12,15 @@
 
 <center>
         {% if team_search %}
+
             <p style="font-size: 40px;">
                 Search Results For <b>{{team_search}}</b>
             </p>
 
-                <br/>
                 <div style="color:rgb(0, 119, 255); font-size: 30px;margin-top: 10px;">
                         {% for team in teams %}
 
-                        team.teamName</br>
+                            {{team.username}} - {{team.teamname}}<br>
 
                     {% endfor %}
                 </div>
@@ -30,4 +30,4 @@
             </h1>
         {% endif %}
 </center>
-{% endblock %} 
+{% endblock %}

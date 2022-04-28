@@ -15,7 +15,7 @@ class NewUserForm(ModelForm):
         # These are the attributes to be stored
         fields = (
             'username',
-            #'teamname',
+            'teamname',
             'email',
             'password',
             'checkpassword',
@@ -25,7 +25,7 @@ class NewUserForm(ModelForm):
         # This is what the form displays them as
         labels = {
             'username': "New username",
-            #'teamname': "New Team Name:",
+            'teamname': "New Team Name:",
             'email': "Registration Email:",
             'password': "Password:",
             'checkpassword': "Password Confirmation:",
@@ -56,9 +56,8 @@ class NewUserForm(ModelForm):
             raise ValidationError("ERROR: A Team Captain has already registered this email address")
 
         # validate teamname
-        #if User.objects.filter(teamname=f.get("teamname")):
         if User.objects.filter(username=f.get("username")):
-            raise ValidationError("ERROR: This team name has already been taken")
+            raise ValidationError("ERROR: This username has already been taken")
 
         # validate latitude
         if latitude < -90 or latitude > 90:

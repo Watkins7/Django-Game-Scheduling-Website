@@ -25,7 +25,7 @@ from django.conf import settings
 def team_search(request):
     if(request.method == "POST"):
         team_search = request.POST['team_search']
-        teams = User.objects.filter(username__contains = team_search)
+        teams = User.objects.all()
         return render(request, 'pick_up_app/team_search.html', {"team_search": team_search, "teams": teams})
     else:
         return render(request, 'pick_up_app/team_search.html')
