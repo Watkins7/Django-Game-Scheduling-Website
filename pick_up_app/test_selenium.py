@@ -1,31 +1,28 @@
-from atexit import register
-from threading import Thread
 from django.test import TestCase
-from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
-from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
-
-from pick_up_app import models
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-
-import os
 import time
 import datetime
 from django.utils import timezone
-
-# Create your tests here.
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from selenium.webdriver.firefox.webdriver import WebDriver
 
 ################################################
 # Registration Tests
 ################################################
 from pick_up_app.models import User, TimeSlot, Games
 from pick_up_app.forms import NewUserForm
+
+print("\n\n######################################################################")
+print("#                                                                    #")
+print("#                                                                    #")
+print("#                     Start of Selenium Tests                        #")
+print("#                                                                    #")
+print("#                                                                    #")
+print("######################################################################")
+
 
 """
 class loginSeleniumTests(StaticLiveServerTestCase):
@@ -41,7 +38,7 @@ class loginSeleniumTests(StaticLiveServerTestCase):
 
         #test to find the username
         try:
-            username = driver.find_element_by_id("id_teamname")
+            username = driver.find_element_by_id("id_username")
             username.send_keys("ThisIsTheUsername")
             print("SUCCESS, found html element ''username")
         except Exception:
@@ -86,16 +83,14 @@ class registrationTests(TestCase):
     # Setup for registration
     ###############################################################
     def register_setup(self):
-        t_username = "nuck"
         t_password = "pass"
         t_check_pass = "pass"
-        t_teamname = "test"
+        t_username = "test"
         t_email = "test@mail.com"
         t_long = 7
         t_lat = 13
 
-        test_user = User(username = t_username,
-                                teamname=t_teamname,
+        test_user = User(username=t_username,
                                password=t_password,
                                email=t_email,
                                checkpassword=t_check_pass,
@@ -112,14 +107,11 @@ class registrationTests(TestCase):
         # Model Setup
         self.register_setup()
 
-        # Known Usernname exists
-        self.assertTrue(User.objects.filter(username="nuck").exists())
-
-        # Known Teamname exists
-        self.assertTrue(User.objects.filter(teamname="test").exists())
+        # Known username exists
+        self.assertTrue(User.objects.filter(username="test").exists())
 
         # Known Teamname does not exists
-        self.assertFalse(User.objects.filter(teamname="testbananasbananasasasfasfasf").exists())
+        self.assertFalse(User.objects.filter(username="testbananasbananasasasfasfasf").exists())
 
         # Model Teardown
         self.register_teardown()
@@ -151,10 +143,10 @@ class registrationTests(TestCase):
         ###############################################################
         # Test already taken team name
         ###############################################################
-        form_1.fields["teamname"] = "test"
+        form_1.fields["username"] = "test"
         self.assertFalse(form_1.is_valid())
 
-        form_1.fields["teamname"] = "test_nottaken"
+        form_1.fields["username"] = "test_nottaken"
 
         ###############################################################
         # Test already registered email
@@ -183,24 +175,20 @@ class registrationTests(TestCase):
     # Setup for registration
     ###############################################################
     def register_teardown(self):
-        User.objects.filter(teamname="test").delete()
+        User.objects.filter(username="test").delete()
 
 
 # Static Testing Server Test Class
 class MySeleniumTests(StaticLiveServerTestCase):
-    print("######################################################################")
-    print("#                                                                    #")
-    print("#                                                                    #")
-    print("#                     Start of Selenium Tests                        #")
-    print("#                                                                    #")
-    print("#                                                                    #")
-    print("######################################################################")
-
 
     #########################################################################
     # Test of home page map
     #########################################################################
     def test_HomePageMap(self):
+
+        print("\n######################################################################")
+        print("#                     Home Page Selenium Test                        #")
+        print("######################################################################")
 
         # Makes handler to FireFox
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
@@ -220,7 +208,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
         except:
             print("FAILED, could not get '/pick_up_app/login'")
 
-        time.sleep(1)
+        time.sleep(3)
 
         # Path to test of where we should be naviagted to
         testingPath = self.live_server_url + "/pick_up_app/ThisIsANewTeamName/"
@@ -231,7 +219,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
             user_id.send_keys("nuck")
             pass_id = driver.find_element_by_class_name("pass")
             pass_id.send_keys("password")
-            time.sleep(1)
+            time.sleep(3)
 
         except Exception:
             print("FAILED, could not find USER or PASSWORD element on login screen")
@@ -239,7 +227,8 @@ class MySeleniumTests(StaticLiveServerTestCase):
         try:
             login_button = driver.find_element_by_class_name("login")
             login_button.click()
-            time.sleep(1)
+            #driver.find_element_by_class_name("login").submit()
+            time.sleep(3)
             print("SUCCESS, was able to navigate to a home page")
 
         except Exception:
@@ -255,11 +244,14 @@ class MySeleniumTests(StaticLiveServerTestCase):
 
         driver.quit()
 
-
     #########################################################################
     # Test of "/register" page
     #########################################################################
     def test_RegisterPage(self):
+
+        print("\n######################################################################")
+        print("#                     Register Page Selenium Test                    #")
+        print("######################################################################")
 
         # Makes handler to FireFox
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
@@ -280,11 +272,11 @@ class MySeleniumTests(StaticLiveServerTestCase):
         except Exception:
             print("FAILED, could not get 'id_teamname' from HTML page")
         try:
-            new_teamname = driver.find_element_by_id("id_teamname")
-            new_teamname.send_keys("ThisIsANewTeamName")
-            print("SUCCESS, found html element ''id_teamname")
+            new_username = driver.find_element_by_id("id_username")
+            new_username.send_keys("ThisIsANewTeamName")
+            print("SUCCESS, found html element ''id_username")
         except Exception:
-            print("FAILED, could not get 'id_teamname' from HTML page")
+            print("FAILED, could not get 'id_username' from HTML page")
 
         try:
             new_email = driver.find_element_by_id("id_email")
@@ -368,18 +360,80 @@ class MySeleniumTests(StaticLiveServerTestCase):
         # tell handler to quit
         driver.quit()
 
-
+# Tests mainpage
 class HomePageHTMLTests(StaticLiveServerTestCase):
-    def test_home_page_rendering(self):
+    def test_main_page_rendering(self):
+
+        print("\n######################################################################")
+        print("#                     Main Page Rendering Selenium Test              #")
+        print("######################################################################")
+
+        # Makes handler to FireFox
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+
+        # Make address of HTML
+        testingPath = self.live_server_url
+
+        driver.get(testingPath)
+        time.sleep(1)
+
+        # Find the heading
+        try:
+            driver.find_element_by_class_name("heading")
+        except Exception as E:
+            driver.quit()
+            self.fail(E)
+
+        # Find the the main box
+        try:
+            driver.find_element_by_class_name("main")
+        except Exception as E:
+            driver.quit()
+            self.fail(E)
+
+        # find the about us box
+        try:
+            driver.find_element_by_class_name("box")
+        except Exception as E:
+            driver.quit()
+            self.fail(E)
+
+        # find all the images
+        try:
+            images = driver.find_elements_by_tag_name('img')
+        except Exception as E:
+            driver.quit()
+            self.fail(E)
+
+        # count to make sure that the number of images is 5
+        count = 0
+        for image in images:
+            print("Image", count, ":", image.get_attribute('src'))
+            count+=1
+
+        if count != 6:
+            driver.quit()
+            self.fail("FAILED, Number of images on the page is not correct")
+
+        print("All tested in HOME page passed")
+        driver.quit()
+
+
+
+class SecondHomePageHTMLTests(StaticLiveServerTestCase):
+    def second_test_home_page_rendering(self):
         """
         This function tests that all the necessary objects are added to
         the home page.
 
         :return: None
         """
+        print("\n######################################################################")
+        print("#                     Home Page Rendering Selenium Test              #")
+        print("######################################################################")
 
         # Add a new user
-        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user = User(username="lime", password="lemon")
         new_user.save()
 
         # Setup Firefox web driver
@@ -445,8 +499,12 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         :return: None
         """
 
+        print("\n######################################################################")
+        print("#                     Redirect Login to Home Selenium Test           #")
+        print("######################################################################")
+
         # Add a new test user
-        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user = User(username="lime", password="lemon")
         new_user.save()
 
         # Setup Firefox web driver
@@ -483,8 +541,12 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         :return: None
         """
 
+        print("\n######################################################################")
+        print("#                     Home to Login Redirection  Selenium Test       #")
+        print("######################################################################")
+
         # Add a new tes user
-        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user = User(username="lime", password="lemon")
         new_user.save()
 
         # Setup Firefox web driver
@@ -573,13 +635,25 @@ class CalendarHTMLTests(StaticLiveServerTestCase):
 
     # Tests that all elements on the calendar page are properly rendered when loaded
     def test_calendar_rendering(self):
+
+        print("\n########################################################################")
+        print("#                     Calendar Rendering Selenium Test                 #")
+        print("########################################################################")
+
         # Creates two users & respective timeslots to be tested
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        test_team = "test_team"
-        test_team2 = "test_team2"
-        test_user = User(username="test", password="pass", teamname=test_team)
-        test_user2 = User(username="test2", password="pass2", teamname=test_team2)
+        test_team = "test"
+        test_team2 = "test2"
+
+
+        test_user = User(username="test", password="pass")
+        test_user2 = User(username="test2", password="pass2")
+        test_user.save()
+        test_user2.save()
+
         test_game = Games(game="newgame", gameType="testing")
+        test_game.save()
+
         test_timeslot = TimeSlot(team=test_user,
                                  game=test_game,
                                  slot_start=timezone.now() + datetime.timedelta(minutes=1),
@@ -588,9 +662,6 @@ class CalendarHTMLTests(StaticLiveServerTestCase):
                                   game=test_game,
                                   slot_start=timezone.now() + datetime.timedelta(minutes=1),
                                   slot_end=timezone.now() + datetime.timedelta(minutes=30))
-        test_game.save()
-        test_user.save()
-        test_user2.save()
         test_timeslot.save()
         test_timeslot2.save()
 
@@ -648,17 +719,26 @@ class CalendarHTMLTests(StaticLiveServerTestCase):
 
     # Tests the redirect links on the calendar work as intended
     def test_calendar_redirection(self):
+
+        print("\n######################################################################")
+        print("#                     Calendar Redirection Selenium Test             #")
+        print("######################################################################")
+
         # Performs user log-in to be used by other tests
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        test_team = "test_team"
-        test_user = User(username="test", password="pass", teamname=test_team)
+
+        test_team = "test"
+
+        test_user = User(username="test", password="pass")
+        test_user.save()
+
         test_game = Games(game="newgame", gameType="testing")
+        test_game.save()
+
         test_timeslot = TimeSlot(team=test_user,
                                  game=test_game,
                                  slot_start=timezone.now() + datetime.timedelta(minutes=1),
                                  slot_end=timezone.now() + datetime.timedelta(minutes=30))
-        test_game.save()
-        test_user.save()
         test_timeslot.save()
 
         # Performs Log-in for the first test user
@@ -706,11 +786,16 @@ class CalendarHTMLTests(StaticLiveServerTestCase):
 class TimeslotHTMLTests(StaticLiveServerTestCase):
     # Tests a new timeslot can be added and removed from the calendar
     def test_timeslot_submission(self):
+
+        print("\n######################################################################")
+        print("#                     Timeslot Selenium Test                         #")
+        print("######################################################################")
+
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
         cur_time = timezone.now().date() + datetime.timedelta(days=1)
         test_time = str(cur_time.month)+str(cur_time.day)+str(cur_time.year)
-        test_team = "test_team"
-        test_user = User(username="test", password="pass", teamname=test_team)
+        test_team = "test"
+        test_user = User(username="test", password="pass")
         test_game = Games(game="newgame", gameType="testing")
         test_game.save()
         test_user.save()
@@ -775,11 +860,16 @@ class TimeslotHTMLTests(StaticLiveServerTestCase):
         driver.quit()
 
     def test_timeslot_redirection(self):
+
+        print("\n######################################################################")
+        print("#                     Time Slot Redirection Selenium Test            #")
+        print("######################################################################")
+
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
         cur_time = timezone.now().date() + datetime.timedelta(days=1)
         test_time = str(cur_time.month) + str(cur_time.day) + str(cur_time.year)
-        test_team = "test_team"
-        test_user = User(username="test", password="pass", teamname=test_team)
+        test_team = "test"
+        test_user = User(username="test", password="pass")
         test_game = Games(game="newgame", gameType="testing")
         test_game.save()
         test_user.save()
@@ -800,10 +890,15 @@ class TimeslotHTMLTests(StaticLiveServerTestCase):
         self.assertEqual(actual_title, cur_title)
 
         driver.quit()
-        print("######################################################################")
-        print("#                                                                    #")
-        print("#                                                                    #")
-        print("#                     End of Selenium Tests                          #")
-        print("#                                                                    #")
-        print("#                                                                    #")
-        print("######################################################################")
+
+
+"""
+print("######################################################################")
+print("#                                                                    #")
+print("#                                                                    #")
+print("#                     End of Selenium Tests                          #")
+print("#                                                                    #")
+print("#                                                                    #")
+print("######################################################################")
+"""
+

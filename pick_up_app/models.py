@@ -30,7 +30,7 @@ class User(AbstractUser):
         return None
 
     def __str__(self):
-        return self.teamname
+        return self.username
 
 
 class Games(models.Model):

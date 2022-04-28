@@ -11,14 +11,14 @@ class UserModelTests(TestCase):
 
     #Ensures the model can be written to and read from
     def test_save(self):
-        newUser = User(username = "nuck", password="milk", teamname="usm")
+        newUser = User(username = "nuck", password="milk")
         newUser.save()
         testUser = User.objects.filter(id=newUser.id)
         self.assertNotEqual(testUser, None)
 
     #Ensures the authentication method works
     def test_authenticate(self):
-        newUser = User(username = "nuck2", password="milk2", teamname="usm")
+        newUser = User(username = "nuck2", password="milk2")
         newUser.save()
         currentUser = User.authenticate(newUser.username, newUser.password)
         self.assertNotEqual(currentUser, None)
@@ -44,7 +44,7 @@ class EmailsModelTests(TestCase):
 
     # Tests an email object can be created and retrieved
     def test_create_email(self):
-        temp_team = User.objects.create(teamname='test_team')
+        temp_team = User.objects.create(username='test_team')
         temp_email = Emails(team=temp_team, email='test@t.co', is_captain=False)
         temp_email.save()
         test_email = Emails.objects.filter(id=temp_email.id)
@@ -52,7 +52,7 @@ class EmailsModelTests(TestCase):
 
     # Tests an exception is raised if a null email is entered
     def test_null_email(self):
-        temp_team = User.objects.create(teamname='test_team')
+        temp_team = User.objects.create(username='test_team')
         temp_email = Emails(team=temp_team, email=None, is_captain=True)
 
         with self.assertRaises(Exception):
@@ -60,7 +60,7 @@ class EmailsModelTests(TestCase):
 
     # Tests an exception is raised if a team has more than one associated team captain email
     def test_two_captain_emails_entered(self):
-        temp_team = User.objects.create(teamname='test_team')
+        temp_team = User.objects.create(username='test_team')
         self.captain_email1 = Emails.objects.create(team=temp_team, is_captain=True)
         captain_email2 = Emails(team=temp_team, is_captain=True)
 
@@ -73,7 +73,7 @@ class EmailsModelTests(TestCase):
 
 # Creates a temporary timeslot with an input time for testing
 def create_timeslot(start_time, end_time):
-    temp_team = User.objects.create(teamname='test_team')
+    temp_team = User.objects.create(username='test_team')
     temp_game = Games.objects.create(game='test_game', gameType='Test')
     return TimeSlot(team=temp_team, game=temp_game, slot_start=start_time, slot_end=end_time)
 
