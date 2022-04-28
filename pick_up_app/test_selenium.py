@@ -9,7 +9,6 @@ import datetime
 from django.utils import timezone
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
-
 ################################################
 # Registration Tests
 ################################################
@@ -108,7 +107,7 @@ class registrationTests(TestCase):
         # Model Setup
         self.register_setup()
 
-        # Known Teamname exists
+        # Known username exists
         self.assertTrue(User.objects.filter(username="test").exists())
 
         # Known Teamname does not exists
@@ -195,9 +194,13 @@ class MySeleniumTests(StaticLiveServerTestCase):
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
 
         #Create Test User
-        new_user = User(username="lime", password="lemon",
-                        latitude=-76.71, longitude=39.2543)
-        new_user.save()
+        test_user = User(username="nuck", teamname="ThisIsANewTeamName",
+                               password="password",
+                               email="testemail.email.com",
+                               checkpassword="password",
+                               longitude=22,
+                               latitude=22)
+        test_user.save()
 
         # Make address of HTML
         try:
@@ -213,16 +216,18 @@ class MySeleniumTests(StaticLiveServerTestCase):
         # get login elements
         try:
             user_id = driver.find_element_by_class_name("user")
-            user_id.send_keys("lime")
+            user_id.send_keys("nuck")
             pass_id = driver.find_element_by_class_name("pass")
-            pass_id.send_keys("lemon")
+            pass_id.send_keys("password")
             time.sleep(3)
 
         except Exception:
             print("FAILED, could not find USER or PASSWORD element on login screen")
 
         try:
-            driver.find_element_by_class_name("login").submit()
+            login_button = driver.find_element_by_class_name("login")
+            login_button.click()
+            #driver.find_element_by_class_name("login").submit()
             time.sleep(3)
             print("SUCCESS, was able to navigate to a home page")
 
@@ -230,10 +235,12 @@ class MySeleniumTests(StaticLiveServerTestCase):
             print("FAILED, could not navigate to home page")
 
         try:
+            driver.implicitly_wait(2)
             find_map = driver.find_element_by_id("googleMap")
             print("SUCCESS, found google map")
-        except Exception:
+        except Exception as e:
             print("FAILED, could not find google map")
+            print(e)
 
         driver.quit()
 
@@ -258,6 +265,12 @@ class MySeleniumTests(StaticLiveServerTestCase):
         #########################################################################
         # Search for known form HTML 'id' attributes
         #########################################################################
+        try:
+            new_username = driver.find_element_by_id("id_username")
+            new_username.send_keys("newUsername")
+            print("SUCCESS, found html element ''id_teamname")
+        except Exception:
+            print("FAILED, could not get 'id_teamname' from HTML page")
         try:
             new_username = driver.find_element_by_id("id_username")
             new_username.send_keys("ThisIsANewTeamName")
@@ -378,7 +391,6 @@ class HomePageHTMLTests(StaticLiveServerTestCase):
             driver.quit()
             self.fail(E)
 
-
         # find the about us box
         try:
             driver.find_element_by_class_name("box")
@@ -410,7 +422,12 @@ class HomePageHTMLTests(StaticLiveServerTestCase):
 
 class SecondHomePageHTMLTests(StaticLiveServerTestCase):
     def second_test_home_page_rendering(self):
+        """
+        This function tests that all the necessary objects are added to
+        the home page.
 
+        :return: None
+        """
         print("\n######################################################################")
         print("#                     Home Page Rendering Selenium Test              #")
         print("######################################################################")
@@ -475,6 +492,12 @@ class SecondHomePageHTMLTests(StaticLiveServerTestCase):
 
 class RedirectLinkTests(StaticLiveServerTestCase):
     def test_redirect_login_to_home_page(self):
+        """
+        This function tests that a successful login will redirect the user to
+        the home page by checking that the 'check' view sends users to the page
+        titled "Team Home Page"
+        :return: None
+        """
 
         print("\n######################################################################")
         print("#                     Redirect Login to Home Selenium Test           #")
@@ -542,7 +565,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         # Find and click the login button
         driver.find_element_by_class_name("login_button").click()
 
-        driver.implicitly_wait(0.5)  # Wait before finding the title
+        driver.implicitly_wait(2)  # Wait before finding the title
 
         curr_title = driver.title  # Gets the title of the current page
         actual_title = "Sign in"  # The actual title of the login page
@@ -552,6 +575,60 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         # Close browser
         driver.quit()
 
+    #Test the search bar functionality
+    def test_search_bar(self):
+        """
+        This function tests the login page button on the home page. It will
+        redirect the user to the login page by checking that the check view
+        sends users to the page titled "Sign in"
+        :return: None
+        """
+
+        # Add a new tes user
+        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user.save()
+        new_user = User(username="lime1", password="lemon1", teamname="cream")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(2)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        #Get the search bar
+        searchBar = driver.find_element_by_class_name("search_bar")
+
+        driver.implicitly_wait(2)  # Wait
+        try:
+            #type c into the search bar and look for the autocomplete results
+            searchBar.send_keys("c")
+            driver.implicitly_wait(2)
+            webList = driver.find_elements_by_class_name("ui-menu-item")
+            optionsList = []
+            for i in webList:
+                optionsList.append(i.text)
+            if("citrus" in optionsList and "cream" in optionsList):
+                print("SUCCESS, both citrus and cream teams found")
+            webList[0].click()
+            searchBar.send_keys(Keys.RETURN)
+        except Exception as e:
+            print("FAILURE, cannot find teams in search bar")
+            print(e)
+
+        driver.implicitly_wait(2)
+        self.assertEqual(driver.title, "Team Home Page")
+
+
+        # Close browser
+        driver.quit()
 
 # Set of selenium tests for the Calendar Page
 class CalendarHTMLTests(StaticLiveServerTestCase):
