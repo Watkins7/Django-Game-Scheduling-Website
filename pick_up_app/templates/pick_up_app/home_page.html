@@ -22,7 +22,7 @@
     <title>Team Home Page</title>
 </head>
 
-<div style="text-align: center"><h1 style="font-size: 50px"> Team <u>{{ centered_team.teamname }}</u></h1></div>
+<div style="text-align: center"><h1 style="font-size: 50px"> Team <u>{{ centered_team.username }}</u></h1></div>
 
 <body>
 {# Adds the search bar at the top of the screen. #}
@@ -48,7 +48,7 @@
             {#Adds each value in top_teams_list into the table as a new row. #}
             {% for team in top_teams_list %}
             <tr>
-                <td>{{ team.teamname }}</td>
+                <td>{{ team.username }}</td>
                 <td>{{ team.mmrScore }}</td>
             </tr>
             {% endfor %}
@@ -60,7 +60,7 @@
         <div id="googleMap" style="width:100%; height:100%;">
 
 
-           <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAi0G64iPArdDxTu1YfHjEiaqZ9XHD1_6A"></script>
+           <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}"></script>
            <script type="text/javascript">
 
           // Kind of like a global map variable, while inside the script
@@ -91,7 +91,7 @@
 
                     var teamlat = {{ team.latitude }}
                     var teamlong = {{ team.longitude }}
-                    var team = "{{ team.teamname }}"
+                    var team = "{{ team.username }}"
 
 
                     var marker = new google.maps.Marker({
@@ -102,12 +102,12 @@
 
                     var infowindow = new google.maps.InfoWindow({
                         content: "<div class=infowindow>" +
-                            "<h1>Team: {{ team.teamname }}</h1>" +
+                            "<h1>Team: {{ team.username }}</h1>" +
                             "<p>MMR Score: <b>{{ team.mmr_score }}</b></p>" +
                             "<p>Longitude: {{ team.longitude }}</p>" +
                             "<p>Latitude: {{ team.latitude }}</p>" +
                             "<p>Email: {{ team.email }}</p>" +
-                            "<a href='/{{team.teamname}}'> 'Check them out!' </a></div>"
+                            "<a href='/{{team.username}}'> 'Check them out!' </a></div>"
 
                     });
 

@@ -56,8 +56,8 @@ class NewUserForm(ModelForm):
             raise ValidationError("ERROR: A Team Captain has already registered this email address")
 
         # validate teamname
-        if User.objects.filter(teamname=f.get("teamname")):
-            raise ValidationError("ERROR: This team name has already been taken")
+        if User.objects.filter(username=f.get("username")):
+            raise ValidationError("ERROR: This username has already been taken")
 
         # validate latitude
         if latitude < -90 or latitude > 90:

@@ -25,14 +25,14 @@ from django.conf import settings
 def team_search(request):
     if(request.method == "POST"):
         team_search = request.POST['team_search']
-        teams = User.objects.filter(teamname__contains = team_search)
+        teams = User.objects.all()
         return render(request, 'pick_up_app/team_search.html', {"team_search": team_search, "teams": teams})
     else:
         return render(request, 'pick_up_app/team_search.html')
 
 def main_page(request):
     # This is just a message for the app's index view page, can be changed later.
-    return HttpResponse("You're looking at the default main page.")
+    return render(request, 'pick_up_app/mainpage.html')
 
 
 def home_page(request, username):
@@ -41,7 +41,7 @@ def home_page(request, username):
     if(request.user.is_authenticated):
 
         #Is the user at THEIR home page
-        if(request.user.teamname != username):
+        if(request.user.username != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
@@ -53,23 +53,25 @@ def home_page(request, username):
             top_teams_list = User.objects.order_by('-mmr_score')[:5]
 
             # All the teams to add markers
-            all_teams = User.objects.order_by('teamname')
+            all_teams = User.objects.order_by('username')
 
             # Centered team "username"
             try:
-                centered_team = User.objects.get(teamname=username)
+                centered_team = User.objects.get(username=username)
             except Exception:
                 return HttpResponse("ERROR, Team does not exist")
 
             teams =  User.objects.all()
             teamNames = []
             for i in range(len(teams)):
-                teamNames.append(teams[i].teamname)
+                teamNames.append(teams[i].username)
+
+            key = str(settings.GOOGLE_MAPS_API_KEY)
 
             context = {'top_teams_list': top_teams_list,
                        'all_teams': all_teams,
                        'centered_team': centered_team,
-                       'api_key': settings.GOOGLE_MAPS_API_KEY,
+                       'api_key': key,
                        "teams": teamNames,
                        }
 
@@ -78,12 +80,12 @@ def home_page(request, username):
     else:
          return HttpResponse("You are not logged in!")
 
-def team_page(request, teamname):
+def team_page(request, username):
      #Is the user logged in
     if(request.user.is_authenticated):
 
         #Is the user at THEIR home page
-        if(request.user.teamname != teamname):
+        if(request.user.username != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
@@ -97,7 +99,8 @@ def index(request):
 
 
 def save(request):
-    newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
+    #newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
+    newUser = User(username=request.POST['username'], password=request.POST['password'])
     print(newUser)
     newUser.save()
     return HttpResponse("New User Saved")
@@ -107,7 +110,7 @@ def check(request):
     currUser = User.authenticate(request.POST['username'], request.POST['password'])
     if(currUser):
         login(request, currUser)
-        return HttpResponseRedirect(reverse('home_page', args=(currUser.teamname,)))
+        return HttpResponseRedirect(reverse('home_page', args=(currUser.username,)))
     else:
         return HttpResponse("not a user oop")
 
@@ -174,12 +177,12 @@ class TeamCalendarView(generic.ListView):
         new_calendar = Calendar(current_month.year, current_month.month)
 
         # Gets the team currently making the request and the team of the calendar being viewed
-        viewing_team = User.objects.get(teamname=self.kwargs['teamname'])
-        cur_team = self.request.user.teamname
+        viewing_team = User.objects.get(username=self.kwargs['username'])
+        cur_team = self.request.user.username
 
         # Call the formatmonth method, which returns our calendar as a table
         formatted_calendar = new_calendar.formatmonth(viewing_team, cur_team)
-        context['viewing_team'] = viewing_team.teamname
+        context['viewing_team'] = viewing_team.username
         context['current_team'] = cur_team
         context['calendar'] = mark_safe(formatted_calendar)
         context['next_month'] = get_next_month(current_month)
@@ -211,13 +214,13 @@ def get_last_month(cur_month):
 
 
 # View to add/update a team's timeslot information
-def timeslot(request, teamname, timeslot_id=None):
+def timeslot(request, username, timeslot_id=None):
     # Ensures only authenticated team can edit timeslot data
     if request.user.is_authenticated:
-        if request.user.teamname != teamname:
+        if request.user.username != username:
             return HttpResponse("You are trying to view a page that is not yours!")
         else:
-            cur_team = User.objects.get(teamname=teamname)
+            cur_team = User.objects.get(username=username)
 
             # If a timeslot ID is in the URL, get that timeslot object to be edited
             if timeslot_id:
@@ -231,14 +234,14 @@ def timeslot(request, teamname, timeslot_id=None):
             if request.POST:
                 if request.POST.get('delete'):
                     instance.delete()
-                    return HttpResponseRedirect(reverse('calendar', args=(teamname,)))
+                    return HttpResponseRedirect(reverse('calendar', args=(username,)))
                 else:
                     if timeslot_form.is_valid():
                         timeslot_form.save()
-                        return HttpResponseRedirect(reverse('calendar', args=(teamname,)))
+                        return HttpResponseRedirect(reverse('calendar', args=(username,)))
 
             context = {'timeslot_form': timeslot_form,
-                       'current_team': cur_team.teamname,
+                       'current_team': cur_team.username,
                        'timeslot_id': timeslot_id}
             return render(request, 'pick_up_app/timeslot.html', context)
     else:
