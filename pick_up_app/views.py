@@ -15,20 +15,22 @@ import calendar
 from .forms import NewUserForm, TimeSlotForm
 
 # Models
-from .models import User, TimeSlot
+from .models import User, TimeSlot, Games
 from django.conf import settings
+
 
 ##########################################
 # Create your views here.
 ##########################################
 
 def team_search(request):
-    if(request.method == "POST"):
+    if (request.method == "POST"):
         team_search = request.POST['team_search']
         teams = User.objects.all()
         return render(request, 'pick_up_app/team_search.html', {"team_search": team_search, "teams": teams})
     else:
         return render(request, 'pick_up_app/team_search.html')
+
 
 def main_page(request):
     # This is just a message for the app's index view page, can be changed later.
@@ -36,9 +38,8 @@ def main_page(request):
 
 
 def home_page(request, username):
-
-    #Is the user logged in
-    if(request.user.is_authenticated):
+    # Is the user logged in
+    if (request.user.is_authenticated):
 
         #Is the user at THEIR home page
         if(request.user.username != username):
@@ -61,7 +62,7 @@ def home_page(request, username):
             except Exception:
                 return HttpResponse("ERROR, Team does not exist")
 
-            teams =  User.objects.all()
+            teams = User.objects.all()
             teamNames = []
             for i in range(len(teams)):
                 teamNames.append(teams[i].username)
@@ -78,7 +79,7 @@ def home_page(request, username):
             return render(request, 'pick_up_app/home_page.html', context)
 
     else:
-         return HttpResponse("You are not logged in!")
+        return HttpResponse("You are not logged in!")
 
 def team_page(request, username):
      #Is the user logged in
@@ -91,6 +92,7 @@ def team_page(request, username):
 
         else:
             return render(request, 'pick_up_app/team.html')
+
 
 def index(request):
     allUsers = User.objects.all()
@@ -108,7 +110,7 @@ def save(request):
 
 def check(request):
     currUser = User.authenticate(request.POST['username'], request.POST['password'])
-    if(currUser):
+    if (currUser):
         login(request, currUser)
         return HttpResponseRedirect(reverse('home_page', args=(currUser.username,)))
     else:
@@ -192,7 +194,6 @@ class TeamCalendarView(generic.ListView):
 
 # Checks the request for a valid date and returns the formatted date
 def get_request_date(cur_month):
-
     # Checks if there is a date in the request, if so re-format it to be used by date()
     if cur_month:
         year, month = (int(date_pair) for date_pair in cur_month.split('-'))
@@ -246,3 +247,89 @@ def timeslot(request, username, timeslot_id=None):
             return render(request, 'pick_up_app/timeslot.html', context)
     else:
         return HttpResponse("You are not logged in!")
+
+
+# View where user can add a new game
+def new_game(request):
+    all_games = Games.objects.all()
+    context = {'game_list': all_games}
+    return render(request, 'pick_up_app/new_game.html', context)
+
+
+# Save the new game that was added by the new game page
+def save_game(request):
+    curr_game = Games(game=request.POST['game_name'], gameType=request.POST['game_type'])
+    curr_game.save()
+    messages.success(request, 'New game added successfully!')
+    return HttpResponse("New game saved.")
+
+
+# Check that the new game given is not in the database yet
+def check_game_list(request):
+    curr_game = Games.verify(request.POST['game_name'], request.POST['game_type'])
+    if curr_game:
+        save_game(request)
+    else:
+        messages.error(request, 'Game could not be added.')
+    return HttpResponseRedirect(reverse('new_game'))
+
+
+def edit_team(request, username):
+    curr_team = User.objects.filter(username=username)
+    context = {'team_info': curr_team}
+    return render(request, 'pick_up_app/edit_team.html', context)
+
+
+def check_team_changes(request):
+    curr_username = request.user.username
+    my_user = User.objects.get(username=curr_username)
+
+    new_username = request.POST['new_username']
+    new_team_name = request.POST['new_team_name']
+    new_password = request.POST['new_password']
+    confirm_password = request.POST['confirm_password']
+    new_email = request.POST['new_email']
+
+    if new_username:
+        if my_user.username == new_username:
+            messages.error(request, "The username given is already this team's username.")
+        else:
+            is_unique = True
+            for check_user in User.objects.all():
+                if check_user.username == new_username and my_user.id != check_user.id:
+                    is_unique = False
+            if is_unique:
+                my_user.username = new_username
+                my_user.save()
+                messages.success(request, "Username changed successfully.")
+            else:
+                messages.error(request, "This username is already taken.")
+
+    if new_team_name:
+        if my_user.teamname == new_team_name:
+            messages.error(request, "The team name given is already this team's team name.")
+        else:
+            my_user.teamname = new_team_name
+            my_user.save()
+            messages.success(request, "Team name changed successfully.")
+
+    if new_password:
+        if my_user.password == new_password:
+            messages.error(request, "The password given is already this team's password.")
+        else:
+            if new_password == confirm_password:
+                my_user.password = new_password
+                my_user.checkpassword = confirm_password
+                my_user.save()
+                messages.success(request, "Password changed successfully.")
+            else:
+                messages.error(request, "The new password and password confirmation do not match.")
+
+    if new_email:
+        if my_user.email == new_email:
+            messages.error(request, "The email given is already this team's email.")
+        else:
+            my_user.email = new_email
+            my_user.save()
+            messages.success(request, "Team email changed successfully.")
+    return HttpResponseRedirect(reverse('edit_team', args=(my_user.username,)))

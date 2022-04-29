@@ -48,7 +48,7 @@
             {#Adds each value in top_teams_list into the table as a new row. #}
             {% for team in top_teams_list %}
             <tr>
-                <td>{{ team.username }}</td>
+                <td>{{ team.teamname }}</td>
                 <td>{{ team.mmrScore }}</td>
             </tr>
             {% endfor %}
@@ -119,24 +119,19 @@
 
                   google.maps.event.addListener(marker, 'click', infoCallback(infowindow, marker));
 
-
                 {% endfor %}
-
-
-
 
         }
 
-
           // Create the map
           google.maps.event.addDomListener(window, 'load', initialize)
-
-
 
         </script>
 
         </div>
     </div>
+    {# Add new game button #}
+    <a class="new_game_link" align="center" href="{% url 'new_game' %}">Add New Game</a>
 </div>
 
 {# Adds a div where the redirect buttons should go. #}

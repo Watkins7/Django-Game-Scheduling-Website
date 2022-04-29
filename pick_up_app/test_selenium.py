@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.urls import reverse
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
@@ -22,6 +23,8 @@ print("#                     Start of Selenium Tests                        #")
 print("#                                                                    #")
 print("#                                                                    #")
 print("######################################################################")
+
+
 
 class registrationTests(TestCase):
 
@@ -542,7 +545,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         print("#                     Home to Login Redirection  Selenium Test       #")
         print("######################################################################")
 
-        # Add a new tes user
+        # Add a new test user
         new_user = User(username="lime", password="lemon")
         new_user.save()
 
@@ -889,13 +892,372 @@ class TimeslotHTMLTests(StaticLiveServerTestCase):
         driver.quit()
 
 
-"""
-print("######################################################################")
-print("#                                                                    #")
-print("#                                                                    #")
-print("#                     End of Selenium Tests                          #")
-print("#                                                                    #")
-print("#                                                                    #")
-print("######################################################################")
-"""
+class NewGamePageTests(StaticLiveServerTestCase):
+    def test_new_game_adds_to_database_successfully(self):
+        """
+        This function tests that a game added via the new_game page actually
+        adds it to the database
+        :return: None
+        """
 
+        # Add a new test user
+        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user so we can access new_game page
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Find and click the new game link
+        driver.find_element_by_class_name("new_game_link").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Enter new game info
+        driver.find_element_by_xpath('//input[@type="text"][@name="game_name"]').send_keys("yahtzee")
+        driver.find_element_by_xpath('//input[@type="text"][@name="game_type"]').send_keys("dice")
+
+        # Find and click the game submit button
+        driver.find_element_by_class_name("game_button").click()
+
+        driver.implicitly_wait(0.5)  # Wait before checking if game was added
+
+        self.assertTrue(Games.objects.filter(game='yahtzee', gameType='dice'))
+
+        # Close browser
+        driver.quit()
+
+
+    def test_new_game_trying_to_add_duplicate_game(self):
+        """
+        This function tests that a game already in the database will not be
+        added again.
+        :return: None
+        """
+
+        # Add a new test user
+        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user.save()
+
+        # Add a test game to test adding an existing game
+        new_game = Games(game="poker", gameType="cards")
+        new_game.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user so we can access new_game page
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Find and click the new game link
+        driver.find_element_by_class_name("new_game_link").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Enter new game info
+        driver.find_element_by_xpath('//input[@type="text"][@name="game_name"]').send_keys("poker")
+        driver.find_element_by_xpath('//input[@type="text"][@name="game_type"]').send_keys("cards")
+
+        # Find and click the game submit button
+        driver.find_element_by_class_name("game_button").click()
+        time.sleep(2)
+
+        driver.implicitly_wait(0.5)  # Wait before checking the game message
+
+        # Get error message from messages
+        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        expected_message = "Game could not be added."
+        message_text = ""  # Primes variable for the message (if one exists)
+        for message in messages_found:
+            message_text = message.text
+
+        # Compare error message (if any) to the expected message string
+        self.assertTrue(message_text == expected_message)
+
+        # Close browser
+        driver.quit()
+
+
+class EditTeamPageTests(StaticLiveServerTestCase):
+    def test_team_changes_made_successfully(self):
+        """
+        This function tests that changes to team info via the edit team page
+        are added are made successfully.
+        :return: None
+        """
+
+        # Add a new test user
+        new_user = User(username="tim", teamname="timtom", password="tommy",
+                        checkpassword="tommy", email="tim@gmail.com")
+        new_user.save()
+
+        # List of expected success messages
+        expected_messages = ["Username changed successfully.",
+                             "Team name changed successfully.",
+                             "Password changed successfully.",
+                             "Team email changed successfully."]
+
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user so we can access new_game page
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("tim")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("tommy")
+        driver.find_element_by_class_name("login").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Open the edit_team URL
+        driver.get(self.live_server_url + reverse('edit_team', kwargs={'username': 'tim'}))
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Enter new user info to be changed
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_team_name"]').send_keys("limeade")
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_password"]').send_keys("lemon")
+        driver.find_element_by_xpath('//input[@type="text"][@name="confirm_password"]').send_keys("lemon")
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_email"]').send_keys("lime@gmail.com")
+
+        # Find and click the save changes button
+        driver.find_element_by_class_name("my_save_button").click()
+
+        driver.implicitly_wait(0.5)  # Wait before checking that team info was updated
+        # Get success messages and check with expected
+        messages_found = driver.find_elements_by_xpath('//p[@class="success"]')
+        message_text = ""  # Primes variable for the message (if one exists)
+        for i in range(len(messages_found)):
+            message_text = messages_found[i].text
+            # Compare messages (if any) to the expected message string
+            self.assertTrue(message_text == expected_messages[i])
+
+
+        # Close browser
+        driver.quit()
+
+    def test_team_changes_made_individually_are_successful(self):
+        """
+        This function tests that changes to team info made separately via
+        the edit team page are added are made successfully.
+        :return: None
+        """
+
+        # Add a new test user
+        new_user = User(username="tim", teamname="timtom", password="tommy",
+                        checkpassword="tommy", email="tim@gmail.com")
+        new_user.save()
+
+        # List of expected success messages
+        expected_messages = ["Username changed successfully.",
+                             "Team name changed successfully.",
+                             "Password changed successfully.",
+                             "Team email changed successfully.", ]
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user so we can access new_game page
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("tim")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("tommy")
+        driver.find_element_by_class_name("login").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Open the login page URL
+        driver.get(self.live_server_url + reverse('edit_team', kwargs={'username': 'tim'}))
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Enter new username info and save changes
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_username"]').send_keys("lime")
+        driver.find_element_by_class_name("my_save_button").click()
+
+        # Wait before confirming that username was changed
+        driver.implicitly_wait(0.5)
+        # Get success message from messages
+        messages_found = driver.find_elements_by_xpath('//p[@class="success"]')
+        message_text = ""  # Clears message_text for next message
+        for message in messages_found:
+            message_text = message.text
+        # Compare message (if any) to the expected message string
+        self.assertTrue(message_text == expected_messages[0])
+
+        # Enter new team name info and save changes
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_team_name"]').send_keys("limeade")
+        driver.find_element_by_class_name("my_save_button").click()
+
+        # Wait before confirming that team name was changed
+        driver.implicitly_wait(0.5)
+        # Get success message from messages
+        messages_found = driver.find_elements_by_xpath('//p[@class="success"]')
+        message_text = ""  # Clears message_text for next message
+        for message in messages_found:
+            message_text = message.text
+        # Compare message (if any) to the expected message string
+        self.assertTrue(message_text == expected_messages[1])
+
+        # Enter password and confirm password and save changes
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_password"]').send_keys("lemon")
+        driver.find_element_by_xpath('//input[@type="text"][@name="confirm_password"]').send_keys("lemon")
+        driver.find_element_by_class_name("my_save_button").click()
+
+        # Wait before confirming that password(s) changed
+        driver.implicitly_wait(0.5)
+        # Get success message from messages
+        messages_found = driver.find_elements_by_xpath('//p[@class="success"]')
+        message_text = ""  # Clears message_text for next message
+        for message in messages_found:
+            message_text = message.text
+        # Compare message (if any) to the expected message string
+        self.assertTrue(message_text == expected_messages[2])
+        #
+        # # Wait before proceeding
+        # driver.implicitly_wait(0.5)
+        #
+        # driver.find_element_by_xpath('//input[@type="text"][@name="new_email"]').send_keys("lime@gmail.com")
+        # driver.find_element_by_class_name("my_save_button").click()
+        #
+        # time.sleep(2)
+        # # Wait before confirming that email was changed
+        # driver.implicitly_wait(0.5)
+        # # Get success message from messages
+        # messages_found = driver.find_elements_by_xpath('//p[@class="success"]')
+        # message_text = ""  # Clears message_text for next message
+        # for message in messages_found:
+        #     message_text = message.text
+        # # Compare message (if any) to the expected message string
+        # print(message_text)
+        # self.assertTrue(message_text == expected_messages[3])
+
+        # Close browser
+        driver.quit()
+
+
+    def test_duplicate_info_given_handled_correctly(self):
+        """
+        This function tests that changes to team info made with separate forms
+         via the edit team page are added are made successfully.
+        :return: None
+        """
+
+        # Add a new test user
+        new_user = User(username="tim", teamname="timtom", password="tommy",
+                        checkpassword="tommy", email="tim@gmail.com")
+        new_user.save()
+
+        # Expected messages for submitting duplicate data
+        expected_message_1 = "The username given is already this team's username."
+        expected_message_2 = "The team name given is already this team's team name."
+        expected_message_3 = "The password given is already this team's password."
+        expected_message_4 = "The email given is already this team's email."
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user so we can access new_game page
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("tim")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("tommy")
+        driver.find_element_by_class_name("login").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Open the login page URL
+        driver.get(self.live_server_url + reverse('edit_team', kwargs={'username': 'tim'}))
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Enter same username info and save changes
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_username"]').send_keys("tim")
+        driver.find_element_by_class_name("my_save_button").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Get error message from messages
+        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        message_text = ""  # Primes variable for the message (if one exists)
+        for message in messages_found:
+            message_text = message.text
+        # Compare error message (if any) to the expected message string
+        self.assertTrue(message_text == expected_message_1)
+
+        # Enter same team name info and save changes
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_team_name"]').send_keys("timtom")
+        driver.find_element_by_class_name("my_save_button").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Get error message from messages
+        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        message_text = ""  # Reset message text to empty
+        for message in messages_found:
+            message_text = message.text
+        # Compare error message (if any) to the expected message string
+        self.assertTrue(message_text == expected_message_2)
+
+        # Enter same password and confirm password and save changes
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_password"]').send_keys("tommy")
+        driver.find_element_by_xpath('//input[@type="text"][@name="confirm_password"]').send_keys("tommy")
+        driver.find_element_by_class_name("my_save_button").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Get error message from messages
+        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        message_text = ""  # Reset message text to empty
+        for message in messages_found:
+            message_text = message.text
+        # Compare error message (if any) to the expected message string
+        self.assertTrue(message_text == expected_message_3)
+
+        # Enter same email address
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_email"]').send_keys("tim@gmail.com")
+        driver.find_element_by_class_name("my_save_button").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Get error message from messages
+        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        message_text = ""  # Reset message text to empty
+        for message in messages_found:
+            message_text = message.text
+        # Compare error message (if any) to the expected message string
+        self.assertTrue(message_text == expected_message_4)
+
+        # Close browser
+        driver.quit()
