@@ -17,18 +17,21 @@
     <div class="edit_box">
 
         <div class="header_container" style="justify-content: center"><h3> Edit Team Info </h3></div>
-        <p>Please fill in the field(s) you would like to change.</p>
-        <form action="{% url 'check_team_changes' username=curr_team.username %}" method="POST">
+
+        <form action="{% url 'check_team_changes' %}" method="POST">
             {% csrf_token %}
 
             {#  Display messages if any #}
             {% if messages %}
                 {% for message in messages %}
-                    <p class="message">{{ message }}</p>
+                    {# Sets message tag as class for class referent #}
+                    <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
                 {% endfor %}
             {% endif %}
 
+            <p>Please fill in the field(s) you would like to change.</p>
 
+            {# Ask for user input  #}
             <div class="container">
                 <label>Edit Username</label>
                 <input type="text" class="input_text" name="new_username" placeholder="Enter New Username">

@@ -231,8 +231,9 @@ def edit_team(request, username):
     return render(request, 'pick_up_app/edit_team.html', context)
 
 
-def check_team_changes(request, username):
-    my_user = User.objects.get(username=username)
+def check_team_changes(request):
+    curr_username = request.user.username
+    my_user = User.objects.get(username=curr_username)
 
     new_username = request.POST['new_username']
     new_team_name = request.POST['new_team_name']
@@ -250,6 +251,7 @@ def check_team_changes(request, username):
                     is_unique = False
             if is_unique:
                 my_user.username = new_username
+                my_user.save()
                 messages.success(request, "Username changed successfully.")
             else:
                 messages.error(request, "This username is already taken.")
@@ -259,7 +261,9 @@ def check_team_changes(request, username):
             messages.error(request, "The team name given is already this team's team name.")
         else:
             my_user.teamname = new_team_name
+            my_user.save()
             messages.success(request, "Team name changed successfully.")
+
     if new_password:
         if my_user.password == new_password:
             messages.error(request, "The password given is already this team's password.")
@@ -267,14 +271,16 @@ def check_team_changes(request, username):
             if new_password == confirm_password:
                 my_user.password = new_password
                 my_user.checkpassword = confirm_password
+                my_user.save()
                 messages.success(request, "Password changed successfully.")
             else:
                 messages.error(request, "The new password and password confirmation do not match.")
+
     if new_email:
         if my_user.email == new_email:
             messages.error(request, "The email given is already this team's email.")
         else:
             my_user.email = new_email
+            my_user.save()
             messages.success(request, "Team email changed successfully.")
-    my_user.save()
-    return HttpResponseRedirect(reverse('edit_team'))
+    return HttpResponseRedirect(reverse('edit_team', args=(my_user.username,)))
