@@ -29,6 +29,9 @@ class User(AbstractUser):
                 return user
         return None
 
+    def __str__(self):
+        return self.username
+
 
 class Games(models.Model):
     game = NameField(max_length=30, unique=True)

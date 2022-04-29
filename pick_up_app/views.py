@@ -1,6 +1,6 @@
 # HTTP libraries
 # from curses.ascii import HT
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import login
@@ -12,7 +12,7 @@ from .utils import Calendar
 import calendar
 
 # Forms
-from .forms import NewUserForm
+from .forms import NewUserForm, TimeSlotForm
 
 # Models
 from .models import User, TimeSlot, Games
@@ -26,7 +26,7 @@ from django.conf import settings
 def team_search(request):
     if (request.method == "POST"):
         team_search = request.POST['team_search']
-        teams = User.objects.filter(teamname__contains=team_search)
+        teams = User.objects.all()
         return render(request, 'pick_up_app/team_search.html', {"team_search": team_search, "teams": teams})
     else:
         return render(request, 'pick_up_app/team_search.html')
@@ -34,15 +34,15 @@ def team_search(request):
 
 def main_page(request):
     # This is just a message for the app's index view page, can be changed later.
-    return HttpResponse("You're looking at the default main page.")
+    return render(request, 'pick_up_app/mainpage.html')
 
 
 def home_page(request, username):
     # Is the user logged in
     if (request.user.is_authenticated):
 
-        # Is the user at THEIR home page
-        if (request.user.teamname != username):
+        #Is the user at THEIR home page
+        if(request.user.username != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
@@ -54,23 +54,25 @@ def home_page(request, username):
             top_teams_list = User.objects.order_by('-mmr_score')[:5]
 
             # All the teams to add markers
-            all_teams = User.objects.order_by('teamname')
+            all_teams = User.objects.order_by('username')
 
             # Centered team "username"
             try:
-                centered_team = User.objects.get(teamname=username)
+                centered_team = User.objects.get(username=username)
             except Exception:
                 return HttpResponse("ERROR, Team does not exist")
 
             teams = User.objects.all()
             teamNames = []
             for i in range(len(teams)):
-                teamNames.append(teams[i].teamname)
+                teamNames.append(teams[i].username)
+
+            key = str(settings.GOOGLE_MAPS_API_KEY)
 
             context = {'top_teams_list': top_teams_list,
                        'all_teams': all_teams,
                        'centered_team': centered_team,
-                       'api_key': settings.GOOGLE_MAPS_API_KEY,
+                       'api_key': key,
                        "teams": teamNames,
                        }
 
@@ -79,13 +81,12 @@ def home_page(request, username):
     else:
         return HttpResponse("You are not logged in!")
 
+def team_page(request, username):
+     #Is the user logged in
+    if(request.user.is_authenticated):
 
-def team_page(request, teamname):
-    # Is the user logged in
-    if (request.user.is_authenticated):
-
-        # Is the user at THEIR home page
-        if (request.user.teamname != teamname):
+        #Is the user at THEIR home page
+        if(request.user.username != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
@@ -100,8 +101,8 @@ def index(request):
 
 
 def save(request):
-    newUser = User(username=request.POST['username'], password=request.POST['password'],
-                   teamName=request.POST['teamName'])
+    #newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
+    newUser = User(username=request.POST['username'], password=request.POST['password'])
     print(newUser)
     newUser.save()
     return HttpResponse("New User Saved")
@@ -111,7 +112,7 @@ def check(request):
     currUser = User.authenticate(request.POST['username'], request.POST['password'])
     if (currUser):
         login(request, currUser)
-        return HttpResponseRedirect(reverse('home_page', args=(currUser.teamname,)))
+        return HttpResponseRedirect(reverse('home_page', args=(currUser.username,)))
     else:
         return HttpResponse("not a user oop")
 
@@ -158,6 +159,13 @@ class TeamCalendarView(generic.ListView):
     model = TimeSlot
     template_name = 'pick_up_app/calendar.html'
 
+    # Ensures only logged-in users can view calendars
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return super(TeamCalendarView, self).dispatch(request, *args, **kwargs)
+        else:
+            return HttpResponse("Only logged in users may view another team's calendar")
+
     # Custom implementation of get_context_data
     # to provide additional information to the template
     def get_context_data(self, **kwargs):
@@ -170,8 +178,14 @@ class TeamCalendarView(generic.ListView):
         # Instantiate our calendar class with today's year and date
         new_calendar = Calendar(current_month.year, current_month.month)
 
+        # Gets the team currently making the request and the team of the calendar being viewed
+        viewing_team = User.objects.get(username=self.kwargs['username'])
+        cur_team = self.request.user.username
+
         # Call the formatmonth method, which returns our calendar as a table
-        formatted_calendar = new_calendar.formatmonth()
+        formatted_calendar = new_calendar.formatmonth(viewing_team, cur_team)
+        context['viewing_team'] = viewing_team.username
+        context['current_team'] = cur_team
         context['calendar'] = mark_safe(formatted_calendar)
         context['next_month'] = get_next_month(current_month)
         context['last_month'] = get_last_month(current_month)
@@ -198,6 +212,41 @@ def get_next_month(cur_month):
 def get_last_month(cur_month):
     previous_month = cur_month.replace(day=1) - datetime.timedelta(days=1)
     return 'month=' + str(previous_month.year) + '-' + str(previous_month.month)
+
+
+# View to add/update a team's timeslot information
+def timeslot(request, username, timeslot_id=None):
+    # Ensures only authenticated team can edit timeslot data
+    if request.user.is_authenticated:
+        if request.user.username != username:
+            return HttpResponse("You are trying to view a page that is not yours!")
+        else:
+            cur_team = User.objects.get(username=username)
+
+            # If a timeslot ID is in the URL, get that timeslot object to be edited
+            if timeslot_id:
+                instance = get_object_or_404(TimeSlot, pk=timeslot_id)
+            else:
+                instance = TimeSlot(team=cur_team)
+
+            timeslot_form = TimeSlotForm(request.POST or None, instance=instance)
+
+            # If the request is a post and the form has been cleaned either save the form or delete the timeslot
+            if request.POST:
+                if request.POST.get('delete'):
+                    instance.delete()
+                    return HttpResponseRedirect(reverse('calendar', args=(username,)))
+                else:
+                    if timeslot_form.is_valid():
+                        timeslot_form.save()
+                        return HttpResponseRedirect(reverse('calendar', args=(username,)))
+
+            context = {'timeslot_form': timeslot_form,
+                       'current_team': cur_team.username,
+                       'timeslot_id': timeslot_id}
+            return render(request, 'pick_up_app/timeslot.html', context)
+    else:
+        return HttpResponse("You are not logged in!")
 
 
 # View where user can add a new game

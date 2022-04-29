@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+{% load static %}
+
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/mainpage.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    <title>Welcome to Pick Up Game!</title>
+</head>
+
+    <div class="heading">Welcome to Pickup Game!</div>
+
+
+    <div class="main"><pre>
+
+        This is a community site where you can register a team to play games in real life!
+
+        <b>You can sign in or register by clicking the <a href="/pick_up_app/login">link</a> below!</b>
+
+        <b>Community rules are:</b>
+            1) In order for results to be valid, each team captain must unanimously agree on the decision
+            2) Pickup App is not responsible for any injury that may occur through physical meetups
+
+        <b>How this works:</b>
+            1) Have your team captain register an account
+            2) After logging in to your HOME page, you should see a map displaying teams in the local area
+            3) Map markers are clickable to view information about the opposing teams
+            4) Use map markers or search bar to navigate to an opponent's calendar
+            5) If you find a game your team is interested in attending, book the appointment on the opponent's calendar
+            6) If you would like to host a game, navigate to your TEAM page (this link is on your HOME page)
+            7) Your TEAM page should function likes settings, you can change your name and host events on your calendar
+            8) If you do not see a game that you are interested in, you can create the game!
+
+
+        <b>How MMR Works:</b>
+            1) Every Team starts with 50 points
+            2) Losing a match gives you -5 points
+            3) Winning a match gives you +5 points
+            4) Invalid match results gives 0 points
+
+        <b>Any questions can be directed to our support staff Xavier!</b>
+        <i>xaviers_home_number@umbc.edu</i>
+
+        <a href="/pick_up_app/login">To register or login, click here!</a>
+
+    </pre></div>
+
+    <div class="box">
+
+        <h1>Pickup Game Family!</h1>
+        <h3>Dr. Johnson!</h3> <p>The CEO of Pickup Game!</p>
+
+        <img src="{% static 'pick up app/media/Johnson.jpg' %}" alt="Johnson" style="width:auto;height:400px;">
+
+        <h3>Nick!</h3> <p>Our team leader and github manger!</p>
+        <img src="{% static 'pick up app/media/Nick.jpg' %}" style="width:auto;height:500px;">
+
+        <h3>Xavier!</h3> <p>Our database guru!</p>
+        <img src="{% static 'pick up app/media/Xavier.png' %}" style="width:auto;height:500px;">
+
+        <h3>Jennifer</h3> <p>Our frontend developer!</p>
+        <img src="{% static 'pick up app/media/Jennifer.jpg' %}" style="width:auto;height:500px;">
+
+        <h3>William!</h3> <p>Backend developer!</p>
+        <img src="{% static 'pick up app/media/william.jpg' %}" style="width:auto;height:500px;">
+
+        <h3>Meet Sisi</h3> <p>Backend developer!</p>
+        <img src="{% static 'pick up app/media/Sisi.jpg' %}" style="width:auto;height:500px;">
+
+
+    </div>
+
+</html>
