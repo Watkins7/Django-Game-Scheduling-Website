@@ -42,7 +42,7 @@ class Calendar(HTMLCalendar):
     # Overrides format month
     def formatmonth(self, viewing_team, cur_team):
         # Retrieves the all timeslots for the current month and year
-        slots = TimeSlot.objects.filter(team_id=viewing_team.id,
+        slots = TimeSlot.objects.filter(host_team_id=viewing_team.id,
                                         slot_start__year=self.year,
                                         slot_start__month=self.month)
 
