@@ -3,6 +3,17 @@ body {
     font-family: 'Ubuntu', sans-serif;
 }
 
+h1{
+  margin-bottom: 0;
+  padding: 0;
+}
+
+h2{
+  margin-top: 10px;
+  padding: 0;
+  font-style: italic;
+}
+
 .calendar {
   width: 98%;
   margin: auto;
@@ -52,6 +63,7 @@ a {
   color: #354157;
   background-color: #ffffff;
   font-size: 21px;
+  font-family: 'Ubuntu', sans-serif;
   padding: 5px 50px;
 }
 

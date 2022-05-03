@@ -162,7 +162,10 @@ class TeamCalendarView(generic.ListView):
     # Ensures only logged-in users can view calendars
     def dispatch(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return super(TeamCalendarView, self).dispatch(request, *args, **kwargs)
+            try:
+                return super(TeamCalendarView, self).dispatch(request, *args, **kwargs)
+            except User.DoesNotExist:
+                return HttpResponse("The calendar you're looking for does not exist")
         else:
             return HttpResponse("Only logged in users may view another team's calendar")
 
@@ -184,6 +187,7 @@ class TeamCalendarView(generic.ListView):
 
         # Call the formatmonth method, which returns our calendar as a table
         formatted_calendar = new_calendar.formatmonth(viewing_team, cur_team)
+        context['viewing_teamname'] = viewing_team.teamname
         context['viewing_team'] = viewing_team.username
         context['current_team'] = cur_team
         context['calendar'] = mark_safe(formatted_calendar)
@@ -227,7 +231,7 @@ def timeslot(request, username, timeslot_id=None):
             if timeslot_id:
                 instance = get_object_or_404(TimeSlot, pk=timeslot_id)
             else:
-                instance = TimeSlot(team=cur_team)
+                instance = TimeSlot(host_team=cur_team)
 
             timeslot_form = TimeSlotForm(request.POST or None, instance=instance)
 

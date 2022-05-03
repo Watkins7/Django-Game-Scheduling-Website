@@ -654,11 +654,11 @@ class CalendarHTMLTests(StaticLiveServerTestCase):
         test_game = Games(game="newgame", gameType="testing")
         test_game.save()
 
-        test_timeslot = TimeSlot(team=test_user,
+        test_timeslot = TimeSlot(host_team=test_user,
                                  game=test_game,
                                  slot_start=timezone.now() + datetime.timedelta(minutes=1),
                                  slot_end=timezone.now() + datetime.timedelta(minutes=30))
-        test_timeslot2 = TimeSlot(team=test_user2,
+        test_timeslot2 = TimeSlot(host_team=test_user2,
                                   game=test_game,
                                   slot_start=timezone.now() + datetime.timedelta(minutes=1),
                                   slot_end=timezone.now() + datetime.timedelta(minutes=30))
@@ -735,7 +735,7 @@ class CalendarHTMLTests(StaticLiveServerTestCase):
         test_game = Games(game="newgame", gameType="testing")
         test_game.save()
 
-        test_timeslot = TimeSlot(team=test_user,
+        test_timeslot = TimeSlot(host_team=test_user,
                                  game=test_game,
                                  slot_start=timezone.now() + datetime.timedelta(minutes=1),
                                  slot_end=timezone.now() + datetime.timedelta(minutes=30))
@@ -793,7 +793,7 @@ class TimeslotHTMLTests(StaticLiveServerTestCase):
 
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
         cur_time = timezone.now().date() + datetime.timedelta(days=1)
-        test_time = str(cur_time.month)+str(cur_time.day)+str(cur_time.year)
+        test_time = str(cur_time.month)+str(cur_time.day)+str(cur_time.year)+""
         test_team = "test"
         test_user = User(username="test", password="pass")
         test_game = Games(game="newgame", gameType="testing")
@@ -866,8 +866,6 @@ class TimeslotHTMLTests(StaticLiveServerTestCase):
         print("######################################################################")
 
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        cur_time = timezone.now().date() + datetime.timedelta(days=1)
-        test_time = str(cur_time.month) + str(cur_time.day) + str(cur_time.year)
         test_team = "test"
         test_user = User(username="test", password="pass")
         test_game = Games(game="newgame", gameType="testing")

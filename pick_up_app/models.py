@@ -64,41 +64,25 @@ class Emails(models.Model):
         ]
 
 
-class MMR(models.Model):
-    team = models.OneToOneField(User, on_delete=models.CASCADE)
-    MMR_rating = models.FloatField(default=0)
-
-    # Constraint to check if a team's MMR is positive
-    class Meta:
-        constraints = [
-            models.CheckConstraint(check=models.Q(MMR_rating__gte=0), name='Positive_MMR_Values')
-        ]
-
-
 class TimeSlot(models.Model):
-    team = models.ForeignKey(User, on_delete=models.CASCADE)
+    host_team = models.ForeignKey(User, on_delete=models.CASCADE, related_name='host_team')
     game = models.ForeignKey(Games, on_delete=models.CASCADE)
     slot_start = models.DateTimeField('Start date/time available')
     slot_end = models.DateTimeField('End date/time available')
-
-    # Checks whether the slot date is in the future or not
-    def is_advanced_date(self):
-        return self.slot_start > timezone.now()
+    opponent_team = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="opponent_team")
+    host_won = models.BooleanField(null=True)
+    opponent_won = models.BooleanField(null=True)
 
     # Checks the duration of a slot
     def slot_duration(self):
         return self.slot_end - self.slot_start
-
-    # Checks if the start of a slot is on the same day as the end of a slot
-    def is_slot_same_day(self):
-        return self.slot_start.day == self.slot_end.day
 
     class Meta:
         constraints = [
             # Constraint to check that a team picks unique slot date-times
             models.UniqueConstraint(
                 name='%(app_label)s_%(class)s_unique_team_slot',
-                fields=['team', 'slot_start', 'slot_end']),
+                fields=['host_team', 'slot_start', 'slot_end']),
             # Constraint to check that the start of a slot is before the end
             models.CheckConstraint(
                 name='%(app_label)s_%(class)s_slotstart_lte_slotend',
