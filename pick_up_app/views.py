@@ -15,33 +15,34 @@ import calendar
 from .forms import NewUserForm, TimeSlotForm
 
 # Models
-from .models import User, TimeSlot
+from .models import User, TimeSlot, Games
 from django.conf import settings
+
 
 ##########################################
 # Create your views here.
 ##########################################
 
 def team_search(request):
-    if(request.method == "POST"):
+    if (request.method == "POST"):
         team_search = request.POST['team_search']
-        teams = User.objects.filter(teamname__contains = team_search)
+        teams = User.objects.all()
         return render(request, 'pick_up_app/team_search.html', {"team_search": team_search, "teams": teams})
     else:
         return render(request, 'pick_up_app/team_search.html')
 
+
 def main_page(request):
     # This is just a message for the app's index view page, can be changed later.
-    return HttpResponse("You're looking at the default main page.")
+    return render(request, 'pick_up_app/mainpage.html')
 
 
 def home_page(request, username):
-
-    #Is the user logged in
-    if(request.user.is_authenticated):
+    # Is the user logged in
+    if (request.user.is_authenticated):
 
         #Is the user at THEIR home page
-        if(request.user.teamname != username):
+        if(request.user.username != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
@@ -53,42 +54,45 @@ def home_page(request, username):
             top_teams_list = User.objects.order_by('-mmr_score')[:5]
 
             # All the teams to add markers
-            all_teams = User.objects.order_by('teamname')
+            all_teams = User.objects.order_by('username')
 
             # Centered team "username"
             try:
-                centered_team = User.objects.get(teamname=username)
+                centered_team = User.objects.get(username=username)
             except Exception:
                 return HttpResponse("ERROR, Team does not exist")
 
-            teams =  User.objects.all()
+            teams = User.objects.all()
             teamNames = []
             for i in range(len(teams)):
-                teamNames.append(teams[i].teamname)
+                teamNames.append(teams[i].username)
+
+            key = str(settings.GOOGLE_MAPS_API_KEY)
 
             context = {'top_teams_list': top_teams_list,
                        'all_teams': all_teams,
                        'centered_team': centered_team,
-                       'api_key': settings.GOOGLE_MAPS_API_KEY,
+                       'api_key': key,
                        "teams": teamNames,
                        }
 
             return render(request, 'pick_up_app/home_page.html', context)
 
     else:
-         return HttpResponse("You are not logged in!")
+        return HttpResponse("You are not logged in!")
 
-def team_page(request, teamname):
+def team_page(request, username):
      #Is the user logged in
     if(request.user.is_authenticated):
 
         #Is the user at THEIR home page
-        if(request.user.teamname != teamname):
+        if(request.user.username != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
         else:
             return render(request, 'pick_up_app/team.html')
+
 
 def index(request):
     allUsers = User.objects.all()
@@ -97,7 +101,8 @@ def index(request):
 
 
 def save(request):
-    newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
+    #newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
+    newUser = User(username=request.POST['username'], password=request.POST['password'])
     print(newUser)
     newUser.save()
     return HttpResponse("New User Saved")
@@ -105,9 +110,9 @@ def save(request):
 
 def check(request):
     currUser = User.authenticate(request.POST['username'], request.POST['password'])
-    if(currUser):
+    if (currUser):
         login(request, currUser)
-        return HttpResponseRedirect(reverse('home_page', args=(currUser.teamname,)))
+        return HttpResponseRedirect(reverse('home_page', args=(currUser.username,)))
     else:
         return HttpResponse("not a user oop")
 
@@ -157,7 +162,10 @@ class TeamCalendarView(generic.ListView):
     # Ensures only logged-in users can view calendars
     def dispatch(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return super(TeamCalendarView, self).dispatch(request, *args, **kwargs)
+            try:
+                return super(TeamCalendarView, self).dispatch(request, *args, **kwargs)
+            except User.DoesNotExist:
+                return HttpResponse("The calendar you're looking for does not exist")
         else:
             return HttpResponse("Only logged in users may view another team's calendar")
 
@@ -174,12 +182,13 @@ class TeamCalendarView(generic.ListView):
         new_calendar = Calendar(current_month.year, current_month.month)
 
         # Gets the team currently making the request and the team of the calendar being viewed
-        viewing_team = User.objects.get(teamname=self.kwargs['teamname'])
-        cur_team = self.request.user.teamname
+        viewing_team = User.objects.get(username=self.kwargs['username'])
+        cur_team = self.request.user.username
 
         # Call the formatmonth method, which returns our calendar as a table
         formatted_calendar = new_calendar.formatmonth(viewing_team, cur_team)
-        context['viewing_team'] = viewing_team.teamname
+        context['viewing_teamname'] = viewing_team.teamname
+        context['viewing_team'] = viewing_team.username
         context['current_team'] = cur_team
         context['calendar'] = mark_safe(formatted_calendar)
         context['next_month'] = get_next_month(current_month)
@@ -189,7 +198,6 @@ class TeamCalendarView(generic.ListView):
 
 # Checks the request for a valid date and returns the formatted date
 def get_request_date(cur_month):
-
     # Checks if there is a date in the request, if so re-format it to be used by date()
     if cur_month:
         year, month = (int(date_pair) for date_pair in cur_month.split('-'))
@@ -211,19 +219,19 @@ def get_last_month(cur_month):
 
 
 # View to add/update a team's timeslot information
-def timeslot(request, teamname, timeslot_id=None):
+def timeslot(request, username, timeslot_id=None):
     # Ensures only authenticated team can edit timeslot data
     if request.user.is_authenticated:
-        if request.user.teamname != teamname:
+        if request.user.username != username:
             return HttpResponse("You are trying to view a page that is not yours!")
         else:
-            cur_team = User.objects.get(teamname=teamname)
+            cur_team = User.objects.get(username=username)
 
             # If a timeslot ID is in the URL, get that timeslot object to be edited
             if timeslot_id:
                 instance = get_object_or_404(TimeSlot, pk=timeslot_id)
             else:
-                instance = TimeSlot(team=cur_team)
+                instance = TimeSlot(host_team=cur_team)
 
             timeslot_form = TimeSlotForm(request.POST or None, instance=instance)
 
@@ -231,15 +239,109 @@ def timeslot(request, teamname, timeslot_id=None):
             if request.POST:
                 if request.POST.get('delete'):
                     instance.delete()
-                    return HttpResponseRedirect(reverse('calendar', args=(teamname,)))
+                    return HttpResponseRedirect(reverse('calendar', args=(username,)))
                 else:
                     if timeslot_form.is_valid():
                         timeslot_form.save()
-                        return HttpResponseRedirect(reverse('calendar', args=(teamname,)))
+                        return HttpResponseRedirect(reverse('calendar', args=(username,)))
 
             context = {'timeslot_form': timeslot_form,
-                       'current_team': cur_team.teamname,
+                       'current_team': cur_team.username,
                        'timeslot_id': timeslot_id}
             return render(request, 'pick_up_app/timeslot.html', context)
     else:
         return HttpResponse("You are not logged in!")
+
+
+# View where user can add a new game
+def new_game(request):
+    all_games = Games.objects.all()
+    context = {'game_list': all_games}
+    return render(request, 'pick_up_app/new_game.html', context)
+
+
+# Save the new game that was added by the new game page
+def save_game(request):
+    curr_game = Games(game=request.POST['game_name'], gameType=request.POST['game_type'])
+    curr_game.save()
+    messages.success(request, 'New game added successfully!')
+    return HttpResponse("New game saved.")
+
+
+# Check that the new game given is not in the database yet
+def check_game_list(request):
+    curr_game = Games.verify(request.POST['game_name'], request.POST['game_type'])
+    if curr_game:
+        save_game(request)
+    else:
+        messages.error(request, 'Game could not be added.')
+    return HttpResponseRedirect(reverse('new_game'))
+
+
+def edit_team(request, username):
+    curr_team = User.objects.filter(username=username)
+    context = {'team_info': curr_team}
+    return render(request, 'pick_up_app/edit_team.html', context)
+
+
+def check_team_changes(request):
+    curr_username = request.user.username
+    my_user = User.objects.get(username=curr_username)
+
+    new_username = request.POST['new_username']
+    new_team_name = request.POST['new_team_name']
+    new_password = request.POST['new_password']
+    confirm_password = request.POST['confirm_password']
+    new_email = request.POST['new_email']
+
+    # If new username given, make sure username is unique and not current username before saving
+    if new_username:
+        if my_user.username == new_username:
+            messages.error(request, "The username given is already this team's username.")
+
+        # Check that username is unique from other users
+        else:
+            is_unique = True
+            for check_user in User.objects.all():
+                if check_user.username == new_username and my_user.id != check_user.id:
+                    is_unique = False
+            # If unique, save the new username
+            if is_unique:
+                my_user.username = new_username
+                my_user.save()
+                messages.success(request, "Username changed successfully.")
+            # If not unique, sent error message
+            else:
+                messages.error(request, "This username is already taken.")
+
+    # If new team name, save if not the same as current team name
+    if new_team_name:
+        if my_user.teamname == new_team_name:
+            messages.error(request, "The team name given is already this team's team name.")
+        else:
+            my_user.teamname = new_team_name
+            my_user.save()
+            messages.success(request, "Team name changed successfully.")
+
+    # If new password is not the same as old one, make sure it matches confirmation password before saving
+    if new_password:
+        if my_user.password == new_password:
+            messages.error(request, "The password given is already this team's password.")
+        else:
+            if new_password == confirm_password:
+                my_user.password = new_password
+                my_user.checkpassword = confirm_password
+                my_user.save()
+                messages.success(request, "Password changed successfully.")
+            else:
+                messages.error(request, "The new password and password confirmation do not match.")
+
+    # If new email given, make sure that the email is not the current email before saving
+    if new_email:
+        if my_user.email == new_email:
+            messages.error(request, "The email given is already this team's email.")
+        else:
+            my_user.email = new_email
+            my_user.save()
+            messages.success(request, "Team email changed successfully.")
+    return HttpResponseRedirect(reverse('edit_team', args=(my_user.username,)))

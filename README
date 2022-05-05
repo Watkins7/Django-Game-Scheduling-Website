@@ -4,6 +4,9 @@ Pickup App Readme
   - In your IDE set up your "venv" (virtual enviornment)
   - Type "pip install -r requirements.txt"
       -This will load the required libraries into your IDE
+  
+  - !!! VERY IMPORTANT !!!
+    - In .env please input your GOOGLE_MAPS API key after the "="
       
 2) Explain how your software must be configured to run
   - In terminal type "python manage.py makemigrations"
@@ -13,7 +16,7 @@ Pickup App Readme
   Terminal should display the IP address of the server, click on that to get to the home page
   
 3) How to run test suite
-  - In terminal type "python manage.py tests"
+  - In terminal type "python manage.py test"
   
 4) URLS currently supported
   - "pick_up_app/"

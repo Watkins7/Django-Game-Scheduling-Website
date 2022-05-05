@@ -8,7 +8,7 @@ import datetime
 class TimeSlotFormTests(TestCase):
     # Creates a user and game to be used in subsequent tests
     def create_user_and_game(self):
-        test_user = User(username="test", password="pass", teamname="test_team")
+        test_user = User(username="test", password="pass")
         test_game = Games(game="newgame", gameType="testing")
         test_user.save()
         test_game.save()
@@ -18,7 +18,7 @@ class TimeSlotFormTests(TestCase):
     def test_invalid_timeslot_different_days(self):
         test_user, test_game = self.create_user_and_game()
         cur_time = datetime.datetime.now()
-        test_form = TimeSlotForm(data={"team": test_user,
+        test_form = TimeSlotForm(data={"host_team": test_user,
                                        "game": test_game,
                                        "slot_start": cur_time + datetime.timedelta(minutes=1),
                                        "slot_end": cur_time + datetime.timedelta(days=1)})
@@ -28,7 +28,7 @@ class TimeSlotFormTests(TestCase):
     def test_invalid_timeslot_end_before_start(self):
         test_user, test_game = self.create_user_and_game()
         cur_time = datetime.datetime.now()
-        test_form = TimeSlotForm(data={"team": test_user,
+        test_form = TimeSlotForm(data={"host_team": test_user,
                                        "game": test_game,
                                        "slot_start": cur_time + datetime.timedelta(minutes=30),
                                        "slot_end": cur_time + datetime.timedelta(minutes=1)})
@@ -38,7 +38,7 @@ class TimeSlotFormTests(TestCase):
     def test_invalid_timeslot_not_advanced(self):
         test_user, test_game = self.create_user_and_game()
         cur_time = datetime.datetime.now()
-        test_form = TimeSlotForm(data={"team": test_user,
+        test_form = TimeSlotForm(data={"host_team": test_user,
                                        "game": test_game,
                                        "slot_start": cur_time - datetime.timedelta(minutes=30),
                                        "slot_end": cur_time - datetime.timedelta(minutes=20)})
@@ -48,26 +48,26 @@ class TimeSlotFormTests(TestCase):
     def test_invalid_timeslot_overlapping(self):
         test_user, test_game = self.create_user_and_game()
         cur_time = datetime.datetime.now()
-        test_form1 = TimeSlotForm(data={"team": test_user,
+        test_form1 = TimeSlotForm(data={"host_team": test_user,
                                         "game": test_game,
                                         "slot_start": cur_time + datetime.timedelta(minutes=5),
                                         "slot_end": cur_time + datetime.timedelta(minutes=10)})
         self.assertTrue(test_form1.is_valid())
         test_form1.save()
 
-        test_form2 = TimeSlotForm(data={"team": test_user,
+        test_form2 = TimeSlotForm(data={"host_team": test_user,
                                         "game": test_game,
                                         "slot_start": cur_time + datetime.timedelta(minutes=3),
                                         "slot_end": cur_time + datetime.timedelta(minutes=12)})
         self.assertFalse(test_form2.is_valid())
 
-        test_form3 = TimeSlotForm(data={"team": test_user,
+        test_form3 = TimeSlotForm(data={"host_team": test_user,
                                         "game": test_game,
                                         "slot_start": cur_time + datetime.timedelta(minutes=3),
                                         "slot_end": cur_time + datetime.timedelta(minutes=7)})
         self.assertFalse(test_form3.is_valid())
 
-        test_form4 = TimeSlotForm(data={"team": test_user,
+        test_form4 = TimeSlotForm(data={"host_team": test_user,
                                         "game": test_game,
                                         "slot_start": cur_time + datetime.timedelta(minutes=7),
                                         "slot_end": cur_time + datetime.timedelta(minutes=12)})
@@ -80,12 +80,12 @@ class TimeSlotFormTests(TestCase):
 
         # Creates 8 timeslots on the same day
         for i in range(1, 9):
-            test_form1 = TimeSlotForm(data={"team": test_user,
+            test_form1 = TimeSlotForm(data={"host_team": test_user,
                                             "game": test_game,
                                             "slot_start": cur_time + datetime.timedelta(minutes=(i*2)),
                                             "slot_end": cur_time + datetime.timedelta(minutes=((i*2)+1))})
             test_form1.save()
-        test_form2 = TimeSlotForm(data={"team": test_user,
+        test_form2 = TimeSlotForm(data={"host_team": test_user,
                                         "game": test_game,
                                         "slot_start": cur_time + datetime.timedelta(minutes=(9 * 2)),
                                         "slot_end": cur_time + datetime.timedelta(minutes=((9 * 2) + 1))})

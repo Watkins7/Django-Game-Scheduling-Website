@@ -56,8 +56,8 @@ class NewUserForm(ModelForm):
             raise ValidationError("ERROR: A Team Captain has already registered this email address")
 
         # validate teamname
-        if User.objects.filter(teamname=f.get("teamname")):
-            raise ValidationError("ERROR: This team name has already been taken")
+        if User.objects.filter(username=f.get("username")):
+            raise ValidationError("ERROR: This username has already been taken")
 
         # validate latitude
         if latitude < -90 or latitude > 90:
@@ -74,11 +74,11 @@ class TimeSlotForm(ModelForm):
         model = TimeSlot
 
         widgets = {
-            'team': forms.HiddenInput(),
+            'host_team': forms.HiddenInput(),
             'slot_start': DateInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),
             'slot_end': DateInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),
         }
-        fields = '__all__'
+        exclude = ('opponent_team', 'host_won', 'opponent_won')
 
     # Initializes the form, overriding the default input formats for dates
     def __init__(self, *args, **kwargs):
@@ -89,7 +89,7 @@ class TimeSlotForm(ModelForm):
     # Validates form input
     def clean(self):
         f = self.cleaned_data
-        team = f.get('team')
+        host_team = f.get('host_team')
         slot_start = f.get('slot_start')
         slot_end = f.get('slot_end')
 
@@ -110,7 +110,7 @@ class TimeSlotForm(ModelForm):
         if self.instance.pk is None:
             daily_timeslots = TimeSlot.objects.filter(slot_start__day=slot_start.day,
                                                       slot_end__day=slot_end.day,
-                                                      team_id=team.id)
+                                                      host_team_id=host_team.id)
             for i in daily_timeslots:
                 check1 = slot_start.time() <= timezone.localtime(i.slot_end).time()
                 check2 = slot_end.time() >= timezone.localtime(i.slot_start).time()
@@ -120,6 +120,6 @@ class TimeSlotForm(ModelForm):
         # Checks the limit on the number of timeslots for a particular day has not been reached
         num_timeslots = TimeSlot.objects.filter(slot_start__day=slot_start.day,
                                                 slot_end__day=slot_end.day,
-                                                team_id=team.id).count()
+                                                host_team_id=host_team.id).count()
         if num_timeslots >= 8:
             raise ValidationError("ERROR: Maximum number of timeslots allowed on this day has been reached")
