@@ -917,21 +917,26 @@ class NewGamePageTests(StaticLiveServerTestCase):
 
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
-        # Find and click the new game link
+        # Open the calendar of the user we made
+        driver.get(self.live_server_url + "/pick_up_app/calendar/lime")
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Click on new timeslot button then the new_game link
+        driver.find_element_by_class_name("new_timeslot_btn").click()
         driver.find_element_by_class_name("new_game_link").click()
 
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Enter new game info
-        driver.find_element_by_xpath('//input[@type="text"][@name="game_name"]').send_keys("yahtzee")
-        driver.find_element_by_xpath('//input[@type="text"][@name="game_type"]').send_keys("dice")
+        driver.find_element_by_xpath('//input[@type="text"][@name="game_name"]').send_keys("poker")
+        driver.find_element_by_xpath('//input[@type="text"][@name="game_type"]').send_keys("cards")
 
         # Find and click the game submit button
         driver.find_element_by_class_name("game_button").click()
 
         driver.implicitly_wait(0.5)  # Wait before checking if game was added
 
-        self.assertTrue(Games.objects.filter(game='yahtzee', gameType='dice'))
+        self.assertTrue(Games.objects.filter(game='poker', gameType='cards'))
 
         # Close browser
         driver.quit()
@@ -967,7 +972,12 @@ class NewGamePageTests(StaticLiveServerTestCase):
 
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
-        # Find and click the new game link
+        # Open the calendar of the user we made
+        driver.get(self.live_server_url + "/pick_up_app/calendar/lime")
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Click on new timeslot button then the new_game link
+        driver.find_element_by_class_name("new_timeslot_btn").click()
         driver.find_element_by_class_name("new_game_link").click()
 
         driver.implicitly_wait(0.5)  # Wait before proceeding
