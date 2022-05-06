@@ -1,0 +1,73 @@
+body {
+    background-color: #c1d9b4;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.mmr_score{
+    margin: 20px;
+    width: 350px;
+    height: 50px;
+    border: 3px solid #326b51;
+    background-color: #e7f2e4;
+    padding-bottom: 30px;
+    padding-top: 5px;
+}
+
+p{
+    margin-bottom: 30px;
+}
+
+.emailList{
+    display: inline-block;
+    background-color:#e7f2e4;
+    margin: 40px;
+    width: 500px;
+    margin-left: 30px;
+    margin-right: 3px;
+    border: 3px solid #326b51;
+    padding-bottom: 150px;
+}
+
+li {
+    padding-right: 10px;
+  }
+  
+  .calendar{
+    display: inline-block; 
+    background-color:#e7f2e4;
+    width: 500px;
+    height: 400px;
+    margin-left: 200px;
+    border: 3px solid #326b51;
+    padding-top: 55px;
+}
+
+.redirect_buttons {
+    margin: 30px;
+    text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
+    color: #354157;
+    background-color: #e7f2e4;
+    border: 3px solid #326b51;
+}
+
+a {
+    text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
+    color: #354157;
+    text-decoration: none
+}
+
+.edit_team_page{
+    margin: 20px;
+}
+
+.home_page{
+    margin: 20px;
+}
+
+.delete_team{
+    margin: 20px;
+}
+
+.logout{
+    margin: 20px;
+}

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from django.utils import timezone
 
 # Create your models here.
 #Creates a field type the forces the characters to be lowercase. This helps
@@ -14,9 +14,14 @@ class NameField(models.CharField):
 
 # Create your models here.
 class User(AbstractUser):
-    teamName = models.TextField(20)
-    # Added mmr_score for home_page template, can be changed later
     mmr_score = models.IntegerField(default=0)
+    teamname = models.CharField(max_length=50,default='')
+    email = models.EmailField(max_length=100, default='')
+    checkpassword = models.CharField(max_length=50, default='')
+    longitude = models.FloatField(default=-76.7100)
+    latitude = models.FloatField(default=39.2543)
+    mmrScore = models.IntegerField(default=50)
+
 
     def authenticate(username, password):
         for user in User.objects.all():
@@ -24,25 +29,31 @@ class User(AbstractUser):
                 return user
         return None
 
+    def __str__(self):
+        return self.username
+
+
 class Games(models.Model):
-    game = NameField(max_length = 30, unique=True)
+    game = NameField(max_length=30, unique=True)
     gameType = models.TextField(20)
 
+    def verify(game, gameType):
+        # This function checks that the new game is not already in the database
+        new_game = Games(game, gameType)
+        # If game exists, return None; otherwise, return the new game
+        for my_game in Games.objects.all():
+            if my_game.game == game and my_game.gameType == gameType:
+                return None
+        return new_game
 
-class PickupTeam(models.Model):
 
-    teamname = models.CharField(max_length=50,default='')
-    email = models.EmailField(max_length=100, default='')
-    password = models.CharField(max_length=50,default='')
-    checkpassword = models.CharField(max_length=50, default='')
-    longitude = models.FloatField(default=76.7100)
-    latitude = models.FloatField(default=39.2543)
-
-    teamaccount = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
+    def __str__(self):
+        # This function controls how this model is displayed in query set
+        return self.game
 
 
 class Emails(models.Model):
-    team = models.ForeignKey(PickupTeam, on_delete=models.CASCADE)
+    team = models.ForeignKey(User, on_delete=models.CASCADE)
     email = models.EmailField()
     is_captain = models.BooleanField()
 
@@ -53,12 +64,27 @@ class Emails(models.Model):
         ]
 
 
-class MMR(models.Model):
-    team = models.OneToOneField(PickupTeam, on_delete=models.CASCADE)
-    MMR_rating = models.FloatField(default=0)
+class TimeSlot(models.Model):
+    host_team = models.ForeignKey(User, on_delete=models.CASCADE, related_name='host_team')
+    game = models.ForeignKey(Games, on_delete=models.CASCADE)
+    slot_start = models.DateTimeField('Start date/time available')
+    slot_end = models.DateTimeField('End date/time available')
+    opponent_team = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="opponent_team")
+    host_won = models.BooleanField(null=True)
+    opponent_won = models.BooleanField(null=True)
 
-    # Constraint to check if a team's MMR is positive
+    # Checks the duration of a slot
+    def slot_duration(self):
+        return self.slot_end - self.slot_start
+
     class Meta:
         constraints = [
-            models.CheckConstraint(check=models.Q(MMR_rating__gte=0), name='Positive_MMR_Values')
+            # Constraint to check that a team picks unique slot date-times
+            models.UniqueConstraint(
+                name='%(app_label)s_%(class)s_unique_team_slot',
+                fields=['host_team', 'slot_start', 'slot_end']),
+            # Constraint to check that the start of a slot is before the end
+            models.CheckConstraint(
+                name='%(app_label)s_%(class)s_slotstart_lte_slotend',
+                check=models.Q(slot_start__lte=models.F('slot_end')))
         ]

@@ -1,0 +1,33 @@
+<!DOCTYPE html>{% load static %}
+<html lang="en">
+
+<head>
+    {# Load in the Ubuntu font stylesheet and the static CSS style.css file. #}
+        <link rel="stylesheet" href={% static "css/style.css" %}>
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+{% block content %}
+
+<center>
+        {% if team_search %}
+
+            <p style="font-size: 40px;">
+                Search Results For <b>{{team_search}}</b>
+            </p>
+
+                <div style="color:rgb(0, 119, 255); font-size: 30px;margin-top: 10px;">
+                        {% for team in teams %}
+
+                            {{team.username}} - {{team.teamname}}<br>
+
+                    {% endfor %}
+                </div>
+        {% else %}>
+            <h1>
+                Do it right!
+            </h1>
+        {% endif %}
+</center>
+{% endblock %}

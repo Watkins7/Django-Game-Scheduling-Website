@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/stylecalendar.css' %}">
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+  <title> {{viewing_team}} Team Calendar </title>
+</head>
+
+<div style="text-align: center">
+    <h1 style="font-size: 40px"> Team {{viewing_teamname}} Calendar</h1>
+    <h2 style="font-size: 32px"> Team Captain: {{viewing_team}}</h2>
+</div>
+
+<body>
+    <div class="redirect_buttons" style="text-align: center">
+        <button class="btn">
+            <a class="previous_month_btn" href="{% url 'calendar' viewing_team %}?{{ last_month }}"
+               style="text-decoration: none"> Previous Month </a>
+        </button>
+	    {% if viewing_team == current_team %}
+            <button class = "btn">
+                <a class="new_timeslot_btn" href="{% url 'timeslot_new' current_team %}"
+                   style="text-decoration: none"> Add New Time Slot </a>
+            </button>
+        {% endif %}
+        <button class = "btn">
+            <a class="next_month_btn" href="{% url 'calendar' viewing_team %}?{{ next_month }}"
+                style="text-decoration: none"> Next Month </a>
+        </button>
+    </div>
+    <div class="calendar">
+        {{ calendar }}
+    </div>
+    <div class="redirect_buttons" style="text-align: center">
+        <button class="btn">
+            <a class="home_btn" href="{% url 'home_page' current_team %}"
+                   style="text-decoration: none"> Back to Home Page </a>
+        </button>
+    </div>
+</body>
+</html>

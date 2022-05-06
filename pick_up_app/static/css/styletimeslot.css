@@ -1,0 +1,33 @@
+body {
+    background-color: #c1d9b4;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.form{
+    margin: auto;
+    font-size: 20px;
+}
+
+.form input,.form select {
+  border-radius: 20px;
+  border: 1px solid #17a2b8;
+  outline: none;
+  background: #FFFFFF;
+  padding: 10px;
+  width: 100%;
+  font-size: 18px;
+}
+
+.btn {
+  border-radius: 20px;
+  border: 1px solid #326b51;
+  cursor: pointer;
+  color: #354157;
+  background-color: #FFFFFF;
+  font-size: 21px;
+  padding: 5px 50px;
+}
+
+a {
+    color: #354157;
+}
