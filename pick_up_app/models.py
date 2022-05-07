@@ -66,7 +66,7 @@ class Emails(models.Model):
 
 class TimeSlot(models.Model):
     host_team = models.ForeignKey(User, on_delete=models.CASCADE, related_name='host_team')
-    game = models.ForeignKey(Games, on_delete=models.CASCADE)
+    game = models.ForeignKey(Games, on_delete=models.CASCADE, related_name="game_name")
     slot_start = models.DateTimeField('Start date/time available')
     slot_end = models.DateTimeField('End date/time available')
     opponent_team = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="opponent_team")

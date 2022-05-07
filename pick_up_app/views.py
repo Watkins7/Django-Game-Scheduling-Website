@@ -1,6 +1,6 @@
 # HTTP libraries
 # from curses.ascii import HT
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import login
@@ -222,7 +222,7 @@ def get_last_month(cur_month):
 def booking(request, username, timeslot_id):
 
     # username should be OPPONENT
-    # timeslot_id should be able to gather all other infomation
+    # timeslot_id should be able to gather all others information
 
     # see if opponent team exists
     cur_team = User.objects.get(username=username)
@@ -230,7 +230,7 @@ def booking(request, username, timeslot_id):
         return HttpResponse("Error, invalid 'username' passed")
 
     # see if timeslot exists
-    instance = TimeSlot.objects.get(pk=timeslot_id).prefetch_related('host_team', 'opponent_team')
+    instance = TimeSlot.objects.get(pk=timeslot_id)
     if not instance:
         return HttpResponse("Error, 'timeslot_id' does not exist")
 
@@ -238,21 +238,51 @@ def booking(request, username, timeslot_id):
     if instance.host_team.username == username:
         return HttpResponse("Error, booking your own timeslot")
 
-    # if there is no opponent team on the timeslot
-    # load booking.html
-    if not instance.opponent_team:
-        return render(request, 'pick_up_app/booking.html')
-
-    # if an opponent is on timeslot
-    else:
+    # if there is already opponent team on the timeslot
+    # return response
+    if instance.opponent_team:
         return HttpResponse("Error, timeslot already booked")
+
+    # if POST request
+    if request.method == 'POST':
+
+        var = request.POST["submitbutton"]
+
+        # update the timeslot with new oppenent_id
+        if var == "Yes":
+            userobject = User.objects.get(username=username)
+            instance.opponent_team_id = userobject.id
+            instance.save()
+
+        # go back to host team calendar
+        host_calendar = "/pick_up_app/calendar" + str(instance.host_team.username)
+        messages.success(request, "Redirected back to Host Calendar!")
+        return HttpResponseRedirect(host_calendar)
+
+    # else this is a GET operation
+    else:
+
+        # variables to past to HTML
+        context = {'host': instance.host_team.username,
+                   'start': instance.slot_start,
+                   'end': instance.slot_end,
+                   'team': cur_team.username,
+                   'gameName': Games.objects.get(id=instance.game_id).game,
+                   'gameType': Games.objects.get(id=instance.game_id).gameType,
+                   'opponent': username
+                    }
+
+        # Render the booking html
+        return render(request, 'pick_up_app/booking.html', context)
+
+
 
 
 # Will allow selected username to update timeslot GAME RESULTS
 def submit_results(request, username, timeslot_id):
 
     # username should be OPPONENT or HOST
-    # timeslot_id should be able to gather all other infomation
+    # timeslot_id should be able to gather all other information
 
     # see if opponent team exists
     cur_team = User.objects.get(username=username)
@@ -260,19 +290,71 @@ def submit_results(request, username, timeslot_id):
         return HttpResponse("Error, invalid 'username' passed")
 
     # see if timeslot exists
-    instance = TimeSlot.objects.get(pk=timeslot_id).prefetch_related('host_team', 'opponent_team')
+    instance = TimeSlot.objects.get(pk=timeslot_id)
     if not instance:
         return HttpResponse("Error, 'timeslot_id' does not exist")
 
     # check if booking_team != host_team
-    if instance.host_team.exists() and instance.opponent_team.exists():
-        return render(request, 'pick_up_app/submitGameResults.html')
+    if instance.host_team and instance.opponent_team:
+
+        # if POST request
+        if request.method == 'POST':
+
+            var = request.POST["submitbutton"]
+
+            if var == "Yes, I won the game!":
+                if instance.host_team.username == username:
+                    instance.host_won = True
+                    instance.save()
+
+                elif instance.opponent_team.username == username:
+                    instance.opponent_won = True
+                    instance.save()
+
+            elif var == "No, we lost the game!":
+                if instance.host_team.username == username:
+                    instance.host_won = False
+                    instance.save()
+
+                elif instance.opponent_team.username == username:
+                    instance.opponent_won = False
+                    instance.save()
+
+            elif var == "Oops! I am not ready at this time!":
+                if instance.host_team.username == username:
+                    instance.host_won = None
+                    instance.save()
+
+                elif instance.opponent_team.username == username:
+                    instance.opponent_won = None
+                    instance.save()
+
+            # go back to host team calendar
+            host_calendar = "/pick_up_app/calendar/" + str(instance.host_team.username)
+            messages.success(request, "Your submission was processed!")
+            return HttpResponseRedirect(host_calendar)
+
+        # else this is get request
+
+        # variables to past to HTML
+        context = {'team': cur_team.username,
+                   'gameName': Games.objects.get(id=instance.game_id).game,
+                   'gameType': Games.objects.get(id=instance.game_id).gameType,
+                   'start': instance.slot_start,
+                   'end': instance.slot_end,
+                   'host': User.objects.get(id=instance.host_team_id).username,
+                   'opponent': User.objects.get(id=instance.opponent_team_id).username
+                    }
+
+        return render(request, 'pick_up_app/submitGameResults.html', context)
 
     # else timeslot does not have enough teams to submit results
     else:
         return HttpResponse("Error, 'timeslot' does not have 'opponent_id'... or possibly 'host_id'")
 
 
+def displayPastGame(request, timeslot_id):
+    return HttpResponse("Not Implemented")
 
 
 # View to add/update a team's timeslot information

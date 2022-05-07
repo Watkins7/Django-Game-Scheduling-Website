@@ -12,9 +12,8 @@ urlpatterns = [
     path('save/', views.save, name='save'),
     path('check/', views.check, name='check'),
     path('teampage/<username>', views.team_page, name="team_page"),
+
     path('calendar/<username>/', views.TeamCalendarView.as_view(), name='calendar'),
-
-
 
     path('timeslot/new/<username>', views.timeslot, name="timeslot_new"),
     path('timeslot/edit/<username>/int:<timeslot_id>', views.timeslot, name="timeslot_edit"),

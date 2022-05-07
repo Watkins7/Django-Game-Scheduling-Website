@@ -1,7 +1,7 @@
 # cal/utils.py
 
 from calendar import HTMLCalendar
-from .models import TimeSlot
+from .models import TimeSlot, User
 from django.urls import reverse
 from django.utils import timezone
 
@@ -68,14 +68,14 @@ def get_slot_url(slot, viewing_team, cur_team):
     # If a team is viewing their own calendar the
     # And timeslot still has NULL opponent team
     # url links to the edit timeslot page
-    if (cur_team == viewing_team.username) and not (slot.opponent_team_id.exists()):
+    if (cur_team == viewing_team.username) and not slot.opponent_team_id:
         url = reverse('timeslot_edit', args=(cur_team, slot.id,))
 
     # If a team is viewing their own calendar the
     # opponent slot is NOT null
     # viewing team needs to submit GAME RESULTS
-    elif (cur_team == viewing_team.username) and (slot.opponent_team_id.exists()):
-        url = reverse('submitGame', args=(cur_team, slot.id,))
+    elif (cur_team == viewing_team.username) and slot.opponent_team_id:
+        url = reverse('submit_results', args=(cur_team, slot.id,))
 
     #############################################################################################
     # Viewing another team's calendar
@@ -83,14 +83,14 @@ def get_slot_url(slot, viewing_team, cur_team):
 
     # if opponent_id slot is null
     # opponent can book game
-    elif not (slot.opponent_team_id.exists()):
-        url = reverse('timeslot_edit', args=(cur_team, slot.id,))
+    elif not slot.opponent_team_id:
+        url = reverse('booking', args=(cur_team, slot.id,))
 
     # if opponent_id slot is NOT null
     # viewing_team id == opponent_id in slot
     # opponent is trying to submit results
-    elif (slot.opponent_team_id == viewing_team.id):
-        url = reverse('timeslot_edit', args=(cur_team, slot.id,))
+    elif User.objects.get(id=slot.opponent_team_id).username == cur_team:
+        url = reverse('submit_results', args=(cur_team, slot.id,))
 
     # the url links to the challenge page
     else:
