@@ -18,6 +18,10 @@ urlpatterns = [
 
     path('timeslot/new/<username>', views.timeslot, name="timeslot_new"),
     path('timeslot/edit/<username>/int:<timeslot_id>', views.timeslot, name="timeslot_edit"),
+
+    path('booking/<username>/int:<timeslot_id>', views.booking, name="booking"),
+    path('submit_results/<username>/int:<timeslot_id>', views.submit_results, name="submit_results"),
+
     path('team_search', views.team_search, name='team_search'),
     path('new_game/', views.new_game, name='new_game'),
     path('save_game/', views.save_game, name='save_game'),

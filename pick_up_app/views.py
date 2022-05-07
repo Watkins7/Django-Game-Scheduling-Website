@@ -218,6 +218,63 @@ def get_last_month(cur_month):
     return 'month=' + str(previous_month.year) + '-' + str(previous_month.month)
 
 
+# Will allow another team to be added to a timeslot
+def booking(request, username, timeslot_id):
+
+    # username should be OPPONENT
+    # timeslot_id should be able to gather all other infomation
+
+    # see if opponent team exists
+    cur_team = User.objects.get(username=username)
+    if not cur_team:
+        return HttpResponse("Error, invalid 'username' passed")
+
+    # see if timeslot exists
+    instance = TimeSlot.objects.get(pk=timeslot_id).prefetch_related('host_team', 'opponent_team')
+    if not instance:
+        return HttpResponse("Error, 'timeslot_id' does not exist")
+
+    # check if booking_team != host_team
+    if instance.host_team.username == username:
+        return HttpResponse("Error, booking your own timeslot")
+
+    # if there is no opponent team on the timeslot
+    # load booking.html
+    if not instance.opponent_team:
+        return render(request, 'pick_up_app/booking.html')
+
+    # if an opponent is on timeslot
+    else:
+        return HttpResponse("Error, timeslot already booked")
+
+
+# Will allow selected username to update timeslot GAME RESULTS
+def submit_results(request, username, timeslot_id):
+
+    # username should be OPPONENT or HOST
+    # timeslot_id should be able to gather all other infomation
+
+    # see if opponent team exists
+    cur_team = User.objects.get(username=username)
+    if not cur_team:
+        return HttpResponse("Error, invalid 'username' passed")
+
+    # see if timeslot exists
+    instance = TimeSlot.objects.get(pk=timeslot_id).prefetch_related('host_team', 'opponent_team')
+    if not instance:
+        return HttpResponse("Error, 'timeslot_id' does not exist")
+
+    # check if booking_team != host_team
+    if instance.host_team.exists() and instance.opponent_team.exists():
+        return render(request, 'pick_up_app/submitGameResults.html')
+
+    # else timeslot does not have enough teams to submit results
+    else:
+        return HttpResponse("Error, 'timeslot' does not have 'opponent_id'... or possibly 'host_id'")
+
+
+
+
 # View to add/update a team's timeslot information
 def timeslot(request, username, timeslot_id=None):
     # Ensures only authenticated team can edit timeslot data

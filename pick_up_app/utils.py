@@ -60,10 +60,39 @@ class Calendar(HTMLCalendar):
 
 # Gets a specific url to be listed on the calendar
 def get_slot_url(slot, viewing_team, cur_team):
-    # If a team is viewing their own calendar the url links to the edit timeslot page
-    if cur_team == viewing_team.username:
+
+    #############################################################################################
+    # Team owns the time slot
+    #############################################################################################
+
+    # If a team is viewing their own calendar the
+    # And timeslot still has NULL opponent team
+    # url links to the edit timeslot page
+    if (cur_team == viewing_team.username) and not (slot.opponent_team_id.exists()):
         url = reverse('timeslot_edit', args=(cur_team, slot.id,))
-    # If a team is viewing another team's calendar, the url links to the challenge page
+
+    # If a team is viewing their own calendar the
+    # opponent slot is NOT null
+    # viewing team needs to submit GAME RESULTS
+    elif (cur_team == viewing_team.username) and (slot.opponent_team_id.exists()):
+        url = reverse('submitGame', args=(cur_team, slot.id,))
+
+    #############################################################################################
+    # Viewing another team's calendar
+    #############################################################################################
+
+    # if opponent_id slot is null
+    # opponent can book game
+    elif not (slot.opponent_team_id.exists()):
+        url = reverse('timeslot_edit', args=(cur_team, slot.id,))
+
+    # if opponent_id slot is NOT null
+    # viewing_team id == opponent_id in slot
+    # opponent is trying to submit results
+    elif (slot.opponent_team_id == viewing_team.id):
+        url = reverse('timeslot_edit', args=(cur_team, slot.id,))
+
+    # the url links to the challenge page
     else:
         return f'<a class="listed_timeslot" href="#" style="text-decoration: none"> {slot.game} </a>'
     return f'<a class="listed_timeslot" href="{url}" style="text-decoration: none"> {slot.game} </a>'
