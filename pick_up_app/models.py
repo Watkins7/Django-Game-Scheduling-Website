@@ -14,13 +14,12 @@ class NameField(models.CharField):
 
 # Create your models here.
 class User(AbstractUser):
-    mmr_score = models.IntegerField(default=0)
     teamname = models.CharField(max_length=50,default='')
     email = models.EmailField(max_length=100, default='')
     checkpassword = models.CharField(max_length=50, default='')
     longitude = models.FloatField(default=-76.7100)
     latitude = models.FloatField(default=39.2543)
-    mmrScore = models.IntegerField(default=50)
+    mmrScore = models.IntegerField(default=100)
 
 
     def authenticate(username, password):
@@ -28,6 +27,18 @@ class User(AbstractUser):
             if (user.username == username and user.password == password):
                 return user
         return None
+
+    #Changes MMR based on bool parameter isWinner
+    def changeMMR(self, isWinner = False):
+        if(isWinner):
+            self.mmrScore += 50
+        else:
+            self.mmrScore -= 50
+
+        if(self.mmrScore < 0):
+            self.mmrScore = 0
+
+        return True
 
     def __str__(self):
         return self.username
