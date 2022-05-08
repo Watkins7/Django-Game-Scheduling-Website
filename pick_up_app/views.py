@@ -48,10 +48,10 @@ def home_page(request, username):
 
         else:
             # List of the top 5 teams in User model database to be displayed on the
-            # team homepage.Note: Uses a placeholder mmr_score in the User model,
+            # team homepage.Note: Uses a placeholder mmrScore in the User model,
             # will need to be properly implemented and tested later.
             # Top Teams to be displayed
-            top_teams_list = User.objects.order_by('-mmr_score')[:5]
+            top_teams_list = User.objects.order_by('-mmrScore')[:5]
 
             # All the teams to add markers
             all_teams = User.objects.order_by('username')
