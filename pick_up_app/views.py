@@ -270,31 +270,6 @@ def timeslot(request, username, timeslot_id=None):
         return HttpResponse("You are not logged in!")
 
 
-# View where user can add a new game
-def new_game(request):
-    all_games = Games.objects.all()
-    context = {'game_list': all_games}
-    return render(request, 'pick_up_app/new_game.html', context)
-
-
-# Save the new game that was added by the new game page
-def save_game(request):
-    curr_game = Games(game=request.POST['game_name'], gameType=request.POST['game_type'])
-    curr_game.save()
-    messages.success(request, 'New game added successfully!')
-    return HttpResponse("New game saved.")
-
-
-# Check that the new game given is not in the database yet
-def check_game_list(request):
-    curr_game = Games.verify(request.POST['game_name'], request.POST['game_type'])
-    if curr_game:
-        save_game(request)
-    else:
-        messages.error(request, 'Game could not be added.')
-    return HttpResponseRedirect(reverse('new_game'))
-
-
 def edit_team(request, username):
     curr_team = User.objects.filter(username=username)
     context = {'team_info': curr_team}
