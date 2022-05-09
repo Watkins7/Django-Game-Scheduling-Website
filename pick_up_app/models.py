@@ -14,7 +14,7 @@ class NameField(models.CharField):
 
 # Create your models here.
 class User(AbstractUser):
-    mmr_score = models.IntegerField(default=50)
+    mmrScore = models.IntegerField(default=50)
     teamname = models.CharField(max_length=50,default='')
     email = models.EmailField(max_length=100, default='')
     checkpassword = models.CharField(max_length=50, default='')
@@ -26,6 +26,18 @@ class User(AbstractUser):
             if (user.username == username and user.password == password):
                 return user
         return None
+
+    #Changes MMR based on bool parameter isWinner
+    def changeMMR(self, isWinner = False):
+        if(isWinner):
+            self.mmrScore += 50
+        else:
+            self.mmrScore -= 50
+
+        if(self.mmrScore < 0):
+            self.mmrScore = 0
+
+        return True
 
     def __str__(self):
         return self.username
@@ -64,7 +76,7 @@ class Emails(models.Model):
 
 class TimeSlot(models.Model):
     host_team = models.ForeignKey(User, on_delete=models.CASCADE, related_name='host_team')
-    game = models.ForeignKey(Games, on_delete=models.CASCADE, related_name="game_name")
+    game = models.ForeignKey(Games, on_delete=models.CASCADE)
     slot_start = models.DateTimeField('Start date/time available')
     slot_end = models.DateTimeField('End date/time available')
     opponent_team = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="opponent_team")
