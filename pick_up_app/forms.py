@@ -166,7 +166,5 @@ class NewGameForm(ModelForm):
         # # Get form data
         new_game = f.get("game")
 
-        for my_game in Games.objects.all():
-            # Validate game isn't already in the database
-            if new_game == my_game.game:
-                raise ValidationError("ERROR: This game is already in the system")
+        if Games.objects.filter(game=new_game):
+            raise ValidationError("ERROR: This game is already in the system")

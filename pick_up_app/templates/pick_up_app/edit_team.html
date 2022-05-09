@@ -57,17 +57,21 @@
             </div>
 
             <div class="container">
-                <label>Edit Latitude</label>
-                <input type="text" class="input_text" name="new_latitude" placeholder="Enter New Latitude Coordinates">
-            </div>
-
-            <div class="container">
                 <label>Edit Longitude</label>
                 <input type="text" class="input_text" name="new_longitude" placeholder="Enter New Longitude Coordinates">
             </div>
 
             <div class="container">
+                <label>Edit Latitude</label>
+                <input type="text" class="input_text" name="new_latitude" placeholder="Enter New Latitude Coordinates">
+            </div>
+
+            <div class="container">
                 <input class="my_save_button" type="submit" align="center" value="Save Changes">
+                <a class="team_pg_redirect" href="{% url 'team_page' team_username %}" align="center">
+                    <button type="button" class="redirect_btn">Back to Team Page</button>
+                </a>
+
             </div>
         </form>
 

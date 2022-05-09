@@ -271,9 +271,15 @@ def timeslot(request, username, timeslot_id=None):
 
 
 def edit_team(request, username):
-    curr_team = User.objects.filter(username=username)
-    context = {'team_info': curr_team}
-    return render(request, 'pick_up_app/edit_team.html', context)
+    # Ensures only authenticated team can edit timeslot data
+    if request.user.is_authenticated:
+        if request.user.username != username:
+            return HttpResponse("You are trying to view a page that is not yours!")
+        else:
+            context = {'team_username': username}
+            return render(request, 'pick_up_app/edit_team.html', context)
+    else:
+        return HttpResponse("You are not logged in!")
 
 
 def check_team_changes(request):
@@ -339,26 +345,35 @@ def check_team_changes(request):
             my_user.save()
             messages.success(request, "SUCCESS: Team email changed successfully.")
 
-    # If new latitude given, make sure that it does not match current coordinate and validate in correct range
-    if new_latitude:
-        if my_user.latitude == new_latitude:
-            messages.error(request, "ERROR: The latitude given is already this team's latitude coordinate.")
-        elif new_latitude < -90 or new_latitude > 90:
-            messages.error(request, "ERROR: Latitude must be within -90 to 90")
-        else:
-            my_user.latitude = new_latitude
-            my_user.save()
-            messages.success(request, "SUCCESS: Team latitude coordinate changed successfully.")
-
     # If new longitude given make sure it doesn't match the current coordinate and validate in correct range
     if new_longitude:
-        if my_user.longitude == new_longitude:
-            messages.error(request, "ERROR: The longitude given is already this team's longitude coordinate.")
-        elif new_longitude < -180 or new_longitude > 180:
-            messages.error(request, "ERROR: Longitude must be within -180 to 180")
-        else:
-            my_user.longitude = new_longitude
-            my_user.save()
-            messages.success(request, "SUCCESS: Team longitude coordinate changed successfully.")
+        try:
+            new_longitude = float(new_longitude)
+            if my_user.longitude == new_longitude:
+                messages.error(request, "ERROR: The longitude given is already this team's longitude coordinate.")
+            elif new_longitude < -180 or new_longitude > 180:
+                messages.error(request, "ERROR: Longitude must be within -180 to 180")
+            else:
+                my_user.longitude = new_longitude
+                my_user.save()
+                messages.success(request, "SUCCESS: Team longitude coordinate changed successfully.")
+        except ValueError as VErr:
+            messages.error(request, "ERROR: Longitude coordinate must be a number.")
+
+    # If new latitude given, make sure that it does not match current coordinate and validate in correct range
+    if new_latitude:
+        try:
+            new_latitude = float(new_latitude)
+            if my_user.latitude == new_latitude:
+                messages.error(request, "ERROR: The latitude given is already this team's latitude coordinate.")
+            elif new_latitude < -90 or new_latitude > 90:
+                messages.error(request, "ERROR: Latitude must be within -90 to 90")
+            else:
+                my_user.latitude = new_latitude
+                my_user.save()
+                messages.success(request, "SUCCESS: Team latitude coordinate changed successfully.")
+        except ValueError as VErr:
+            messages.error(request, "ERROR: Latitude coordinate must be a number.")
+
 
     return HttpResponseRedirect(reverse('edit_team', args=(my_user.username,)))
