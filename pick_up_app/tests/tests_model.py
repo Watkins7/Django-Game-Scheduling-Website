@@ -39,6 +39,26 @@ class UserModelTests(TestCase):
         with self.assertRaises(IntegrityError):
             failGame.save()
 
+    #Ensures the increment works properly
+    def test_mmr_Increment(self):
+        newUser = User(username = "nuck", password="milk")
+        newUser.changeMMR(True)
+        self.assertEqual(newUser.mmrScore, 150)
+
+    #Ensures the decrement works properly
+    def test_mmr_Decrement(self):
+        newUser = User(username = "nuck", password="milk")
+        newUser.changeMMR(False)
+        self.assertEqual(newUser.mmrScore, 50)
+
+    #Test to ensure the MMR scores wont become negative
+    def test_mmr_negative(self):
+        newUser = User(username = "nuck", password="milk")
+        newUser.changeMMR(False)
+        newUser.changeMMR(False)
+        newUser.changeMMR(False)
+        newUser.changeMMR(False)
+        self.assertEqual(newUser.mmrScore, 0)
 
 class EmailsModelTests(TestCase):
 
