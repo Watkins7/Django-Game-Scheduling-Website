@@ -115,7 +115,8 @@ def check(request):
         login(request, currUser)
         return HttpResponseRedirect(reverse('home_page', args=(currUser.username,)))
     else:
-        return HttpResponse("not a user oop")
+        messages.add_message(request, messages.ERROR, 'Error, Invalid username or password')
+        return render(request, 'pick_up_app/login.html')
 
 
 ##########################################
@@ -145,7 +146,8 @@ def register(request):
             ##############################################################
 
             # Send back success message
-            messages.add_message(request, messages.SUCCESS, 'Registration submitted successfully! Welcome to PickupTeam')
+            messages.add_message(request, messages.SUCCESS,
+                                 'Registration submitted successfully! Welcome to PickupTeam')
 
     # GET request
     else:
@@ -257,10 +259,10 @@ def booking(request, username, timeslot_id):
             userobject = User.objects.get(username=username)
             instance.opponent_team_id = userobject.id
             instance.save()
+            messages.success(request, "You have successfully booked this game!")
 
         # go back to host team calendar
-        host_calendar = "/pick_up_app/calendar" + str(instance.host_team.username)
-        messages.success(request, "You have successfully booked this game!")
+        host_calendar = "/pick_up_app/calendar/" + str(instance.host_team.username)
         return HttpResponseRedirect(host_calendar)
 
     # else this is a GET operation
@@ -330,6 +332,20 @@ def submit_results(request, username, timeslot_id):
                     instance.opponent_won = None
                     instance.save()
 
+            if (instance.opponent_won == False and instance.host_won == True) or (
+                    instance.opponent_won == True and instance.host_won == False):
+
+                hostObj = User.objects.get(id=instance.host_team_id)
+                opponentObj = User.objects.get(id=instance.opponent_team_id)
+
+                if instance.opponent_won == False:
+                    opponentObj.mmr_score -= 5
+                    hostObj.mmr_score += 5
+
+                else:
+                    opponentObj.mmr_score += 5
+                    hostObj.mmr_score -= 5
+
             # go back to host team calendar
             host_calendar = "/pick_up_app/calendar/" + str(instance.host_team.username)
             messages.success(request, "Your submission was processed!")
@@ -355,10 +371,10 @@ def submit_results(request, username, timeslot_id):
 
 
 # Views for displaying a finished game
-def past_game(request, game_id):
-
+def past_game(request, timeslot_id, game_id):
     # get game object
     gameObj = Games.objects.get(id=game_id)
+    timeslotObj = TimeSlot.objects.get(id=timeslot_id)
 
     # default settings
     results = "Invalid!"
@@ -366,27 +382,30 @@ def past_game(request, game_id):
     loser = "Invalid!"
 
     # if there is a winner and loser
-    if gameObj.host_won == (not gameObj.opponent_won):
+    if timeslotObj.host_won == (not timeslotObj.opponent_won):
         results = "Valid!"
 
         # set variables based on who won
-        if gameObj.host_won:
-            winner = User.objects.get(id=gameObj.host_team_id).username
-            loser = User.objects.get(id=gameObj.opponent_team_id).username
+        if timeslotObj.host_won:
+            winner = User.objects.get(id=timeslotObj.host_team_id).username
+            loser = User.objects.get(id=timeslotObj.opponent_team_id).username
         else:
-            winner = User.objects.get(id=gameObj.opponent_team_id).username
-            loser = User.objects.get(id=gameObj.winner_team_id).username
+            winner = User.objects.get(id=timeslotObj.opponent_team_id).username
+            loser = User.objects.get(id=timeslotObj.host_team_id).username
 
     # appropriate context to be passed to HTML
     context = {'results': results,
                'gameName': gameObj.game,
                'gameType': gameObj.gameType,
-               'start': gameObj.slot_start,
-               'end': gameObj.slot_end,
-               'host': User.objects.get(id=gameObj.host_team_id).username,
-               'opponent': User.objects.get(id=gameObj.opponent_team_id).username,
+               'start': timeslotObj.slot_start,
+               'end': timeslotObj.slot_end,
+               'host': User.objects.get(id=timeslotObj.host_team_id).username,
+               'opponent': User.objects.get(id=timeslotObj.opponent_team_id).username,
                'winner': winner,
-               'loser': loser
+               'loser': loser,
+               'current_team': request.user.username,
+               'home_page': '/pick_up_app/'
+
                }
 
     return render(request, 'pick_up_app/past_game.html', context)

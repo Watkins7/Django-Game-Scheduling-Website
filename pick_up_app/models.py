@@ -20,8 +20,6 @@ class User(AbstractUser):
     checkpassword = models.CharField(max_length=50, default='')
     longitude = models.FloatField(default=-76.7100)
     latitude = models.FloatField(default=39.2543)
-    mmrScore = models.IntegerField(default=50)
-
 
     def authenticate(username, password):
         for user in User.objects.all():

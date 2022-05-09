@@ -66,13 +66,14 @@ def get_slot_url(slot, viewing_team, cur_team):
     #############################################################################################
 
     # if game is recorded as finish
-    if slot.host_won and slot.opponent_won:
-        url = reverse('past_game', args=(slot.id))
+    if slot.host_won or not slot.host_won:
+        if slot.opponent_won or not slot.opponent_won:
+            url = reverse('past_game', args=(slot.id, slot.game_id,))
 
     # If a team is viewing their own calendar the
     # And timeslot still has NULL opponent team
     # url links to the edit timeslot page
-    if (cur_team == viewing_team.username) and not slot.opponent_team_id:
+    elif (cur_team == viewing_team.username) and not slot.opponent_team_id:
         url = reverse('timeslot_edit', args=(cur_team, slot.id,))
 
     # If a team is viewing their own calendar the

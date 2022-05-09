@@ -11,7 +11,7 @@
     <title> {{viewing_team}} Team Calendar </title>
 </head>
 
-<div style="text-align: center">
+<div style="text-align: center; margin-top: 2%">
     <h1 style="font-size: 40px"> Team {{viewing_teamname}} Calendar</h1>
     <h2 style="font-size: 32px"> Team Captain: {{viewing_team}}</h2>
 </div>
@@ -42,7 +42,7 @@
 
 
 <body>
-    <div class="redirect_buttons" style="text-align: center">
+    <div class="redirect_buttons" style="text-align: center ; margin-top: 2%">
         <button class="btn">
             <a class="previous_month_btn" href="{% url 'calendar' viewing_team %}?{{ last_month }}"
                style="text-decoration: none"> Previous Month </a>
@@ -58,10 +58,10 @@
                 style="text-decoration: none"> Next Month </a>
         </button>
     </div>
-    <div class="calendar">
+    <div class="calendar" style="margin-top: 2%">
         {{ calendar }}
     </div>
-    <div class="redirect_buttons" style="text-align: center">
+    <div class="redirect_buttons" style="text-align: center; margin-top: 2%; margin-bottom: 3%">
         <button class="btn">
             <a class="home_btn" href="{% url 'home_page' current_team %}"
                    style="text-decoration: none"> Back to Home Page </a>
