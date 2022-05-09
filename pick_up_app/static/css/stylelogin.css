@@ -1,89 +1,69 @@
 body {
+    overflow:hidden;
     background: #c1d9b4;
     font-family: 'Ubuntu', sans-serif;
-}
-
-.main {
-    background-color: #FFFFFF;
-    width: 400px;
-    height: 400px;
-    margin-top: 10em;
-    margin-left: 30em;
-    border-radius: 2em;
-    box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
-}
-
-.top-waves {
-    position: absolute;
-    bottom: 0;
-    left: 0;
+    height: 100%;
     width: 100%;
-    overflow: hidden;
-    line-height: 0;
-    transform: rotate(180deg);
 }
 
-.top-waves svg {
-    position: relative;
-    display: block;
-    width: calc(100% + 1.3px);
-    height: 250px;
+.left {
+   position: fixed;
+    top: 15%;
+    bottom: 15%;
+vertical-align:middle;
+    justify-content: left;
+   float: left;
+   width: 30%;
+    margin: auto;
 }
 
-.top-waves .shape-fill {
-    fill: #4C5E4B;
+.right {
+   position: fixed;
+    right: 100%;
+    left: 75%;
+    top: 15%;
+    bottom: 15%;
+vertical-align:middle;
+    justify-content: left;
+   float: left;
+   width: 30%;
+
 }
 
-.sign {
-    padding-top: 40px;
-    color: black;
-    font-family: 'Ubuntu', sans-serif;
-    font-weight: bold;
-    font-size: 23px;
+.logincontent{
+   position: relative;
+   float: left;
+   width: 35%;
 }
 
-.bottom-waves {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    overflow: hidden;
-    line-height: 0;
-}
-
-.bottom-waves svg {
-    position: relative;
-    display: block;
-    width: calc(135% + 1.3px);
-    height: 250px;
-}
-
-.bottom-waves .shape-fill {
-    fill: #4C5E4B;
+.middle_box{
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #FFFFFF;
+  border-top: 0;
+  border-bottom: 0;
+  border-radius: 2em;
+  box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
 }
 
 .user {
-width: 76%;
-color: rgb(38, 50, 56);
-font-weight: 700;
-font-size: 14px;
-letter-spacing: 1px;
-background: rgba(136, 126, 126, 0.04);
-padding: 10px 20px;
-border: none;
-border-radius: 20px;
-outline: none;
-box-sizing: border-box;
-border: 2px solid rgba(0, 0, 0, 0.02);
-margin-bottom: 50px;
-margin-left: 46px;
-text-align: center;
-margin-bottom: 27px;
-font-family: 'Ubuntu', sans-serif;
-}
-
-form.form1 {
-    padding-top: 40px;
+    width: 76%;
+    color: rgb(38, 50, 56);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+    background: rgba(136, 126, 126, 0.04);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    box-sizing: border-box;
+    border: 2px solid rgba(0, 0, 0, 0.02);
+    margin-bottom: 50px;
+    margin-left: 46px;
+    text-align: center;
+    margin-bottom: 27px;
+    font-family: 'Ubuntu', sans-serif;
 }
 
 .pass {
@@ -109,7 +89,7 @@ form.form1 {
 
 .un:focus, .pass:focus {
     border: 2px solid rgba(0, 0, 0, 0.18) !important;
-    
+
 }
 
 .login {
@@ -150,4 +130,72 @@ a {
     .main {
         border-radius: 0px;
     }
+}
+
+.top-waves {
+    position: absolute;
+        display: flex;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10%;
+    overflow: hidden;
+    line-height: 0;
+    transform: rotate(180deg);
+}
+
+.top-waves svg {
+    position: relative;
+    display: flex;
+    width: calc(100% + 1.3px);
+    height: 100%;
+}
+
+.top-waves .shape-fill {
+    fill: #4C5E4B;
+}
+
+.bottom-waves {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 10%;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.bottom-waves svg {
+    position: relative;
+    display: flex;
+    width: calc(135% + 1.3px);
+    height: 100%;
+}
+
+.bottom-waves .shape-fill {
+    fill: #4C5E4B;
+}
+
+.sign {
+    padding-top: 40px;
+    color: black;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: bold;
+    font-size: 23px;
+}
+
+img {
+    height: 200px;
+    width: 200px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20%;
+    display: block;
+    font-size: 0;
+    line-height: 0;
+    float: right;
+    margin-top: 5%;
+    position: relative;
 }

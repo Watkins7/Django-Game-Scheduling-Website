@@ -65,6 +65,10 @@ def get_slot_url(slot, viewing_team, cur_team):
     # Team owns the time slot
     #############################################################################################
 
+    # if game is recorded as finish
+    if slot.host_won and slot.opponent_won:
+        url = reverse('past_game', args=(slot.id))
+
     # If a team is viewing their own calendar the
     # And timeslot still has NULL opponent team
     # url links to the edit timeslot page

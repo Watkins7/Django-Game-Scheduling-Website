@@ -41,8 +41,8 @@ def home_page(request, username):
     # Is the user logged in
     if (request.user.is_authenticated):
 
-        #Is the user at THEIR home page
-        if(request.user.username != username):
+        # Is the user at THEIR home page
+        if (request.user.username != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
@@ -81,12 +81,13 @@ def home_page(request, username):
     else:
         return HttpResponse("You are not logged in!")
 
-def team_page(request, username):
-     #Is the user logged in
-    if(request.user.is_authenticated):
 
-        #Is the user at THEIR home page
-        if(request.user.username != username):
+def team_page(request, username):
+    # Is the user logged in
+    if (request.user.is_authenticated):
+
+        # Is the user at THEIR home page
+        if (request.user.username != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
@@ -101,7 +102,7 @@ def index(request):
 
 
 def save(request):
-    #newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
+    # newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
     newUser = User(username=request.POST['username'], password=request.POST['password'])
     print(newUser)
     newUser.save()
@@ -144,7 +145,7 @@ def register(request):
             ##############################################################
 
             # Send back success message
-            messages.success(request, 'Registration submitted successfully! Welcome to PickupTeam')
+            messages.add_message(request, messages.SUCCESS, 'Registration submitted successfully! Welcome to PickupTeam')
 
     # GET request
     else:
@@ -220,7 +221,6 @@ def get_last_month(cur_month):
 
 # Will allow another team to be added to a timeslot
 def booking(request, username, timeslot_id):
-
     # username should be OPPONENT
     # timeslot_id should be able to gather all others information
 
@@ -236,12 +236,16 @@ def booking(request, username, timeslot_id):
 
     # check if booking_team != host_team
     if instance.host_team.username == username:
-        return HttpResponse("Error, booking your own timeslot")
+        host_calendar = "/pick_up_app/calendar/" + str(instance.host_team.username)
+        messages.error(request, "You are trying to book your own game!")
+        return HttpResponseRedirect(host_calendar)
 
     # if there is already opponent team on the timeslot
     # return response
     if instance.opponent_team:
-        return HttpResponse("Error, timeslot already booked")
+        host_calendar = "/pick_up_app/calendar/" + str(instance.host_team.username)
+        messages.error(request, "This game has already been booked!")
+        return HttpResponseRedirect(host_calendar)
 
     # if POST request
     if request.method == 'POST':
@@ -256,7 +260,7 @@ def booking(request, username, timeslot_id):
 
         # go back to host team calendar
         host_calendar = "/pick_up_app/calendar" + str(instance.host_team.username)
-        messages.success(request, "Redirected back to Host Calendar!")
+        messages.success(request, "You have successfully booked this game!")
         return HttpResponseRedirect(host_calendar)
 
     # else this is a GET operation
@@ -270,17 +274,14 @@ def booking(request, username, timeslot_id):
                    'gameName': Games.objects.get(id=instance.game_id).game,
                    'gameType': Games.objects.get(id=instance.game_id).gameType,
                    'opponent': username
-                    }
+                   }
 
         # Render the booking html
         return render(request, 'pick_up_app/booking.html', context)
 
 
-
-
 # Will allow selected username to update timeslot GAME RESULTS
 def submit_results(request, username, timeslot_id):
-
     # username should be OPPONENT or HOST
     # timeslot_id should be able to gather all other information
 
@@ -344,7 +345,7 @@ def submit_results(request, username, timeslot_id):
                    'end': instance.slot_end,
                    'host': User.objects.get(id=instance.host_team_id).username,
                    'opponent': User.objects.get(id=instance.opponent_team_id).username
-                    }
+                   }
 
         return render(request, 'pick_up_app/submitGameResults.html', context)
 
@@ -353,8 +354,42 @@ def submit_results(request, username, timeslot_id):
         return HttpResponse("Error, 'timeslot' does not have 'opponent_id'... or possibly 'host_id'")
 
 
-def displayPastGame(request, timeslot_id):
-    return HttpResponse("Not Implemented")
+# Views for displaying a finished game
+def past_game(request, game_id):
+
+    # get game object
+    gameObj = Games.objects.get(id=game_id)
+
+    # default settings
+    results = "Invalid!"
+    winner = "Invalid!"
+    loser = "Invalid!"
+
+    # if there is a winner and loser
+    if gameObj.host_won == (not gameObj.opponent_won):
+        results = "Valid!"
+
+        # set variables based on who won
+        if gameObj.host_won:
+            winner = User.objects.get(id=gameObj.host_team_id).username
+            loser = User.objects.get(id=gameObj.opponent_team_id).username
+        else:
+            winner = User.objects.get(id=gameObj.opponent_team_id).username
+            loser = User.objects.get(id=gameObj.winner_team_id).username
+
+    # appropriate context to be passed to HTML
+    context = {'results': results,
+               'gameName': gameObj.game,
+               'gameType': gameObj.gameType,
+               'start': gameObj.slot_start,
+               'end': gameObj.slot_end,
+               'host': User.objects.get(id=gameObj.host_team_id).username,
+               'opponent': User.objects.get(id=gameObj.opponent_team_id).username,
+               'winner': winner,
+               'loser': loser
+               }
+
+    return render(request, 'pick_up_app/past_game.html', context)
 
 
 # View to add/update a team's timeslot information

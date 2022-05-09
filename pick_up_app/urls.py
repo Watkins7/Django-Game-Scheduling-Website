@@ -17,6 +17,7 @@ urlpatterns = [
 
     path('timeslot/new/<username>', views.timeslot, name="timeslot_new"),
     path('timeslot/edit/<username>/int:<timeslot_id>', views.timeslot, name="timeslot_edit"),
+    path('pastgame/int:<timeslot_id>', views.past_game, name="past_game"),
 
     path('booking/<username>/int:<timeslot_id>', views.booking, name="booking"),
     path('submit_results/<username>/int:<timeslot_id>', views.submit_results, name="submit_results"),
