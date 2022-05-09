@@ -339,12 +339,12 @@ def submit_results(request, username, timeslot_id):
                 opponentObj = User.objects.get(id=instance.opponent_team_id)
 
                 if instance.opponent_won == False:
-                    opponentObj.mmr_score -= 5
-                    hostObj.mmr_score += 5
+                    opponentObj.mmrScore -= 5
+                    hostObj.mmrScore += 5
 
                 else:
-                    opponentObj.mmr_score += 5
-                    hostObj.mmr_score -= 5
+                    opponentObj.mmrScore += 5
+                    hostObj.mmrScore -= 5
 
             # go back to host team calendar
             host_calendar = "/pick_up_app/calendar/" + str(instance.host_team.username)
