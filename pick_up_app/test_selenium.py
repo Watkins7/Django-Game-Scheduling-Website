@@ -14,7 +14,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 # Registration Tests
 ################################################
 from pick_up_app.models import User, TimeSlot, Games
-from pick_up_app.forms import NewUserForm
+from pick_up_app.forms import NewUserForm, NewGameForm
 
 print("\n\n######################################################################")
 print("#                                                                    #")
@@ -890,7 +890,7 @@ class TimeslotHTMLTests(StaticLiveServerTestCase):
         driver.quit()
 
 
-class NewGamePageTests(StaticLiveServerTestCase):
+class NewGameOverlayTests(StaticLiveServerTestCase):
     def test_new_game_adds_to_database_successfully(self):
         """
         This function tests that a game added via the new_game page actually
@@ -957,6 +957,9 @@ class NewGamePageTests(StaticLiveServerTestCase):
         new_game = Games(game="poker", gameType="cards")
         new_game.save()
 
+        # Check that the game was added to the database
+        self.assertTrue(Games.objects.filter(new_game.game).exists())
+
         # Setup Firefox web driver
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
         driver.implicitly_wait(0.5)
@@ -972,35 +975,16 @@ class NewGamePageTests(StaticLiveServerTestCase):
 
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
-        # Open the calendar of the user we made
-        driver.get(self.live_server_url + "/pick_up_app/calendar/lime")
-        driver.implicitly_wait(0.5)  # Wait before proceeding
+        # Create a new game form
+        my_form = NewGameForm()
+        my_form.fields['game'] = 'poker'
+        my_form.fields['gameType'] = 'cards'
 
-        # Click on new timeslot button then the new_game link
-        driver.find_element_by_class_name("new_timeslot_btn").click()
-        driver.find_element_by_class_name("new_game_link").click()
+        # Check that the game added is not valid (duplicate game name)
+        self.assertFalse(my_form.is_valid())
 
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Enter new game info
-        driver.find_element_by_xpath('//input[@type="text"][@name="game_name"]').send_keys("poker")
-        driver.find_element_by_xpath('//input[@type="text"][@name="game_type"]').send_keys("cards")
-
-        # Find and click the game submit button
-        driver.find_element_by_class_name("game_button").click()
-        time.sleep(2)
-
-        driver.implicitly_wait(0.5)  # Wait before checking the game message
-
-        # Get error message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
-        expected_message = "Game could not be added."
-        message_text = ""  # Primes variable for the message (if one exists)
-        for message in messages_found:
-            message_text = message.text
-
-        # Compare error message (if any) to the expected message string
-        self.assertTrue(message_text == expected_message)
+        # Check that the game is still in the database
+        self.assertTrue(Games.objects.filter(game='poker', gameType='cards'))
 
         # Close browser
         driver.quit()

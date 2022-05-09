@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm, DateInput
 from django.utils import timezone
-from .models import User, TimeSlot
+from .models import User, TimeSlot, Games
 
 # Error Handling
 from django.core.exceptions import ValidationError
@@ -70,6 +70,8 @@ class NewUserForm(ModelForm):
 
 # Timeslot Form
 class TimeSlotForm(ModelForm):
+    is_timeslot_form = forms.BooleanField(widget=forms.HiddenInput, initial=True)
+
     class Meta:
         model = TimeSlot
 
@@ -123,3 +125,48 @@ class TimeSlotForm(ModelForm):
                                                 host_team_id=host_team.id).count()
         if num_timeslots >= 8:
             raise ValidationError("ERROR: Maximum number of timeslots allowed on this day has been reached")
+
+
+# New Game Form
+class NewGameForm(ModelForm):
+    is_game_form = forms.BooleanField(widget=forms.HiddenInput, initial=True)
+
+    class Meta:
+        model = Games
+
+        # These are the attributes to be stored
+        fields = ('game', 'gameType')
+
+        widgets = {
+            'game': forms.TextInput(attrs={
+                'class': "form-input",
+                'style': 'max-width: 300px;',
+                'placeholder': 'Game Name'
+            }),
+            'gameType': forms.TextInput(attrs={
+                'class': "form-input",
+                'style': 'max-width: 300px;',
+                'placeholder': 'Game Type'
+            }),
+        }
+
+        # This is what the form displays the fields
+        labels = {
+            'game': "New Game",
+            'gameType': "New Game Type",
+        }
+
+    ##########################################################
+    # Handles cleaning data of form / checking accurate data
+    ##########################################################
+    def clean(self):
+        # Initial clean of form data
+        f = self.cleaned_data
+
+        # # Get form data
+        new_game = f.get("game")
+
+        for my_game in Games.objects.all():
+            # Validate game isn't already in the database
+            if new_game == my_game.game:
+                raise ValidationError("ERROR: This game is already in the system")
