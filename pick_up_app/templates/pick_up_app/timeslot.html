@@ -4,7 +4,9 @@
 {% load static %}
 <head>
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
+    {#  Load in both the styletimeslot.css and style_new_game.css stylesheets  #}
     <link rel="stylesheet" type="text/css" href="{% static 'css/styletimeslot.css' %}">
+    <link rel="stylesheet" href={% static "css/style_new_game.css" %}>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
     <title> Timeslot Page</title>
@@ -51,12 +53,15 @@
 
             <form method="POST">
                 {% csrf_token %}
+
+                {# Print any messages #}
                 {% if messages %}
                     {% for message in messages %}
                         {# Sets message tag as class for class referent #}
                         <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
                     {% endfor %}
                 {% endif %}
+                {# An example text of how games should be entered into the form  #}
                 <p class="ex_text">EX.: Game Name: poker, Game Type: cards</p>
                 <table class="game_form">
                     {{ game_form }}
