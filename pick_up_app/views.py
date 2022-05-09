@@ -12,7 +12,7 @@ from .utils import Calendar
 import calendar
 
 # Forms
-from .forms import NewUserForm, TimeSlotForm
+from .forms import NewUserForm, TimeSlotForm, NewGameForm
 
 # Models
 from .models import User, TimeSlot, Games
@@ -233,21 +233,38 @@ def timeslot(request, username, timeslot_id=None):
             else:
                 instance = TimeSlot(host_team=cur_team)
 
-            timeslot_form = TimeSlotForm(request.POST or None, instance=instance)
+            timeslot_form = TimeSlotForm(instance=instance)
+            game_form = NewGameForm()
 
             # If the request is a post and the form has been cleaned either save the form or delete the timeslot
-            if request.POST:
-                if request.POST.get('delete'):
-                    instance.delete()
-                    return HttpResponseRedirect(reverse('calendar', args=(username,)))
-                else:
-                    if timeslot_form.is_valid():
-                        timeslot_form.save()
+            if request.method == 'POST':
+                if 'is_timeslot_form' in request.POST:
+                    timeslot_form = TimeSlotForm(request.POST, instance=instance)
+                    if request.POST.get('delete'):
+                        instance.delete()
                         return HttpResponseRedirect(reverse('calendar', args=(username,)))
+                    else:
+                        if timeslot_form.is_valid():
+                            timeslot_form.save()
+                            return HttpResponseRedirect(reverse('calendar', args=(username,)))
+                if 'is_game_form' in request.POST:
+                    # Post new game form
+                    game_form = NewGameForm(request.POST)
+                    # Try save game if form is valid
+                    if game_form.is_valid():
+                        game_form.save()
+
+                        # Send back success message
+                        messages.success(request, 'SUCCESS: New game added successfully!')
+                    # Reload empty form
+                    game_form = NewGameForm()
 
             context = {'timeslot_form': timeslot_form,
                        'current_team': cur_team.username,
-                       'timeslot_id': timeslot_id}
+                       'timeslot_id': timeslot_id,
+                       'game_form': game_form,
+                       }
+
             return render(request, 'pick_up_app/timeslot.html', context)
     else:
         return HttpResponse("You are not logged in!")

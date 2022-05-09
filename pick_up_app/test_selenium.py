@@ -923,13 +923,13 @@ class NewGameOverlayTests(StaticLiveServerTestCase):
 
         # Click on new timeslot button then the new_game link
         driver.find_element_by_class_name("new_timeslot_btn").click()
-        driver.find_element_by_class_name("new_game_link").click()
+        driver.find_element_by_class_name("new_game_btn").click()
 
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Enter new game info
-        driver.find_element_by_xpath('//input[@type="text"][@name="game_name"]').send_keys("poker")
-        driver.find_element_by_xpath('//input[@type="text"][@name="game_type"]').send_keys("cards")
+        driver.find_element_by_xpath('//input[@type="text"][@name="game"]').send_keys("poker")
+        driver.find_element_by_xpath('//input[@type="text"][@name="gameType"]').send_keys("cards")
 
         # Find and click the game submit button
         driver.find_element_by_class_name("game_button").click()
@@ -957,8 +957,8 @@ class NewGameOverlayTests(StaticLiveServerTestCase):
         new_game = Games(game="poker", gameType="cards")
         new_game.save()
 
-        # Check that the game was added to the database
-        self.assertTrue(Games.objects.filter(new_game.game).exists())
+        # Check if the game we added is there
+        self.assertTrue(Games.objects.filter(game='poker', gameType='cards'))
 
         # Setup Firefox web driver
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
