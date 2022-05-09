@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 {% load static %}
 <head>
-    {# Load in the Ubuntu font stylesheet and the static CSS style.css file. #}
+    {# Load in the Ubuntu font stylesheet and the static CSS style_edit_team.css file. #}
     <link rel="stylesheet" href={% static "css/style_edit_team.css" %}>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
@@ -54,6 +54,16 @@
             <div class="container">
                 <label>Edit Email</label>
                 <input type="text" class="input_text" name="new_email" placeholder="Enter New Email">
+            </div>
+
+            <div class="container">
+                <label>Edit Latitude</label>
+                <input type="text" class="input_text" name="new_latitude" placeholder="Enter New Latitude Coordinates">
+            </div>
+
+            <div class="container">
+                <label>Edit Longitude</label>
+                <input type="text" class="input_text" name="new_longitude" placeholder="Enter New Longitude Coordinates">
             </div>
 
             <div class="container">

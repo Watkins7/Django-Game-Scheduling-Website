@@ -81,17 +81,17 @@ def home_page(request, username):
     else:
         return HttpResponse("You are not logged in!")
 
-def team_page(request, username):
-     #Is the user logged in
-    if(request.user.is_authenticated):
 
-        #Is the user at THEIR home page
-        if(request.user.username != username):
+def team_page(request, username):
+    # Is the user logged in
+    if request.user.is_authenticated:
+
+        # Is the user at THEIR home page
+        if request.user.username != username:
 
             return HttpResponse("You are trying to view a page that is not yours!")
-
         else:
-            return render(request, 'pick_up_app/team.html')
+            return render(request, 'pick_up_app/team.html', context={'username': username})
 
 
 def index(request):
@@ -285,11 +285,13 @@ def check_team_changes(request):
     new_password = request.POST['new_password']
     confirm_password = request.POST['confirm_password']
     new_email = request.POST['new_email']
+    new_latitude = request.POST['new_latitude']
+    new_longitude = request.POST['new_longitude']
 
     # If new username given, make sure username is unique and not current username before saving
     if new_username:
         if my_user.username == new_username:
-            messages.error(request, "The username given is already this team's username.")
+            messages.error(request, "ERROR: The username given is already this team's username.")
 
         # Check that username is unique from other users
         else:
@@ -301,39 +303,62 @@ def check_team_changes(request):
             if is_unique:
                 my_user.username = new_username
                 my_user.save()
-                messages.success(request, "Username changed successfully.")
+                messages.success(request, "SUCCESS: Username changed successfully.")
             # If not unique, sent error message
             else:
-                messages.error(request, "This username is already taken.")
+                messages.error(request, "ERROR: This username is already taken.")
 
     # If new team name, save if not the same as current team name
     if new_team_name:
         if my_user.teamname == new_team_name:
-            messages.error(request, "The team name given is already this team's team name.")
+            messages.error(request, "ERROR: The team name given is already this team's team name.")
         else:
             my_user.teamname = new_team_name
             my_user.save()
-            messages.success(request, "Team name changed successfully.")
+            messages.success(request, "SUCCESS: Team name changed successfully.")
 
     # If new password is not the same as old one, make sure it matches confirmation password before saving
     if new_password:
         if my_user.password == new_password:
-            messages.error(request, "The password given is already this team's password.")
+            messages.error(request, "ERROR: The password given is already this team's password.")
         else:
             if new_password == confirm_password:
                 my_user.password = new_password
                 my_user.checkpassword = confirm_password
                 my_user.save()
-                messages.success(request, "Password changed successfully.")
+                messages.success(request, "SUCCESS: Password changed successfully.")
             else:
-                messages.error(request, "The new password and password confirmation do not match.")
+                messages.error(request, "ERROR: The new password and password confirmation do not match.")
 
     # If new email given, make sure that the email is not the current email before saving
     if new_email:
         if my_user.email == new_email:
-            messages.error(request, "The email given is already this team's email.")
+            messages.error(request, "ERROR: The email given is already this team's email.")
         else:
             my_user.email = new_email
             my_user.save()
-            messages.success(request, "Team email changed successfully.")
+            messages.success(request, "SUCCESS: Team email changed successfully.")
+
+    # If new latitude given, make sure that it does not match current coordinate and validate in correct range
+    if new_latitude:
+        if my_user.latitude == new_latitude:
+            messages.error(request, "ERROR: The latitude given is already this team's latitude coordinate.")
+        elif new_latitude < -90 or new_latitude > 90:
+            messages.error(request, "ERROR: Latitude must be within -90 to 90")
+        else:
+            my_user.latitude = new_latitude
+            my_user.save()
+            messages.success(request, "SUCCESS: Team latitude coordinate changed successfully.")
+
+    # If new longitude given make sure it doesn't match the current coordinate and validate in correct range
+    if new_longitude:
+        if my_user.longitude == new_longitude:
+            messages.error(request, "ERROR: The longitude given is already this team's longitude coordinate.")
+        elif new_longitude < -180 or new_longitude > 180:
+            messages.error(request, "ERROR: Longitude must be within -180 to 180")
+        else:
+            my_user.longitude = new_longitude
+            my_user.save()
+            messages.success(request, "SUCCESS: Team longitude coordinate changed successfully.")
+
     return HttpResponseRedirect(reverse('edit_team', args=(my_user.username,)))
