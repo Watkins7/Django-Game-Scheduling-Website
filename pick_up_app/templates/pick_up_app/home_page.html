@@ -48,8 +48,8 @@
             {#Adds each value in top_teams_list into the table as a new row. #}
             {% for team in top_teams_list %}
             <tr>
-                <td>{{ team.teamname }}</td>
-                <td>{{ team.mmrScore }}</td>
+                <td><a href="/pick_up_app/calendar/{{ team.teamname }}">{{ team.teamname }}</a></td>
+                <td>{{ team.mmr_score }}</td>
             </tr>
             {% endfor %}
         </table>
@@ -107,7 +107,7 @@
                             "<p>Longitude: {{ team.longitude }}</p>" +
                             "<p>Latitude: {{ team.latitude }}</p>" +
                             "<p>Email: {{ team.email }}</p>" +
-                            "<a href='/{{team.username}}'> 'Check them out!' </a></div>"
+                            "<a href='/pick_up_app/calendar/{{team.username}}'> 'Check them out!' </a></div>"
 
                     });
 

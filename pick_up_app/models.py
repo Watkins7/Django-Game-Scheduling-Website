@@ -14,13 +14,12 @@ class NameField(models.CharField):
 
 # Create your models here.
 class User(AbstractUser):
+    mmrScore = models.IntegerField(default=50)
     teamname = models.CharField(max_length=50,default='')
     email = models.EmailField(max_length=100, default='')
     checkpassword = models.CharField(max_length=50, default='')
     longitude = models.FloatField(default=-76.7100)
     latitude = models.FloatField(default=39.2543)
-    mmrScore = models.IntegerField(default=100)
-
 
     def authenticate(username, password):
         for user in User.objects.all():
