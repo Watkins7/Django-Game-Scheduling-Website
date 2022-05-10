@@ -1,5 +1,6 @@
 <!DOCTYPE html>{% load static %}
 <html lang="en">
+<title>Team Search Page</title>
 
 <head>
     {# Load in the Ubuntu font stylesheet and the static CSS style.css file. #}
@@ -14,13 +15,15 @@
         {% if team_search %}
 
             <p style="font-size: 40px;">
-                Search Results For <b>{{team_search}}</b>
+                Search Results For <b>{{team_search}}</b><br>
+                
             </p>
 
-                <div style="color:rgb(0, 119, 255); font-size: 30px;margin-top: 10px;">
+                <div style="color:rgb(0, 0, 0); font-size: 35px;margin-top: 10px;">
+                    Format: Username - Teamname<br>
                         {% for team in teams %}
 
-                            {{team.username}} - {{team.teamname}}<br>
+                        <a href="{% url 'calendar' username=team.username %}" style="color:rgb(0, 88, 183);font-size: 30px;" class="calendarLinks">{{team.username}} - {{team.teamname}}</a><br>
 
                     {% endfor %}
                 </div>

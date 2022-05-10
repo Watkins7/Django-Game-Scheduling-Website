@@ -1,10 +1,17 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" type="text/css" href="{% static 'pick up app/style.css' %}">
+<head>
+<meta charset="utf-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/register.css' %}">
+</head>
+
+
 
 <!--Register-->
-<div class="container py-5">
+<div style="display: inline-block; position: center">
 
     <h1>Register for Pick Up Games!</h1>
     <hr style="width:100%; height:2px; background-color: black; border:none;"/>
@@ -17,38 +24,40 @@
             Display Messages
         ########################################### -->
         {% if messages %}
-            <ul>
+            <div align="center">
+
                 {% for message in messages %}
-                <li>{{ message }}</li>
+                    <div class="alert alert-primary" role="alert" id="msg" style="width: 500px">
+                    {{ message }}
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
+
         {% endif %}
 
+
         <!-- ######################################
-            Display Errors
+            Display Form Errors
         ########################################### -->
-
         {% if form.errors %}
-
-            {% for error in field.errors %}
-              <div class="alert alert-danger">
-                   <strong>{{ error|escape }}</strong>
-              </div>
-           {% endfor %}
-
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <p> {{ error }} </p>
+                {% endfor %}
+            {% endfor %}
         {% endif %}
 
+
         <!-- ######################################
-            Display Form
+            Display Forms
         ########################################### -->
         {{ form.non_field_errors }}
         {% for field in form  %}
-            <div class="col-sm-6">
+            <div class="custom_reg">
              <b>{{ field.label_tag }}</b> {{ field }}
             </div>
         {% endfor %}
-
-
+    
         <!-- ######################################
             Button
         ########################################### -->
@@ -60,12 +69,14 @@
     <!-- ######################################
         Redirect to '/login'
     ########################################### -->
-    <p class="text-center">If you already have an account, <a href="/pick_up_app/login">login</a> instead.</p>
+    <div> <p class="text-center">If you already have an account, <a href="/pick_up_app/login">login</a> instead.</p></div>
 
     <!-- ######################################
         Redirect to '/'
     ########################################### -->
-    <p class="text-center">Go back to <a href="/pick_up_app">main site</a> instead.</p>
+    <div><p class="text-center">Go back to <a href="/pick_up_app">main site</a> instead.</p></div>
+</div>
+
 
     <div class="top-waves">
         <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
@@ -75,5 +86,5 @@
         </svg>
         </div>
 
-</div>
+
 {% endblock %}

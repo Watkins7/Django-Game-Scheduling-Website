@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from pyrsistent import v
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
@@ -641,12 +642,25 @@ class RedirectLinkTests(StaticLiveServerTestCase):
             print("FAILURE, cannot find teams in search bar")
             print(e)
 
+        time.sleep(1)
+        print(driver.title)
+        self.assertEqual(driver.title, "Team Search Page")
+
+        try:
+            result = driver.find_element_by_class_name("calendarLinks")
+            result.click()
+            print("SUCCESS, Calendar page found")
+        except Exception as e:
+            print("FAILURE, could not get to calendar from search bar results.")
+            print(e)
+
         driver.implicitly_wait(2)
-        self.assertEqual(driver.title, "Team Home Page")
+        self.assertEqual(driver.title, "lime Team Calendar")
+
+        driver.quit()
 
 
         # Close browser
-        driver.quit()
 
 # Set of selenium tests for the Calendar Page
 class CalendarHTMLTests(StaticLiveServerTestCase):

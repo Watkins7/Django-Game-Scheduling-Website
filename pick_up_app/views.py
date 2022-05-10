@@ -1,6 +1,6 @@
 # HTTP libraries
 # from curses.ascii import HT
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import login
@@ -26,7 +26,7 @@ from django.conf import settings
 def team_search(request):
     if (request.method == "POST"):
         team_search = request.POST['team_search']
-        teams = User.objects.all()
+        teams = User.objects.filter(teamname__contains=team_search)
         return render(request, 'pick_up_app/team_search.html', {"team_search": team_search, "teams": teams})
     else:
         return render(request, 'pick_up_app/team_search.html')
@@ -41,17 +41,17 @@ def home_page(request, username):
     # Is the user logged in
     if (request.user.is_authenticated):
 
-        #Is the user at THEIR home page
-        if(request.user.username != username):
+        # Is the user at THEIR home page
+        if (request.user.username != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
         else:
             # List of the top 5 teams in User model database to be displayed on the
-            # team homepage.Note: Uses a placeholder mmr_score in the User model,
+            # team homepage.Note: Uses a placeholder mmrScore in the User model,
             # will need to be properly implemented and tested later.
             # Top Teams to be displayed
-            top_teams_list = User.objects.order_by('-mmr_score')[:5]
+            top_teams_list = User.objects.order_by('-mmrScore')[:5]
 
             # All the teams to add markers
             all_teams = User.objects.order_by('username')
@@ -65,7 +65,7 @@ def home_page(request, username):
             teams = User.objects.all()
             teamNames = []
             for i in range(len(teams)):
-                teamNames.append(teams[i].username)
+                teamNames.append(teams[i].teamname)
 
             key = str(settings.GOOGLE_MAPS_API_KEY)
 
@@ -81,12 +81,13 @@ def home_page(request, username):
     else:
         return HttpResponse("You are not logged in!")
 
-def team_page(request, username):
-     #Is the user logged in
-    if(request.user.is_authenticated):
 
-        #Is the user at THEIR home page
-        if(request.user.username != username):
+def team_page(request, username):
+    # Is the user logged in
+    if (request.user.is_authenticated):
+
+        # Is the user at THEIR home page
+        if (request.user.username != username):
 
             return HttpResponse("You are trying to view a page that is not yours!")
 
@@ -101,7 +102,7 @@ def index(request):
 
 
 def save(request):
-    #newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
+    # newUser = User(username=request.POST['username'], password=request.POST['password'], teamName=request.POST['teamName'])
     newUser = User(username=request.POST['username'], password=request.POST['password'])
     print(newUser)
     newUser.save()
@@ -114,7 +115,8 @@ def check(request):
         login(request, currUser)
         return HttpResponseRedirect(reverse('home_page', args=(currUser.username,)))
     else:
-        return HttpResponse("not a user oop")
+        messages.add_message(request, messages.ERROR, 'Error, Invalid username or password')
+        return render(request, 'pick_up_app/login.html')
 
 
 ##########################################
@@ -144,7 +146,8 @@ def register(request):
             ##############################################################
 
             # Send back success message
-            messages.success(request, 'Registration submitted successfully! Welcome to PickupTeam')
+            messages.add_message(request, messages.SUCCESS,
+                                 'Registration submitted successfully! Welcome to PickupTeam')
 
     # GET request
     else:
@@ -216,6 +219,196 @@ def get_next_month(cur_month):
 def get_last_month(cur_month):
     previous_month = cur_month.replace(day=1) - datetime.timedelta(days=1)
     return 'month=' + str(previous_month.year) + '-' + str(previous_month.month)
+
+
+# Will allow another team to be added to a timeslot
+def booking(request, username, timeslot_id):
+    # username should be OPPONENT
+    # timeslot_id should be able to gather all others information
+
+    # see if opponent team exists
+    cur_team = User.objects.get(username=username)
+    if not cur_team:
+        return HttpResponse("Error, invalid 'username' passed")
+
+    # see if timeslot exists
+    instance = TimeSlot.objects.get(pk=timeslot_id)
+    if not instance:
+        return HttpResponse("Error, 'timeslot_id' does not exist")
+
+    # check if booking_team != host_team
+    if instance.host_team.username == username:
+        host_calendar = "/pick_up_app/calendar/" + str(instance.host_team.username)
+        messages.error(request, "You are trying to book your own game!")
+        return HttpResponseRedirect(host_calendar)
+
+    # if there is already opponent team on the timeslot
+    # return response
+    if instance.opponent_team:
+        host_calendar = "/pick_up_app/calendar/" + str(instance.host_team.username)
+        messages.error(request, "This game has already been booked!")
+        return HttpResponseRedirect(host_calendar)
+
+    # if POST request
+    if request.method == 'POST':
+
+        var = request.POST["submitbutton"]
+
+        # update the timeslot with new oppenent_id
+        if var == "Yes":
+            userobject = User.objects.get(username=username)
+            instance.opponent_team_id = userobject.id
+            instance.save()
+            messages.success(request, "You have successfully booked this game!")
+
+        # go back to host team calendar
+        host_calendar = "/pick_up_app/calendar/" + str(instance.host_team.username)
+        return HttpResponseRedirect(host_calendar)
+
+    # else this is a GET operation
+    else:
+
+        # variables to past to HTML
+        context = {'host': instance.host_team.username,
+                   'start': instance.slot_start,
+                   'end': instance.slot_end,
+                   'team': cur_team.username,
+                   'gameName': Games.objects.get(id=instance.game_id).game,
+                   'gameType': Games.objects.get(id=instance.game_id).gameType,
+                   'opponent': username
+                   }
+
+        # Render the booking html
+        return render(request, 'pick_up_app/booking.html', context)
+
+
+# Will allow selected username to update timeslot GAME RESULTS
+def submit_results(request, username, timeslot_id):
+    # username should be OPPONENT or HOST
+    # timeslot_id should be able to gather all other information
+
+    # see if opponent team exists
+    cur_team = User.objects.get(username=username)
+    if not cur_team:
+        return HttpResponse("Error, invalid 'username' passed")
+
+    # see if timeslot exists
+    instance = TimeSlot.objects.get(pk=timeslot_id)
+    if not instance:
+        return HttpResponse("Error, 'timeslot_id' does not exist")
+
+    # check if booking_team != host_team
+    if instance.host_team and instance.opponent_team:
+
+        # if POST request
+        if request.method == 'POST':
+
+            var = request.POST["submitbutton"]
+
+            if var == "Yes, I won the game!":
+                if instance.host_team.username == username:
+                    instance.host_won = True
+                    instance.save()
+
+                elif instance.opponent_team.username == username:
+                    instance.opponent_won = True
+                    instance.save()
+
+            elif var == "No, we lost the game!":
+                if instance.host_team.username == username:
+                    instance.host_won = False
+                    instance.save()
+
+                elif instance.opponent_team.username == username:
+                    instance.opponent_won = False
+                    instance.save()
+
+            elif var == "Oops! I am not ready at this time!":
+                if instance.host_team.username == username:
+                    instance.host_won = None
+                    instance.save()
+
+                elif instance.opponent_team.username == username:
+                    instance.opponent_won = None
+                    instance.save()
+
+            if (instance.opponent_won == False and instance.host_won == True) or (
+                    instance.opponent_won == True and instance.host_won == False):
+
+                hostObj = User.objects.get(id=instance.host_team_id)
+                opponentObj = User.objects.get(id=instance.opponent_team_id)
+
+                if instance.opponent_won == False:
+                    opponentObj.mmrScore -= 5
+                    hostObj.mmrScore += 5
+
+                else:
+                    opponentObj.mmrScore += 5
+                    hostObj.mmrScore -= 5
+
+            # go back to host team calendar
+            host_calendar = "/pick_up_app/calendar/" + str(instance.host_team.username)
+            messages.success(request, "Your submission was processed!")
+            return HttpResponseRedirect(host_calendar)
+
+        # else this is get request
+
+        # variables to past to HTML
+        context = {'team': cur_team.username,
+                   'gameName': Games.objects.get(id=instance.game_id).game,
+                   'gameType': Games.objects.get(id=instance.game_id).gameType,
+                   'start': instance.slot_start,
+                   'end': instance.slot_end,
+                   'host': User.objects.get(id=instance.host_team_id).username,
+                   'opponent': User.objects.get(id=instance.opponent_team_id).username
+                   }
+
+        return render(request, 'pick_up_app/submitGameResults.html', context)
+
+    # else timeslot does not have enough teams to submit results
+    else:
+        return HttpResponse("Error, 'timeslot' does not have 'opponent_id'... or possibly 'host_id'")
+
+
+# Views for displaying a finished game
+def past_game(request, timeslot_id, game_id):
+    # get game object
+    gameObj = Games.objects.get(id=game_id)
+    timeslotObj = TimeSlot.objects.get(id=timeslot_id)
+
+    # default settings
+    results = "Invalid!"
+    winner = "Invalid!"
+    loser = "Invalid!"
+
+    # if there is a winner and loser
+    if timeslotObj.host_won == (not timeslotObj.opponent_won):
+        results = "Valid!"
+
+        # set variables based on who won
+        if timeslotObj.host_won:
+            winner = User.objects.get(id=timeslotObj.host_team_id).username
+            loser = User.objects.get(id=timeslotObj.opponent_team_id).username
+        else:
+            winner = User.objects.get(id=timeslotObj.opponent_team_id).username
+            loser = User.objects.get(id=timeslotObj.host_team_id).username
+
+    # appropriate context to be passed to HTML
+    context = {'results': results,
+               'gameName': gameObj.game,
+               'gameType': gameObj.gameType,
+               'start': timeslotObj.slot_start,
+               'end': timeslotObj.slot_end,
+               'host': User.objects.get(id=timeslotObj.host_team_id).username,
+               'opponent': User.objects.get(id=timeslotObj.opponent_team_id).username,
+               'winner': winner,
+               'loser': loser,
+               'current_team': request.user.username,
+               'home_page': '/pick_up_app/'
+
+               }
+
+    return render(request, 'pick_up_app/past_game.html', context)
 
 
 # View to add/update a team's timeslot information
