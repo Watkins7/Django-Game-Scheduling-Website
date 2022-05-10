@@ -742,9 +742,14 @@ class CalendarHTMLTests(StaticLiveServerTestCase):
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
 
         test_team = "test"
+        test_team2 = "test2"
 
         test_user = User(username="test", password="pass")
         test_user.save()
+        test_user2 = User(username="test2", password="pass")
+        test_user2.save()
+        test_user3 = User(username="test3", password="pass")
+        test_user3.save()
 
         test_game = Games(game="newgame", gameType="testing")
         test_game.save()
@@ -754,6 +759,11 @@ class CalendarHTMLTests(StaticLiveServerTestCase):
                                  slot_start=timezone.now() + datetime.timedelta(minutes=1),
                                  slot_end=timezone.now() + datetime.timedelta(minutes=30))
         test_timeslot.save()
+        test_timeslot2 = TimeSlot(host_team=test_user2,
+                                  game=test_game,
+                                  slot_start=timezone.now() + datetime.timedelta(minutes=1),
+                                  slot_end=timezone.now() + datetime.timedelta(minutes=30))
+        test_timeslot2.save()
 
         # Performs Log-in for the first test user
         driver.get(self.live_server_url + "/pick_up_app/login/")
@@ -792,6 +802,64 @@ class CalendarHTMLTests(StaticLiveServerTestCase):
         actual_url = self.live_server_url + "/pick_up_app/calendar/" + test_team
         actual_url += "/?month=" + str(timezone.now().year) + "-" + str(timezone.now().month)
         self.assertEqual(cur_url, actual_url)
+
+        # Tests redirection from the Calendar page to the 'Challenge Team' page when viewing another team's calendar
+        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team2)
+        driver.find_element(by=By.CLASS_NAME, value="listed_timeslot").click()
+        driver.implicitly_wait(0.5)
+        cur_title = driver.title
+        actual_title = test_team2 + " vs " + test_team + "!!!"
+        self.assertEqual(actual_title, cur_title)
+        try:
+            driver.find_element(by=By.XPATH, value="//form//input[@type='submit' and @value='Yes']")
+            print("SUCCESS, redirected to book match page")
+        except Exception:
+            print("FAILED, did not redirect to book match page")
+
+        # Tests redirection from the Calendar page to the 'Submit Match Results' Page as one of the team's involved
+        test_timeslot.opponent_team = test_user2
+        test_timeslot.save()
+        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team)
+        driver.find_element(by=By.CLASS_NAME, value="listed_timeslot").click()
+        driver.implicitly_wait(0.5)
+        cur_title = driver.title
+        actual_title = test_team + " vs " + test_team2 + "!!!"
+        self.assertEqual(actual_title, cur_title)
+        try:
+            driver.find_element(by=By.XPATH, value="//form//input[@type='submit' and @value='Yes, I won the game!']")
+            print("SUCCESS, redirected to submit match results page")
+        except Exception:
+            print("FAILED, did not redirect to submit match results page")
+
+        # Tests redirection from the Calendar page to the 'Submit Match Results' Page as a team NOT involved
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+        driver.find_element(by=By.XPATH, value='//input[@class="user"][@type="username"]').send_keys("test3")
+        driver.find_element(by=By.XPATH, value='//input[@class="pass"][@type="password"]').send_keys("pass")
+        login_button = driver.find_element(by=By.CLASS_NAME, value="login")
+        login_button.click()
+        driver.implicitly_wait(0.5)
+        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team)
+        driver.find_element(by=By.CLASS_NAME, value="listed_timeslot").click()
+        driver.implicitly_wait(0.5)
+        cur_title = driver.title
+        actual_title = test_team + " Team Calendar"
+        self.assertEqual(actual_title, cur_title)
+
+        # Tests redirection from the Calendar page to the 'Past Game' Page
+        test_timeslot.host_won = True
+        test_timeslot.opponent_won = False
+        test_timeslot.save()
+        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team)
+        driver.find_element(by=By.CLASS_NAME, value="listed_timeslot").click()
+        driver.implicitly_wait(0.5)
+        cur_title = driver.title
+        actual_title = test_team + " vs " + test_team2 + "!!!"
+        self.assertEqual(actual_title, cur_title)
+        try:
+            driver.find_element(by=By.XPATH, value="//*[contains(text(),'Game Results')]")
+            print("SUCCESS, redirected to past match results page")
+        except Exception:
+            print("FAILED, did not redirect to past match results page")
 
         driver.quit()
 
