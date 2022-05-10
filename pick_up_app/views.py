@@ -186,13 +186,13 @@ class TeamCalendarView(generic.ListView):
 
         # Gets the team currently making the request and the team of the calendar being viewed
         viewing_team = User.objects.get(username=self.kwargs['username'])
-        cur_team = self.request.user.username
+        cur_team = self.request.user
 
         # Call the formatmonth method, which returns our calendar as a table
         formatted_calendar = new_calendar.formatmonth(viewing_team, cur_team)
         context['viewing_teamname'] = viewing_team.teamname
         context['viewing_team'] = viewing_team.username
-        context['current_team'] = cur_team
+        context['current_team'] = cur_team.username
         context['calendar'] = mark_safe(formatted_calendar)
         context['next_month'] = get_next_month(current_month)
         context['last_month'] = get_last_month(current_month)
