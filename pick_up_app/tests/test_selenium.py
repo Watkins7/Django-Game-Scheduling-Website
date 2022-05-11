@@ -26,7 +26,6 @@ print("#                                                                    #")
 print("######################################################################")
 
 
-
 class registrationTests(TestCase):
 
     ###############################################################
@@ -309,35 +308,13 @@ class MySeleniumTests(StaticLiveServerTestCase):
 
         # tell handler to quit
         driver.quit()
-
-class TeamPageHTMLTests(StaticLiveServerTestCase):
-    def test_teamPage(self):
-        new_user = User(username="lime", password="lemon", teamname="citrus")
-        new_user.save()
-
-        # Setup Firefox web driver
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        driver.implicitly_wait(0.5)
-        driver.maximize_window()
-
-        # Open the login page URL
-        driver.get(self.live_server_url + "/pick_up_app/login/")
-
-         # Send the username and password to the login page and hit enter to redirect
-        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
-        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
-
         
 class loginSeleniumTests(StaticLiveServerTestCase):
     def test_LoginPage(self):
         ###This test just makes sure that it finds the username and password###
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-
-        # Make address of HTML
-        testingPath = self.live_server_url + "/pick_up_app/login"
-
-        # Go to URL to test
-        driver.get(testingPath)
+        driver.get(self.live_server_url + "/pick_up_app/login")
+        time.sleep(1)
 
         #make new user
         new_user = User(username="user", password="pw", teamname="team")
@@ -347,17 +324,14 @@ class loginSeleniumTests(StaticLiveServerTestCase):
         driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("pw")
 
         try:
-            driver.find_element_by_class_name("main")
-            driver.find_element_by_class_name("user")
-            driver.find_element_by_class_name("pass")
-            driver.find_element_by_class_name("login")
+            driver.find_element_by_class_name("middle_box")
             print("SUCCESS, found the classes")
         except Exception:
             print("FAILED, couldn't find the classes")
 
     def test_RegisterRedirect(self):
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        testingPath = self.live_server_url + "/pick_up_app/login"
+        driver.get(self.live_server_url + "/pick_up_app/login")
         try:
             # Try to find the redirect buttons
             driver.find_element_by_class_name("newuser")
@@ -369,7 +343,7 @@ class loginSeleniumTests(StaticLiveServerTestCase):
 
     def test_ForgotRedirect(self):
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        testingPath = self.live_server_url + "/pick_up_app/login"
+        driver.get(self.live_server_url + "/pick_up_app/login")
         try:
             # Try to find the redirect buttons
             driver.find_element_by_class_name("forgot")
@@ -379,6 +353,78 @@ class loginSeleniumTests(StaticLiveServerTestCase):
 
         driver.quit()
 
+class teamPageSeleniumTests(StaticLiveServerTestCase):
+    def test_teamPage(self):
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.get(self.live_server_url + "/pick_up_app/login")
+
+        time.sleep(1)
+
+        #make new user
+        new_user = User(username="user1", password="pw1", teamname="team1")
+        new_user.save()
+
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("user1")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("pw1")
+
+        login_button = driver.find_element_by_class_name("login")
+        login_button.click()
+        driver.implicitly_wait(0.5)
+
+        team_button = driver.find_element_by_class_name("team_button")
+        team_button.click()
+        driver.implicitly_wait(1)
+
+        try:
+            # Try to find the classes
+            driver.find_element_by_class_name("home_page")
+            print("SUCCESS, found home page class")
+        except Exception:
+            print("FAILED, did not find home page class")
+
+        try:
+            # Try to find the classes
+            driver.find_element_by_class_name("team_name")
+            print("SUCCESS, found team name class")
+        except Exception:
+            print("FAILED, did not find team name class")
+
+        try:
+            # Try to find the classes
+            driver.find_element_by_class_name("mmr")
+            print("SUCCESS, found mmr class")
+        except Exception:
+            print("FAILED, did not find mmr class")
+
+        try:
+            # Try to find the redirect buttons
+            driver.find_element_by_class_name("edit_team_page")
+            print("SUCCESS, found edit team page redirect")
+        except Exception:
+            print("FAILED, did not find edit team page redirect")
+
+        try:
+            # Try to find the redirect buttons
+            driver.find_element_by_class_name("home_page")
+            print("SUCCESS, found home page redirect")
+        except Exception:
+            print("FAILED, did not find home page redirect")
+
+        try:
+            # Try to find the redirect buttons
+            driver.find_element_by_class_name("delete_team")
+            print("SUCCESS, found delete team page redirect")
+        except Exception:
+            print("FAILED, did not find delete team page redirect")
+
+        try:
+            # Try to find the redirect buttons
+            driver.find_element_by_class_name("logout")
+            print("SUCCESS, found logout redirect")
+        except Exception:
+            print("FAILED, did not find logout redirect")
+
+        driver.quit()
 
 class HomePageHTMLTests(StaticLiveServerTestCase):
     def test_main_page_rendering(self):

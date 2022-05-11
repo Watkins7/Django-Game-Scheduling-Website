@@ -9,30 +9,35 @@
     </head>
 
     <body>
-        <div class = "team_name" align ="center">
-            <p class="team_name">[Insert Team Name Here]</p>
+        <hr>
+        <div class = "teamName" align ="center">
+            <p class="team_name">Team Name: {{user.username}}</p>
         </div>
+        <hr>
 
+        <div class="container1">
+            <div><img src="{% static 'pick up app/media/minions.gif' %}" alt="spin" style="position: relative;width: 320px; top: 25px; left: 0;float: left; margin-left: 20px"></div>
+            <div><img src="{% static 'pick up app/media/aerobics-dreamteam.gif' %}" alt="spin" style="position: absolute; width: 310px;top:330px; left: 10px;float: left; margin-left: 20px"></div>
+        </div>
         <div class = "mmr" align ="center">
-            <p class="mmrScore">Team MMR Score: </p>
+            <p class="mmrScore">Team MMR Score: {{user.mmrScore}}</p>
         </div>
-
+  
         <div class = "emailList" align="center">
             <p class="email">Team Member Email List</p>
             <ul>
-                <li>for loop somewhere here for emails from database</li>
+                <li>{{user.email}}</li>
             </ul>
         </div>
 
-        <div class="calendar">
-            <p class="insert_calendar" align="center">[Insert calendar here]</p>
-        </div>
+        <div><img src="{% static 'pick up app/media/spongebob.gif' %}" alt="spin" style="position: absolute; width: 300px; top: 340px; right: 10px;float: right; margin-right: 20px"></div>
+        <div><img src="{% static 'pick up app/media/powerrangers.gif' %}" alt="spin" style="position: absolute; width: 300px; top:150px; right: 10px;float: right; margin-right: 20px"></div>
 
         <div class="redirect_buttons" align="center">
-            <p class="edit_team_page" style="display:inline-block;"><a href="#">Edit Team Page</a></p> 
-            <p class="home_page" style="display:inline-block;"><a href="/pick_up_app/home_page/">Go to Home Page</a></p> 
+            <p class="edit_team_page" style="display:inline-block;"><a href="{% url 'edit_team' user.username}">Edit Team Page</a></p> 
+            <p class="home_page" style="display:inline-block;"><a href="{% url 'home_page' user.username}">Go to Home Page</a></p> 
             <p class="delete_team" style="display:inline-block;"><a href="#">Delete Team</a></p> 
-            <p class="logout" style="display:inline-block;"><a href="/pick_up_app/login/">Logout</a></p> 
+            <p class="logout" style="display:inline-block;"><a href="#">Logout</a></p> 
         </div>
 
     </body>

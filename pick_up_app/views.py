@@ -85,13 +85,17 @@ def home_page(request, username):
 def team_page(request, username):
     # Is the user logged in
     if (request.user.is_authenticated):
-
         # Is the user at THEIR home page
         if (request.user.username != username):
-
             return HttpResponse("You are trying to view a page that is not yours!")
-
         else:
+            allUsers = User.objects.all()
+            email_list = User.objects.order_by('email')
+            emailList = []
+            for i in range(len(email_list)):
+                emailList.append(email_list[i].email) 
+            context = {'userList': allUsers,
+                        'email_list': email_list}
             return render(request, 'pick_up_app/team.html')
 
 
