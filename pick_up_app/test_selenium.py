@@ -575,6 +575,89 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         # Close browser
         driver.quit()
 
+
+    def test_redirect_home_to_team_page(self):
+        """
+        This function tests the team page button on the home page. It will
+        redirect the user to their team page by checking that the check view
+        sends users to the page titled "Team Page"
+        :return: None
+        """
+
+        # Add a new test user
+        new_user = User(username="lime", password="lemon")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        # Find and click the login button
+        driver.find_element_by_class_name("team_button").click()
+
+        driver.implicitly_wait(2)  # Wait before finding the title
+
+        curr_title = driver.title  # Gets the title of the current page
+        actual_title = "Team Page"  # The actual title of the login page
+
+        self.assertEqual(actual_title, curr_title)  # Title of redirected page should match
+
+        # Close browser
+        driver.quit()
+
+
+    def test_redirect_team_to_home_page(self):
+        """
+        This function tests the team page button on the home page. It will
+        redirect the user to their home page by checking that the check view
+        sends users to the page titled "Team Home Page"
+        :return: None
+        """
+
+        # Add a new test user
+        new_user = User(username="lime", password="lemon")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        # Redirect to the team page
+        driver.get(self.live_server_url + reverse('team_page', kwargs={'username': 'lime'}))
+
+        # Find and click the login button
+        driver.find_element_by_class_name("home_page").click()
+
+        driver.implicitly_wait(2)  # Wait before finding the title
+
+        curr_title = driver.title  # Gets the title of the current page
+        actual_title = "Team Home Page"  # The actual title of the login page
+
+        self.assertEqual(actual_title, curr_title)  # Title of redirected page should match
+
+        # Close browser
+        driver.quit()
+
+
+class TestSearchBar(StaticLiveServerTestCase):
     #Test the search bar functionality
     def test_search_bar(self):
         """
@@ -629,6 +712,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
 
         # Close browser
         driver.quit()
+
 
 # Set of selenium tests for the Calendar Page
 class CalendarHTMLTests(StaticLiveServerTestCase):

@@ -74,6 +74,7 @@ def home_page(request, username):
                        'centered_team': centered_team,
                        'api_key': key,
                        "teams": teamNames,
+                       'username': username,
                        }
 
             return render(request, 'pick_up_app/home_page.html', context)
