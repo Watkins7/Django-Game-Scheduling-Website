@@ -48,6 +48,17 @@ class Games(models.Model):
     game = NameField(max_length=30, unique=True)
     gameType = models.CharField(max_length=30)
 
+
+    def verify(game, gameType):
+        # This function checks that the new game is not already in the database
+        new_game = Games(game, gameType)
+        # If game exists, return None; otherwise, return the new game
+        for my_game in Games.objects.all():
+            if my_game.game == game and my_game.gameType == gameType:
+                return None
+        return new_game
+
+
     def __str__(self):
         # This function controls how this model is displayed in query set
         return self.game

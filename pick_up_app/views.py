@@ -85,9 +85,9 @@ def home_page(request, username):
 
 def team_page(request, username):
     # Is the user logged in
-    if (request.user.is_authenticated):
+    if request.user.is_authenticated:
         # Is the user at THEIR home page
-        if (request.user.username != username):
+        if request.user.username != username:
             return HttpResponse("You are trying to view a page that is not yours!")
         else:
             return render(request, 'pick_up_app/team.html', context={'username': username})
@@ -523,7 +523,9 @@ def check_team_changes(request):
                 my_user.password = new_password
                 my_user.checkpassword = confirm_password
                 my_user.save()
-                messages.success(request, "SUCCESS: Password changed successfully.")
+
+                # Changing the password will prompt you to login again with your new password
+                return HttpResponseRedirect(reverse('index'))
             else:
                 messages.error(request, "ERROR: The new password and password confirmation do not match.")
 
