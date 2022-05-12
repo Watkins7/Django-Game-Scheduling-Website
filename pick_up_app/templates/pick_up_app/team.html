@@ -5,7 +5,7 @@
     <head>
         <link rel="stylesheet" type="text/css" href="{% static 'css/styleteam.css' %}">
         <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
-        <title>Team Name</title>
+        <title>Team Page</title>
     </head>
 
     <body>
@@ -34,8 +34,9 @@
         <div><img src="{% static 'pick up app/media/powerrangers.gif' %}" alt="spin" style="position: absolute; width: 300px; top:150px; right: 10px;float: right; margin-right: 20px"></div>
 
         <div class="redirect_buttons" align="center">
-            <p class="edit_team_page" style="display:inline-block;"><a href="{% url 'edit_team' user.username}">Edit Team Page</a></p> 
-            <p class="home_page" style="display:inline-block;"><a href="{% url 'home_page' user.username}">Go to Home Page</a></p> 
+            <p class="calendar" style= "display:inline-block;"><a href="{% url 'calendar' username %}">View Team Calendar</a></p> 
+            <p class="edit_team_page" style="display:inline-block;"><a href="{% url 'edit_team' username %}">Edit Team Page</a></p> 
+            <p class="home_page" style="display:inline-block;"><a href="{% url 'home_page' username %}">Go to Home Page</a></p> 
             <p class="delete_team" style="display:inline-block;"><a href="#">Delete Team</a></p> 
             <p class="logout" style="display:inline-block;"><a href="#">Logout</a></p> 
         </div>
