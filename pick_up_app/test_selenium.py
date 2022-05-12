@@ -580,7 +580,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
     def test_redirect_home_to_team_page(self):
         """
         This function tests the team page button on the home page. It will
-        redirect the user to their team page by checking that the check view
+        redirect the user to their team page by checking that the button
         sends users to the page titled "Team Page"
         :return: None
         """
@@ -602,7 +602,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
         driver.find_element_by_class_name("login").click()
 
-        # Find and click the login button
+        # Find and click the team page button
         driver.find_element_by_class_name("team_button").click()
 
         driver.implicitly_wait(2)  # Wait before finding the title
@@ -619,7 +619,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
     def test_redirect_team_to_home_page(self):
         """
         This function tests the team page button on the home page. It will
-        redirect the user to their home page by checking that the check view
+        redirect the user to their home page by checking that the button
         sends users to the page titled "Team Home Page"
         :return: None
         """
@@ -644,7 +644,7 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         # Redirect to the team page
         driver.get(self.live_server_url + reverse('team_page', kwargs={'username': 'lime'}))
 
-        # Find and click the login button
+        # Find and click the home page link
         driver.find_element_by_class_name("home_page").click()
 
         driver.implicitly_wait(2)  # Wait before finding the title
@@ -658,25 +658,21 @@ class RedirectLinkTests(StaticLiveServerTestCase):
         driver.quit()
 
 
-class TestSearchBar(StaticLiveServerTestCase):
-    #Test the search bar functionality
-    def test_search_bar(self):
+    def test_redirect_team_to_edit_team_page(self):
         """
-        This function tests the login page button on the home page. It will
-        redirect the user to the login page by checking that the check view
-        sends users to the page titled "Sign in"
+        This function tests the edit team page button on the team page. It will
+        redirect the user to their edit team page by checking that the link
+        sends users to the page titled "Edit Team Info"
         :return: None
         """
 
-        # Add a new tes user
-        new_user = User(username="lime", password="lemon", teamname="citrus")
-        new_user.save()
-        new_user = User(username="lime1", password="lemon1", teamname="cream")
+        # Add a new test user
+        new_user = User(username="lime", password="lemon")
         new_user.save()
 
         # Setup Firefox web driver
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        driver.implicitly_wait(2)
+        driver.implicitly_wait(0.5)
         driver.maximize_window()
 
         # Open the login page URL
@@ -687,304 +683,31 @@ class TestSearchBar(StaticLiveServerTestCase):
         driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
         driver.find_element_by_class_name("login").click()
 
-        #Get the search bar
-        searchBar = driver.find_element_by_class_name("search_bar")
+        # Go to the team_page then find and click the edit_team link
+        driver.get(self.live_server_url + reverse('team_page', kwargs={'username': 'lime'}))
+        driver.find_element_by_class_name("edit_team_page").click()
 
-        driver.implicitly_wait(2)  # Wait
-        try:
-            #type c into the search bar and look for the autocomplete results
-            searchBar.send_keys("c")
-            driver.implicitly_wait(2)
-            webList = driver.find_elements_by_class_name("ui-menu-item")
-            optionsList = []
-            for i in webList:
-                optionsList.append(i.text)
-            if("citrus" in optionsList and "cream" in optionsList):
-                print("SUCCESS, both citrus and cream teams found")
-            webList[0].click()
-            searchBar.send_keys(Keys.RETURN)
-        except Exception as e:
-            print("FAILURE, cannot find teams in search bar")
-            print(e)
+        driver.implicitly_wait(2)  # Wait before finding the title
 
-        driver.implicitly_wait(2)
-        self.assertEqual(driver.title, "Team Home Page")
+        curr_title = driver.title  # Gets the title of the current page
+        actual_title = "Edit Team Info"  # The actual title of the login page
 
+        self.assertEqual(actual_title, curr_title)  # Title of redirected page should match
 
         # Close browser
         driver.quit()
 
 
-# Set of selenium tests for the Calendar Page
-class CalendarHTMLTests(StaticLiveServerTestCase):
-
-    # Tests that all elements on the calendar page are properly rendered when loaded
-    def test_calendar_rendering(self):
-
-        print("\n########################################################################")
-        print("#                     Calendar Rendering Selenium Test                 #")
-        print("########################################################################")
-
-        # Creates two users & respective timeslots to be tested
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        test_team = "test"
-        test_team2 = "test2"
-
-
-        test_user = User(username="test", password="pass")
-        test_user2 = User(username="test2", password="pass2")
-        test_user.save()
-        test_user2.save()
-
-        test_game = Games(game="newgame", gameType="testing")
-        test_game.save()
-
-        test_timeslot = TimeSlot(host_team=test_user,
-                                 game=test_game,
-                                 slot_start=timezone.now() + datetime.timedelta(minutes=1),
-                                 slot_end=timezone.now() + datetime.timedelta(minutes=30))
-        test_timeslot2 = TimeSlot(host_team=test_user2,
-                                  game=test_game,
-                                  slot_start=timezone.now() + datetime.timedelta(minutes=1),
-                                  slot_end=timezone.now() + datetime.timedelta(minutes=30))
-        test_timeslot.save()
-        test_timeslot2.save()
-
-        # Performs Log-in for the first test user
-        driver.get(self.live_server_url + "/pick_up_app/login/")
-        driver.find_element(by=By.XPATH, value='//input[@class="user"][@type="username"]').send_keys("test")
-        driver.find_element(by=By.XPATH, value='//input[@class="pass"][@type="password"]').send_keys("pass")
-        login_button = driver.find_element(by=By.CLASS_NAME, value="login")
-        login_button.click()
-        driver.implicitly_wait(0.5)
-        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team)
-
-        # Try to find all the button elements which should be on the first test user's calendar
-        try:
-            driver.find_element(by=By.CLASS_NAME, value="previous_month_btn")
-            driver.find_element(by=By.CLASS_NAME, value="new_timeslot_btn")
-            driver.find_element(by=By.CLASS_NAME, value="next_month_btn")
-            driver.find_element(by=By.CLASS_NAME, value="home_btn")
-            print("SUCCESS, found logged-in user's redirection buttons")
-        except Exception:
-            print("FAILED, did not find logged-in user's redirection buttons")
-
-        # Try to find the first test user's calendar element
-        try:
-            driver.find_element(by=By.CLASS_NAME, value="calendar")
-            print("SUCCESS, found logged-in user's calendar")
-        except Exception:
-            print("FAILED, did not find logged-in user's calendar")
-
-        # Try to find a listed timeslot on the first test user's calendar
-        try:
-            driver.find_element(by=By.CLASS_NAME, value="listed_timeslot")
-            print("SUCCESS, found logged-in user's timeslot")
-        except Exception:
-            print("FAILED, did not find logged-in user's timeslot")
-
-        # Redirect to the other team's calendar while logged in as the first test user
-        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team2)
-
-        # Try to find new timeslot button while viewing another team's calendar
-        try:
-            driver.find_element(by=By.CLASS_NAME, value="new_timeslot_btn")
-            print("FAILED, found new timeslot button while viewing another team's calendar")
-        except Exception:
-            print("SUCCESS, did not find new timeslot button while viewing another team's calendar")
-
-        # Try to find a listed timeslot while viewing the second test user's calendar
-        try:
-            driver.find_element(by=By.CLASS_NAME, value="listed_timeslot")
-            print("SUCCESS, found timeslot while viewing another team's calendar")
-        except Exception:
-            print("FAILED, did not find timeslot while viewing another team's calendar")
-
-        driver.quit()
-
-    # Tests the redirect links on the calendar work as intended
-    def test_calendar_redirection(self):
-
-        print("\n######################################################################")
-        print("#                     Calendar Redirection Selenium Test             #")
-        print("######################################################################")
-
-        # Performs user log-in to be used by other tests
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-
-        test_team = "test"
-
-        test_user = User(username="test", password="pass")
-        test_user.save()
-
-        test_game = Games(game="newgame", gameType="testing")
-        test_game.save()
-
-        test_timeslot = TimeSlot(host_team=test_user,
-                                 game=test_game,
-                                 slot_start=timezone.now() + datetime.timedelta(minutes=1),
-                                 slot_end=timezone.now() + datetime.timedelta(minutes=30))
-        test_timeslot.save()
-
-        # Performs Log-in for the first test user
-        driver.get(self.live_server_url + "/pick_up_app/login/")
-        driver.find_element(by=By.XPATH, value='//input[@class="user"][@type="username"]').send_keys("test")
-        driver.find_element(by=By.XPATH, value='//input[@class="pass"][@type="password"]').send_keys("pass")
-        login_button = driver.find_element(by=By.CLASS_NAME, value="login")
-        login_button.click()
-        driver.implicitly_wait(0.5)
-        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team)
-
-        # Tests redirection from the Calendar page to the Home Page using the home button
-        driver.find_element(by=By.CLASS_NAME, value="home_btn").click()
-        cur_title = driver.title
-        actual_title = "Team Home Page"
-        self.assertEqual(actual_title, cur_title)
-
-        # Tests redirection from the Calendar page to the Timeslot page using the new timeslot button
-        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team)
-        driver.find_element(by=By.CLASS_NAME, value="new_timeslot_btn").click()
-        driver.implicitly_wait(0.5)
-        cur_title = driver.title
-        actual_title = "Timeslot Page"
-        self.assertEqual(actual_title, cur_title)
-
-        # Tests redirection from the Calendar page to a future month using the next month button
-        driver.get(self.live_server_url + "/pick_up_app/calendar/" + test_team)
-        driver.find_element(by=By.CLASS_NAME, value="next_month_btn").click()
-        cur_url = driver.current_url
-        actual_url = self.live_server_url+"/pick_up_app/calendar/"+test_team
-        actual_url += "/?month="+str(timezone.now().year)+"-"+str(timezone.now().month + 1)
-        self.assertEqual(cur_url, actual_url)
-
-        # Tests redirection from the Calendar page to a previous month using the previous month button
-        driver.find_element(by=By.CLASS_NAME, value="previous_month_btn").click()
-        cur_url = driver.current_url
-        actual_url = self.live_server_url + "/pick_up_app/calendar/" + test_team
-        actual_url += "/?month=" + str(timezone.now().year) + "-" + str(timezone.now().month)
-        self.assertEqual(cur_url, actual_url)
-
-        driver.quit()
-
-
-# Set of Selenium tests for the Timeslot Page
-class TimeslotHTMLTests(StaticLiveServerTestCase):
-    # Tests a new timeslot can be added and removed from the calendar
-    def test_timeslot_submission(self):
-
-        print("\n######################################################################")
-        print("#                     Timeslot Selenium Test                         #")
-        print("######################################################################")
-
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        cur_time = timezone.now().date() + datetime.timedelta(days=1)
-        test_time = str(cur_time.month)+str(cur_time.day)+str(cur_time.year)+""
-        test_team = "test"
-        test_user = User(username="test", password="pass")
-        test_game = Games(game="newgame", gameType="testing")
-        test_game.save()
-        test_user.save()
-
-        # Performs Log-in for the first test user
-        driver.get(self.live_server_url + "/pick_up_app/login/")
-        driver.find_element(by=By.XPATH, value='//input[@class="user"][@type="username"]').send_keys("test")
-        driver.find_element(by=By.XPATH, value='//input[@class="pass"][@type="password"]').send_keys("pass")
-        login_button = driver.find_element(by=By.CLASS_NAME, value="login")
-        login_button.click()
-        driver.implicitly_wait(0.5)
-        driver.get(self.live_server_url + "/pick_up_app/timeslot/new/" + test_team)
-
-        # Try to find submission location for game choice
-        try:
-            select_element = driver.find_element(by=By.ID, value="id_game")
-            select_object = Select(select_element)
-            select_object.select_by_index(1)
-            print("SUCCESS, found element id_game")
-        except Exception:
-            print("FAILED, could not find element id_game")
-
-        # Try to find submission location for start of a timeslot
-        try:
-            driver.find_element(by=By.ID, value="id_slot_start").send_keys(test_time)
-            driver.find_element(by=By.ID, value="id_slot_start").send_keys(Keys.TAB)
-            driver.find_element(by=By.ID, value="id_slot_start").send_keys("0245PM")
-            print("SUCCESS, found element id_slot_start")
-        except Exception:
-            print("FAILED, could not find element id_slot_start")
-
-        # Try to find submission location for end of a timeslot
-        try:
-            driver.find_element(by=By.ID, value="id_slot_end").send_keys(test_time)
-            driver.find_element(by=By.ID, value="id_slot_end").send_keys(Keys.TAB)
-            driver.find_element(by=By.ID, value="id_slot_end").send_keys("0345PM")
-            print("SUCCESS, found element id_slot_end")
-        except Exception:
-            print("FAILED, could not find element id_slot_end")
-
-        # Try to submit the newly created timeslot
-        try:
-            driver.find_element(by=By.NAME, value="add").click()
-            driver.implicitly_wait(0.5)
-            print("SUCCESS, submitted timeslot form")
-        except Exception:
-            print("FAILED, could not submit timeslot form")
-
-        # Tests the submission button redirects from the Timeslot Page to the Calendar Page
-        cur_title = driver.title
-        actual_title = test_team + " Team Calendar"
-        self.assertEqual(actual_title, cur_title)
-
-        # Try to delete the newly created timeslot
-        driver.find_element(by=By.CLASS_NAME, value="listed_timeslot").click()
-        try:
-            driver.find_element(by=By.NAME, value="delete").click()
-            print("SUCCESS, deleted timeslot")
-        except Exception:
-            print("FAILED, could not delete timeslot")
-
-        driver.quit()
-
-    def test_timeslot_redirection(self):
-
-        print("\n######################################################################")
-        print("#                     Time Slot Redirection Selenium Test            #")
-        print("######################################################################")
-
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        test_team = "test"
-        test_user = User(username="test", password="pass")
-        test_game = Games(game="newgame", gameType="testing")
-        test_game.save()
-        test_user.save()
-
-        # Performs Log-in for the first test user
-        driver.get(self.live_server_url + "/pick_up_app/login/")
-        driver.find_element(by=By.XPATH, value='//input[@class="user"][@type="username"]').send_keys("test")
-        driver.find_element(by=By.XPATH, value='//input[@class="pass"][@type="password"]').send_keys("pass")
-        login_button = driver.find_element(by=By.CLASS_NAME, value="login")
-        login_button.click()
-        driver.implicitly_wait(0.5)
-        driver.get(self.live_server_url + "/pick_up_app/timeslot/new/" + test_team)
-
-        # Tests redirection from the Timeslot page to the Calendar using the calendar button
-        driver.find_element(by=By.CLASS_NAME, value="calendar_btn").click()
-        cur_title = driver.title
-        actual_title = test_team + " Team Calendar"
-        self.assertEqual(actual_title, cur_title)
-
-        driver.quit()
-
-
-class NewGameOverlayTests(StaticLiveServerTestCase):
-    def test_open_new_game_overlay(self):
+    def test_redirect_edit_team_to_team_page(self):
         """
-        This function tests that the new_game overlay opens when the
-        'Add Game' button is clicked.
+        This function tests the "Back to Team Page" button on the edit team
+        page. It will redirect the user to their team page by checking that
+        the button sends users to the page titled "Team Page"
         :return: None
         """
 
         # Add a new test user
-        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user = User(username="lime", password="lemon")
         new_user.save()
 
         # Setup Firefox web driver
@@ -995,352 +718,25 @@ class NewGameOverlayTests(StaticLiveServerTestCase):
         # Open the login page URL
         driver.get(self.live_server_url + "/pick_up_app/login/")
 
-        # Login user so we can access new_game page
+        # Login user
         driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
         driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
         driver.find_element_by_class_name("login").click()
 
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Open the calendar of the user we made
-        driver.get(self.live_server_url + "/pick_up_app/calendar/lime")
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Click on new timeslot button then the new_game link
-        driver.find_element_by_class_name("new_timeslot_btn").click()
-        driver.find_element_by_class_name("new_game_btn").click()
-
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        is_overlay_open = True  # Boolean for checking if overlay is open
-
-        try:
-            # Try to find the close button of the overlay
-            driver.find_element_by_class_name("game_button")
-        except Exception:
-            is_overlay_open = False
-
-        self.assertTrue(is_overlay_open)
-
-        # CLose browser
-        driver.quit()
-
-    def test_close_new_game_overlay(self):
-        """
-        This function tests that the new_game overlay closes when the
-        X button is clicked.
-        :return: None
-        """
-
-        # Add a new test user
-        new_user = User(username="lime", password="lemon", teamname="citrus")
-        new_user.save()
-
-        # Setup Firefox web driver
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        driver.implicitly_wait(0.5)
-        driver.maximize_window()
-
-        # Open the login page URL
-        driver.get(self.live_server_url + "/pick_up_app/login/")
-
-        # Login user so we can access new_game page
-        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
-        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
-        driver.find_element_by_class_name("login").click()
-
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Open the calendar of the user we made
-        driver.get(self.live_server_url + "/pick_up_app/calendar/lime")
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Click on new timeslot button then the new_game link
-        driver.find_element_by_class_name("new_timeslot_btn").click()
-        driver.find_element_by_class_name("new_game_btn").click()
-
-        driver.implicitly_wait(1)  # Wait before proceeding
-
-        is_overlay_closed = True  # Boolean for checking if overlay is closed
-
-        try:
-            # Try to click the X button then check for "Add Game" button
-            close_button = driver.find_element_by_class_name("btn")
-            # Note: ActionChains is needed to avoid obscuring of the button in Selenium
-            ActionChains(driver).move_to_element(close_button).click().perform()
-
-            driver.find_element_by_class_name("new_game_btn")
-        except Exception as ex:
-            print(ex)
-            is_overlay_closed = False
-
-        self.assertTrue(is_overlay_closed)
-
-        # CLose browser
-        driver.quit()
-
-
-    def test_new_game_adds_to_database_successfully(self):
-        """
-        This function tests that a game added via the new_game page actually
-        adds it to the database
-        :return: None
-        """
-
-        # Add a new test user
-        new_user = User(username="lime", password="lemon", teamname="citrus")
-        new_user.save()
-
-        # Setup Firefox web driver
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        driver.implicitly_wait(0.5)
-        driver.maximize_window()
-
-        # Open the login page URL
-        driver.get(self.live_server_url + "/pick_up_app/login/")
-
-        # Login user so we can access new_game page
-        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
-        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
-        driver.find_element_by_class_name("login").click()
-
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Open the calendar of the user we made
-        driver.get(self.live_server_url + "/pick_up_app/calendar/lime")
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Click on new timeslot button then the new_game link
-        driver.find_element_by_class_name("new_timeslot_btn").click()
-        driver.find_element_by_class_name("new_game_btn").click()
-
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Enter new game info
-        driver.find_element_by_xpath('//input[@type="text"][@name="game"]').send_keys("poker")
-        driver.find_element_by_xpath('//input[@type="text"][@name="gameType"]').send_keys("cards")
-
-        # Find and click the game submit button
-        driver.find_element_by_class_name("game_button").click()
-
-        driver.implicitly_wait(0.5)  # Wait before checking if game was added
-
-        self.assertTrue(Games.objects.filter(game='poker', gameType='cards'))
-
-        # Close browser
-        driver.quit()
-
-
-    def test_new_game_trying_to_add_duplicate_game(self):
-        """
-        This function tests that a game already in the database will not be
-        added again.
-        :return: None
-        """
-
-        # Add a new test user
-        new_user = User(username="lime", password="lemon", teamname="citrus")
-        new_user.save()
-
-        # Add a test game to test adding an existing game
-        new_game = Games(game="poker", gameType="cards")
-        new_game.save()
-
-        # Check if the game we added is there
-        self.assertTrue(Games.objects.filter(game='poker', gameType='cards'))
-
-        # Setup Firefox web driver
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        driver.implicitly_wait(0.5)
-        driver.maximize_window()
-
-        # Open the login page URL
-        driver.get(self.live_server_url + "/pick_up_app/login/")
-
-        # Login user so we can access new_game page
-        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
-        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
-        driver.find_element_by_class_name("login").click()
-
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Create a new game form
-        my_form = NewGameForm()
-        my_form.fields['game'] = 'poker'
-        my_form.fields['gameType'] = 'cards'
-
-        # Check that the game added is not valid (duplicate game name)
-        self.assertFalse(my_form.is_valid())
-
-        # Check that the game is still in the database
-        self.assertTrue(Games.objects.filter(game='poker', gameType='cards'))
-
-        # Close browser
-        driver.quit()
-
-
-class EditTeamPageTests(StaticLiveServerTestCase):
-    def test_team_changes_made_successfully(self):
-        """
-        This function tests that changes to team info via the edit team page
-        are added are made successfully.
-        :return: None
-        """
-
-        # Add a new test user
-        new_user = User(username="tim", teamname="timtom", password="tommy", checkpassword="tommy",
-                        email="tim@gmail.com", longitude=-76.71, latitude=39.2543)
-        new_user.save()
-
-        # Setup Firefox web driver
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        driver.implicitly_wait(0.5)
-        driver.maximize_window()
-
-        # Open the login page URL
-        driver.get(self.live_server_url + "/pick_up_app/login/")
-
-        # Login user so we can access new_game page
-        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("tim")
-        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("tommy")
-        driver.find_element_by_class_name("login").click()
-
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Open the edit_team URL
-        driver.get(self.live_server_url + reverse('edit_team', kwargs={'username': 'tim'}))
-
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Enter new user info to be changed
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_username"]').send_keys("lime")
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_team_name"]').send_keys("limeade")
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_password"]').send_keys("lemon")
-        driver.find_element_by_xpath('//input[@type="text"][@name="confirm_password"]').send_keys("lemon")
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_email"]').send_keys("lime@gmail.com")
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_longitude"]').send_keys("-76.3503")
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_latitude"]').send_keys("39.5375")
-
-        # Find and click the save changes button
-        driver.find_element_by_class_name("my_save_button").click()
-
-        driver.implicitly_wait(0.5)  # Wait before checking that team info was updated
-
-        # Get the newly updated user and check that all values were correctly changed
-        my_user = User.objects.filter(username="lime")
-        self.assertTrue(my_user.first().username == "lime")
-        self.assertTrue(my_user.first().teamname == "limeade")
-        self.assertTrue(my_user.first().password == "lemon")
-        self.assertTrue(my_user.first().checkpassword == "lemon")
-        self.assertTrue(my_user.first().email == "lime@gmail.com")
-        self.assertTrue(my_user.first().longitude == -76.3503)
-        self.assertTrue(my_user.first().latitude == 39.5375)
-
-        # Close browser
-        driver.quit()
-
-
-    def test_team_changes_made_individually_are_successful(self):
-        """
-        This function tests that changes to team info made separately via
-        the edit team page are added are made successfully.
-        :return: None
-        """
-
-        # Add a new test user
-        new_user = User(username="tim", teamname="timtom", password="tommy", checkpassword="tommy",
-                        email="tim@gmail.com", longitude=-76.71, latitude=39.2543)
-        new_user.save()
-
-        # Setup Firefox web driver
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        driver.implicitly_wait(0.5)
-        driver.maximize_window()
-
-        # Open the login page URL
-        driver.get(self.live_server_url + "/pick_up_app/login/")
-
-        # Login user so we can access new_game page
-        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("tim")
-        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("tommy")
-        driver.find_element_by_class_name("login").click()
-
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Open the login page URL
-        driver.get(self.live_server_url + reverse('edit_team', kwargs={'username': 'tim'}))
-
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Enter new username info and save changes
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_username"]').send_keys("lime")
-        driver.find_element_by_class_name("my_save_button").click()
-        driver.implicitly_wait(0.5)
-
-        # Get the newly updated user and check that username was correctly changed
-        my_user = User.objects.filter(username="lime")
-        self.assertTrue(my_user.first().username == "lime")
-
-        # Enter new team name info and save changes
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_team_name"]').send_keys("limeade")
-        driver.find_element_by_class_name("my_save_button").click()
-        driver.implicitly_wait(0.5)
-
-        # Get the newly updated user and check that teamname was correctly changed
-        my_user = User.objects.filter(username="lime")
-        self.assertTrue(my_user.first().teamname == "limeade")
-
-        # Enter password and confirm password and save changes
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_password"]').send_keys("lemon")
-        driver.find_element_by_xpath('//input[@type="text"][@name="confirm_password"]').send_keys("lemon")
-        driver.find_element_by_class_name("my_save_button").click()
-        driver.implicitly_wait(0.5)
-
-        # Get the newly updated user and check that password and password confirmation was correctly changed
-        my_user = User.objects.filter(username="lime")
-        self.assertTrue(my_user.first().password == "lemon")
-        self.assertTrue(my_user.first().checkpassword == "lemon")
-
-        # Open the login page URL again (re-login with new credentials)
-        driver.get(self.live_server_url + "/pick_up_app/login/")
-
-        # Login user so we can access new_game page
-        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
-        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
-        driver.find_element_by_class_name("login").click()
-
-        driver.implicitly_wait(0.5)  # Wait before proceeding
-
-        # Open the login page URL
+        # Redirect to the edit_team page
         driver.get(self.live_server_url + reverse('edit_team', kwargs={'username': 'lime'}))
 
-        driver.implicitly_wait(0.5)  # Wait before proceeding
+        # Find and click the redirect to team page button
+        driver.find_element_by_class_name("redirect_btn").click()
 
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_email"]').send_keys("lime@gmail.com")
-        driver.find_element_by_class_name("my_save_button").click()
-        driver.implicitly_wait(0.5)
+        driver.implicitly_wait(2)  # Wait before finding the title
 
-        # Get the newly updated user and check that email was correctly changed
-        my_user = User.objects.filter(username="lime")
-        self.assertTrue(my_user.first().email == "lime@gmail.com")
+        curr_title = driver.title  # Gets the title of the current page
+        actual_title = "Team Page"  # The actual title of the login page
 
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_longitude"]').send_keys("-76.3503")
-        driver.find_element_by_class_name("my_save_button").click()
-        driver.implicitly_wait(0.5)
+        self.assertEqual(actual_title, curr_title)  # Title of redirected page should match
 
-        # Get the newly updated user and check that longitude was correctly changed
-        my_user = User.objects.filter(username="lime")
-        self.assertTrue(my_user.first().longitude == -76.3503)
-
-        driver.find_element_by_xpath('//input[@type="text"][@name="new_latitude"]').send_keys("39.5375")
-        driver.find_element_by_class_name("my_save_button").click()
-        driver.implicitly_wait(0.5)
-
-    # Get the newly updated user and check that longitude was correctly changed
-        my_user = User.objects.filter(username="lime")
-        self.assertTrue(my_user.first().latitude == 39.5375)
-
-    # Close browser
+        # Close browser
         driver.quit()
 
 
