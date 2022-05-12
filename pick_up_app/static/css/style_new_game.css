@@ -1,0 +1,159 @@
+.overlay{
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 2;
+}
+
+
+.overlay .new_game {
+    margin: 70px auto;
+    padding: 20px;
+    background: #FFFFFF;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    width: 30%;
+    height: fit-content;
+    position: relative;
+}
+
+.overlay .close_icon {
+    position: absolute;
+    font-size: 30px;
+}
+
+.overlay .btn {
+    padding-left: 3px;
+    padding-right: 3px;
+    text-decoration: none;
+    font-size: 15px;
+    color: #818181;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    margin-left: 96%;
+}
+
+.overlay .header_container {
+    box-sizing: border-box;
+    display: block;
+    margin: 0;
+    position: relative;
+}
+
+.game_title {
+    font-size: 2em;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: bold;
+    margin: 0 0 15px;
+    text-align: center;
+}
+
+.text{
+    color: #000000;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.ex_text {
+    font-size: 15px;
+    color: #666666;
+    margin-top: 15px;
+    margin-bottom: 0;
+    text-align: center;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.success {
+    color: #006b1b;
+    background: #BEFFB9;
+    font-size: 16px;
+    font-family: 'Ubuntu', sans-serif;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-left: 25px;
+    margin-right: 25px;
+}
+
+.error, .warning {
+    font-size: 16px;
+    font-family: 'Ubuntu', sans-serif;
+    text-align: center;
+    color: #bb0a1e;
+    background: #FFBBAC;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-left: 25px;
+    margin-right: 25px;
+}
+
+.overlay .game_form label {
+    display: flex;
+    text-align: left;
+    font-size: 1.15em;
+    font-family: 'Ubuntu', sans-serif;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.overlay .game_form .form-input {
+    width: 77%;
+    border-radius: 20px;
+    border: 1px solid #ced4da;
+    font-family: 'Ubuntu', sans-serif;
+    display: block;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #f5f5f5;
+    margin-top: 10px;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+.overlay .container {
+    box-sizing: border-box;
+    display: block;
+    margin-left: 12%;
+    position: relative;
+}
+
+.overlay .game_button {
+    display: inline-block;
+    width: 50%;
+    cursor: pointer;
+    border-radius: 5em;
+    color: #fff;
+    background: #628760;
+    border: 0;
+    padding: 10px 40px;
+    margin-left: 20%;
+    margin-bottom: 10%;
+    margin-top: 13px;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 13px;
+    text-align: center;
+}
+
+.new_game_btn {
+    display: inline-block;
+    width: fit-content;
+    cursor: pointer;
+    border-radius: 5em;
+    color: #fff;
+    background: #628760;
+    border: 0;
+    padding: 10px 40px;
+    margin-left: 5px;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 12px;
+    text-align: center;
+}

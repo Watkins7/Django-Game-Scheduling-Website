@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% load static %}
+<head>
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
+    {#  Load in both the styletimeslot.css and style_new_game.css stylesheets  #}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styletimeslot.css' %}">
+    <link rel="stylesheet" href={% static "css/style_new_game.css" %}>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    <title> Timeslot Page</title>
+</head>
+
+<div style="text-align: center">
+    <h1 style="font-size: 40px"> Team {{ current_team }} Time Slot Information </h1>
+</div>
+
+<body>
+
+{#  Add link to add new game  #}
+<p class="text" align="center"> Don't see the game you want?
+    <button class="new_game_btn" onclick="overlay_on()">Add New Game</button> </p>
+
+    <form method="post">
+      {% csrf_token %}
+        <table class="form">
+            {{ timeslot_form}}
+        </table>
+        <div class="redirect_buttons" style="text-align: center">
+           <button type="submit" name="add" class="btn"> Submit </button>
+           {% if timeslot_id %}
+               <button type="submit" name="delete" value="delete" class="btn"> Delete </button>
+           {% endif %}
+        </div>
+    </form>
+    <div class="redirect_buttons" style="text-align: center">
+        <button class="btn">
+            <a class="calendar_btn" href="{% url 'calendar' current_team %}"
+               style="text-decoration: none"> Go Back Without Saving </a>
+        </button>
+    </div>
+
+    {#  Add new_game option as an overlay  #}
+    <div class="overlay" id="overlay">
+        <div class="new_game">
+            <div class=close_icon">
+                <button class="btn" onclick="overlay_off()"><i class="fa fa-close"></i></button>
+            </div>
+
+            <div class="header_container" style="justify-content: center"><p class="game_title"> Add New Game </p></div>
+
+
+            <form method="POST">
+                {% csrf_token %}
+
+                {# Print any messages #}
+                {% if messages %}
+                    {% for message in messages %}
+                        {# Sets message tag as class for class referent #}
+                        <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+                {# An example text of how games should be entered into the form  #}
+                <p class="ex_text">EX.: Game Name: poker, Game Type: cards</p>
+                <table class="game_form">
+                    {{ game_form }}
+                </table>
+
+                <div class="container">
+                    <button class="game_button" type="submit" align="center">Add Game</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+
+    {#  The following functions are used to turn on and off the new_game overlay  #}
+    <script>
+        function overlay_on() {
+            document.getElementById("overlay").style.display = "block";
+        }
+
+        function overlay_off() {
+            document.getElementById("overlay").style.display = "none";
+        }
+    </script>
+</body>
+</html>

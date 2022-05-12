@@ -1,0 +1,93 @@
+<!DOCTYPE html>{% load static %}
+<html lang="en">
+<meta charset="UTF-8">
+{% load static %}
+<head>
+    {# Load in the Ubuntu font stylesheet and the static CSS style_edit_team.css file. #}
+    <link rel="stylesheet" href={% static "css/style_edit_team.css" %}>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Team Info</title>
+</head>
+
+<body>
+
+<div class="overlay">
+    <div class="edit_box">
+
+        <div class="header_container" style="justify-content: center"><h3> Edit Team Info </h3></div>
+
+        <form action="{% url 'check_team_changes' %}" method="POST">
+            {% csrf_token %}
+
+            {#  Display messages if any #}
+            {% if messages %}
+                {% for message in messages %}
+                    {# Sets message tag as class for class referent #}
+                    <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <p>Please fill in the field(s) you would like to change.</p>
+
+            {# Ask for user input  #}
+            <div class="container">
+                <label>Edit Username
+                    <input type="text" class="input_text" name="new_username" placeholder="Enter New Username">
+                </label>
+            </div>
+
+            <div class="container">
+                <label>Edit Team Name
+                    <input type="text" class="input_text" name="new_team_name" placeholder="Enter New Team Name">
+                </label>
+            </div>
+
+            <div class="container">
+                <label>Edit Password
+                    <input type="text" class="input_text" name="new_password" placeholder="Enter New Password">
+                </label>
+            </div>
+            <div class="container">
+                <label>Confirm New Password
+                    <input type="text" class="input_text" name="confirm_password" placeholder="Confirm New Password">
+                </label>
+            </div>
+
+            <div class="container">
+                <label>Edit Email
+                    <input type="text" class="input_text" name="new_email" placeholder="Enter New Email">
+                </label>
+            </div>
+
+            <div class="container">
+                <label>Edit Longitude
+                    <input type="text" class="input_text" name="new_longitude"
+                           placeholder="Enter New Longitude Coordinates">
+                </label>
+            </div>
+
+            <div class="container">
+                <label>Edit Latitude
+                    <input type="text" class="input_text" name="new_latitude"
+                           placeholder="Enter New Latitude Coordinates">
+                </label>
+            </div>
+
+            <p class="pass_note">Note: Changing your password will prompt you to login again.</p>
+
+            <div class="container">
+                <input class="my_save_button" type="submit" align="center" value="Save Changes">
+                <a class="team_pg_redirect" href="{% url 'team_page' team_username %}" align="center">
+                    <button type="button" class="redirect_btn">Back to Team Page</button>
+                </a>
+
+            </div>
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>

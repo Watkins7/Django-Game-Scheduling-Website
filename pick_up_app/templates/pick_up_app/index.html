@@ -1,0 +1,27 @@
+{% for user in userList %}
+    <p>
+        {{user.username}}
+    </p>
+{% endfor %}
+
+<form action="{% url 'save'%}" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <legend><h1>Thingy</h1></legend>
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        <input type="text", name="username", id="username">
+        <input type="text", name="password", id="password">
+    </fieldset>
+    <input type="submit" value="enter">
+</form>
+
+<form action="{% url 'check'%}" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <legend><h1>Thingy</h1></legend>
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        <input type="text", name="username", id="username">
+        <input type="text", name="password", id="password">
+    </fieldset>
+    <input type="submit" value="enter">
+</form>

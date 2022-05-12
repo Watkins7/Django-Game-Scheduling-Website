@@ -1,0 +1,36 @@
+<!DOCTYPE html>{% load static %}
+<html lang="en">
+<title>Team Search Page</title>
+
+<head>
+    {# Load in the Ubuntu font stylesheet and the static CSS style.css file. #}
+        <link rel="stylesheet" href={% static "css/style.css" %}>
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+{% block content %}
+
+<center>
+        {% if team_search %}
+
+            <p style="font-size: 40px;">
+                Search Results For <b>{{team_search}}</b><br>
+                
+            </p>
+
+                <div style="color:rgb(0, 0, 0); font-size: 35px;margin-top: 10px;">
+                    Format: Username - Teamname<br>
+                        {% for team in teams %}
+
+                        <a href="{% url 'calendar' username=team.username %}" style="color:rgb(0, 88, 183);font-size: 30px;" class="calendarLinks">{{team.username}} - {{team.teamname}}</a><br>
+
+                    {% endfor %}
+                </div>
+        {% else %}>
+            <h1>
+                Do it right!
+            </h1>
+        {% endif %}
+</center>
+{% endblock %}

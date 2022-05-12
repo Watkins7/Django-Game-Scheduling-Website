@@ -1,0 +1,145 @@
+h1{
+  color: black;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: bold;
+  font-size: 40px;
+  background-color: #c1d9b4;
+  border-width: 4px;
+  text-align:  center;
+  width: 600px;
+  margin: auto;
+  margin-bottom: 5px;
+}
+
+body {
+  background-color: #c1d9b4;
+  width: 76%;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 1px;
+  padding: 60px 50px;
+  border: none;
+  border-radius: 20px;
+  box-sizing: border-box;
+  margin-bottom: 120px;
+  margin-left: 150px;
+  margin-right: 120px;
+  margin-top: 40px;
+  text-align: center;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+div {
+  background-color: #c1d9b4;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+/* unvisited link */
+a:link {
+  color: lightcyan;
+}
+
+/* visited link */
+a:visited {
+  color: lightcoral;
+}
+
+/* mouse over link */
+a:hover {
+  color: hotpink;
+}
+
+p {
+  text-align: center;
+  margin: auto;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-style: solid;
+  border-radius: 50px;
+  background-color: #678366;
+  color: white;
+
+  border-color: #9aa599;
+  font-size: 12px;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+.btn-primary{
+  cursor: pointer;
+  border-radius: 5em;
+  color: #fff;
+  background: #678366;
+  border: 0;
+  margin-top: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 14px;
+  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+}
+
+.header {
+  background-color: #c1d9b4;
+  text-align: center;
+  padding: 20px;
+}
+
+/* The navbar container */
+.topnav {
+  overflow: hidden;
+  background-color: #333;
+}
+
+/* Navbar links */
+.topnav a {
+  float: left;
+  display: block;
+  color: black;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+/* Links - change color on hover */
+.topnav a:hover {
+  background-color: #c1d9b4;
+  color: black;
+
+}
+
+.custom_reg{
+  display: block;
+  color: rgb(49, 55, 49);
+  border-width: 5px;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+.top-waves {
+  display: inline-block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  transform: rotate(180deg);
+}
+
+.top-waves svg {
+  position: relative;
+  display: inline-block;
+  width: calc(100% + 1.3px);
+  height: 250px;
+}
+
+.top-waves .shape-fill {
+  fill: #4C5E4B;
+}
+
+
+.container {
+  display: inline-block;
+  flex-direction: column;
+}
