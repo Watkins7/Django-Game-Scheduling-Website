@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/past_game.css' %}">
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+  <title>{{ host }} vs {{ opponent }}!!!</title>
+</head>
+
+<div class="heading">
+    <p><b><u>{{ host }} vs {{ opponent }}!!!</u></b></p>
+</div>
+
+<div class="main">
+    <pre>
+
+"<b><u>Game Results:</u> {{ results }}</b>"!
+
+<b>Winner: </b> {{ winner }}
+<b>Loser: </b> {{ loser }}
+
+<b>Name of the Game:</b> '{{ gameName }}'
+<b>Type of Game:</b> '{{ gameType }}'
+
+<b>Start Time</b>: {{ start }}
+<b>End Time</b>: {{ end }}
+
+</pre>
+</div>
+
+    <div class="redirect_buttons" style="text-align: center">
+        <button class="btn">
+            <a class="home_btn" href="{% url 'home_page' current_team %}"
+                   style="text-decoration: none"> Back to Home Page </a>
+        </button>
+    </div>

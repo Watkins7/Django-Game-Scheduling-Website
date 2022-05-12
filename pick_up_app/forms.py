@@ -67,7 +67,6 @@ class NewUserForm(ModelForm):
         if longitude < -180 or longitude > 180:
             raise ValidationError("ERROR: Longitude must be within -180 to 180")
 
-
 # Timeslot Form
 class TimeSlotForm(ModelForm):
     is_timeslot_form = forms.BooleanField(widget=forms.HiddenInput, initial=True)
