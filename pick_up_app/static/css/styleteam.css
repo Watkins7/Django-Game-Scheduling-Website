@@ -3,43 +3,54 @@ body {
     font-family: 'Ubuntu', sans-serif;
 }
 
-.mmr_score{
-    margin: 20px;
-    width: 350px;
-    height: 50px;
-    border: 3px solid #326b51;
-    background-color: #e7f2e4;
-    padding-bottom: 30px;
-    padding-top: 5px;
+hr{
+    border: 2px;
+    height: 0;
+    border-top: 5px solid rgba(148, 227, 132, 0.1);
+    border-bottom: 5px solid rgba(74, 113, 74, 0.3);
 }
 
-p{
-    margin-bottom: 30px;
+.team_name{
+    font-size: 35px;
+    margin: auto;
+    width: 70%;
+    height: 45px;
+    margin-top: 7px;
+    padding: 15px;
+    border: 3px solid #326b51;
+    background-color: #e7f2e4;
+}
+
+.welcome_gif{
+    width: 100px;
+}
+
+.mmr{
+    font-size: 25px;
+    margin: auto;
+    border-radius: 25px;
+    margin-top: 40px;
+    width: 350px;
+    border: 3px solid #326b51;
+    background-color: #e7f2e4;
+}
+
+.email{
+    font-size: 25px;
 }
 
 .emailList{
-    display: inline-block;
     background-color:#e7f2e4;
-    margin: 40px;
-    width: 500px;
-    margin-left: 30px;
-    margin-right: 3px;
+    margin: auto;
+    border-radius: 50px;
+    width: 50%;
+    margin-top: 50px;
     border: 3px solid #326b51;
     padding-bottom: 150px;
 }
 
 li {
-    padding-right: 10px;
-  }
-  
-  .calendar{
-    display: inline-block; 
-    background-color:#e7f2e4;
-    width: 500px;
-    height: 400px;
-    margin-left: 200px;
-    border: 3px solid #326b51;
-    padding-top: 55px;
+    margin: auto;
 }
 
 .redirect_buttons {
