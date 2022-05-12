@@ -12,7 +12,7 @@ from .utils import Calendar
 import calendar
 
 # Forms
-from .forms import NewUserForm, TimeSlotForm
+from .forms import NewUserForm, TimeSlotForm, NewGameForm
 
 # Models
 from .models import User, TimeSlot, Games
@@ -74,7 +74,7 @@ def home_page(request, username):
                        'centered_team': centered_team,
                        'api_key': key,
                        "teams": teamNames,
-                       'username' : username,
+                       'username': username,
                        }
 
             return render(request, 'pick_up_app/home_page.html', context)
@@ -85,13 +85,12 @@ def home_page(request, username):
 
 def team_page(request, username):
     # Is the user logged in
-    if (request.user.is_authenticated):
+    if request.user.is_authenticated:
         # Is the user at THEIR home page
-        if (request.user.username != username):
+        if request.user.username != username:
             return HttpResponse("You are trying to view a page that is not yours!")
         else:
-            context = {'username': username}
-            return render(request, 'pick_up_app/team.html', context)
+            return render(request, 'pick_up_app/team.html', context={'username': username})
 
 
 def index(request):
@@ -425,71 +424,79 @@ def timeslot(request, username, timeslot_id=None):
             else:
                 instance = TimeSlot(host_team=cur_team)
 
-            timeslot_form = TimeSlotForm(request.POST or None, instance=instance)
+            # Render both forms for the timeslot page
+            timeslot_form = TimeSlotForm(instance=instance)
+            game_form = NewGameForm()
 
-            # If the request is a post and the form has been cleaned either save the form or delete the timeslot
-            if request.POST:
-                if request.POST.get('delete'):
-                    instance.delete()
-                    return HttpResponseRedirect(reverse('calendar', args=(username,)))
-                else:
-                    if timeslot_form.is_valid():
-                        timeslot_form.save()
+            # Check if the request is a post
+            if request.method == 'POST':
+                # Check if the info submitted is for the timeslot form
+                if 'is_timeslot_form' in request.POST:
+                    # If the form has been cleaned either save the form or delete the timeslot
+                    timeslot_form = TimeSlotForm(request.POST, instance=instance)
+                    if request.POST.get('delete'):
+                        instance.delete()
                         return HttpResponseRedirect(reverse('calendar', args=(username,)))
+                    else:
+                        if timeslot_form.is_valid():
+                            timeslot_form.save()
+                            return HttpResponseRedirect(reverse('calendar', args=(username,)))
+
+                # Check if the info submitted is for the new_game form
+                if 'is_game_form' in request.POST:
+                    # Post new game form
+                    game_form = NewGameForm(request.POST)
+
+                    # Try save game if form is valid
+                    if game_form.is_valid():
+                        game_form.save()
+
+                        # Send back success message
+                        messages.success(request, 'SUCCESS: New game added successfully!')
+                    # Reload empty form
+                    game_form = NewGameForm()
 
             context = {'timeslot_form': timeslot_form,
                        'current_team': cur_team.username,
-                       'timeslot_id': timeslot_id}
+                       'timeslot_id': timeslot_id,
+                       'game_form': game_form,
+                       }
+
             return render(request, 'pick_up_app/timeslot.html', context)
     else:
         return HttpResponse("You are not logged in!")
 
 
-# View where user can add a new game
-def new_game(request):
-    all_games = Games.objects.all()
-    context = {'game_list': all_games}
-    return render(request, 'pick_up_app/new_game.html', context)
-
-
-# Save the new game that was added by the new game page
-def save_game(request):
-    curr_game = Games(game=request.POST['game_name'], gameType=request.POST['game_type'])
-    curr_game.save()
-    messages.success(request, 'New game added successfully!')
-    return HttpResponse("New game saved.")
-
-
-# Check that the new game given is not in the database yet
-def check_game_list(request):
-    curr_game = Games.verify(request.POST['game_name'], request.POST['game_type'])
-    if curr_game:
-        save_game(request)
-    else:
-        messages.error(request, 'Game could not be added.')
-    return HttpResponseRedirect(reverse('new_game'))
-
-
 def edit_team(request, username):
-    curr_team = User.objects.filter(username=username)
-    context = {'team_info': curr_team}
-    return render(request, 'pick_up_app/edit_team.html', context)
+    # Ensures only authenticated team can edit their team info
+    if request.user.is_authenticated:
+        if request.user.username != username:
+            return HttpResponse("You are trying to view a page that is not yours!")
+        else:
+            context = {'team_username': username}
+            return render(request, 'pick_up_app/edit_team.html', context)
+    # Otherwise, user not logged in
+    else:
+        return HttpResponse("You are not logged in!")
 
 
 def check_team_changes(request):
     curr_username = request.user.username
     my_user = User.objects.get(username=curr_username)
 
+    # Get the form values
     new_username = request.POST['new_username']
     new_team_name = request.POST['new_team_name']
     new_password = request.POST['new_password']
     confirm_password = request.POST['confirm_password']
     new_email = request.POST['new_email']
+    new_latitude = request.POST['new_latitude']
+    new_longitude = request.POST['new_longitude']
 
     # If new username given, make sure username is unique and not current username before saving
     if new_username:
         if my_user.username == new_username:
-            messages.error(request, "The username given is already this team's username.")
+            messages.error(request, "ERROR: The username given is already this team's username.")
 
         # Check that username is unique from other users
         else:
@@ -501,39 +508,75 @@ def check_team_changes(request):
             if is_unique:
                 my_user.username = new_username
                 my_user.save()
-                messages.success(request, "Username changed successfully.")
+                messages.success(request, "SUCCESS: Username changed successfully.")
             # If not unique, sent error message
             else:
-                messages.error(request, "This username is already taken.")
+                messages.error(request, "ERROR: This username is already taken.")
 
-    # If new team name, save if not the same as current team name
+    # If new team name given, save if not the same as current team name
     if new_team_name:
         if my_user.teamname == new_team_name:
-            messages.error(request, "The team name given is already this team's team name.")
+            messages.error(request, "ERROR: The team name given is already this team's team name.")
         else:
             my_user.teamname = new_team_name
             my_user.save()
-            messages.success(request, "Team name changed successfully.")
+            messages.success(request, "SUCCESS: Team name changed successfully.")
+
+    # If new email given, make sure that the email is not the current email before saving
+    if new_email:
+        if my_user.email == new_email:
+            messages.error(request, "ERROR: The email given is already this team's email.")
+        else:
+            my_user.email = new_email
+            my_user.save()
+            messages.success(request, "SUCCESS: Team email changed successfully.")
+
+    # If new longitude given make sure it doesn't match the current coordinate and validate in correct range
+    if new_longitude:
+        try:
+            new_longitude = float(new_longitude)  # Also validate that the value given is a number
+            if my_user.longitude == new_longitude:
+                messages.error(request, "ERROR: The longitude given is already this team's longitude coordinate.")
+            elif new_longitude < -180 or new_longitude > 180:
+                messages.error(request, "ERROR: Longitude must be within -180 to 180")
+            else:
+                my_user.longitude = new_longitude
+                my_user.save()
+                messages.success(request, "SUCCESS: Team longitude coordinate changed successfully.")
+        # If message not a number, send error message
+        except ValueError as VErr:
+            messages.error(request, "ERROR: Longitude coordinate must be a number.")
+
+    # If new latitude given, make sure that it does not match current coordinate and validate in correct range
+    if new_latitude:
+        try:
+            new_latitude = float(new_latitude)  # Also validate that the value given is a number
+            if my_user.latitude == new_latitude:
+                messages.error(request, "ERROR: The latitude given is already this team's latitude coordinate.")
+            elif new_latitude < -90 or new_latitude > 90:
+                messages.error(request, "ERROR: Latitude must be within -90 to 90")
+            else:
+                my_user.latitude = new_latitude
+                my_user.save()
+                messages.success(request, "SUCCESS: Team latitude coordinate changed successfully.")
+        # If message not a number, send error message
+        except ValueError as VErr:
+            messages.error(request, "ERROR: Latitude coordinate must be a number.")
 
     # If new password is not the same as old one, make sure it matches confirmation password before saving
     if new_password:
         if my_user.password == new_password:
-            messages.error(request, "The password given is already this team's password.")
+            messages.error(request, "ERROR: The password given is already this team's password.")
         else:
             if new_password == confirm_password:
                 my_user.password = new_password
                 my_user.checkpassword = confirm_password
                 my_user.save()
-                messages.success(request, "Password changed successfully.")
-            else:
-                messages.error(request, "The new password and password confirmation do not match.")
 
-    # If new email given, make sure that the email is not the current email before saving
-    if new_email:
-        if my_user.email == new_email:
-            messages.error(request, "The email given is already this team's email.")
-        else:
-            my_user.email = new_email
-            my_user.save()
-            messages.success(request, "Team email changed successfully.")
+                # Changing the password will prompt you to login again with your new password
+                return HttpResponseRedirect(reverse('index'))
+            else:
+                messages.error(request, "ERROR: The new password and password confirmation do not match.")
+
+
     return HttpResponseRedirect(reverse('edit_team', args=(my_user.username,)))

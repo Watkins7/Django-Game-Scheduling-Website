@@ -2,8 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
-# Create your models here.
-#Creates a field type the forces the characters to be lowercase. This helps
+
+#Creates a field type that forces the characters to be lowercase. This helps
 #preserve uniqueness
 class NameField(models.CharField):
     def __init__(self, *args, **kwargs):
@@ -11,6 +11,7 @@ class NameField(models.CharField):
 
     def get_prep_value(self, value):
         return str(value).lower() 
+
 
 # Create your models here.
 class User(AbstractUser):
@@ -45,7 +46,8 @@ class User(AbstractUser):
 
 class Games(models.Model):
     game = NameField(max_length=30, unique=True)
-    gameType = models.TextField(20)
+    gameType = models.CharField(max_length=30)
+
 
     def verify(game, gameType):
         # This function checks that the new game is not already in the database
@@ -75,7 +77,7 @@ class Emails(models.Model):
 
 
 class TimeSlot(models.Model):
-    host_team = models.ForeignKey(User, on_delete=models.CASCADE, related_name='host_team')
+    host_team = models.ForeignKey(User, on_delete=models.CASCADE, related_name='host_team', default='')
     game = models.ForeignKey(Games, on_delete=models.CASCADE)
     slot_start = models.DateTimeField('Start date/time available')
     slot_end = models.DateTimeField('End date/time available')

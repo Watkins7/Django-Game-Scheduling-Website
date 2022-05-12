@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 {% load static %}
 <head>
-    {# Load in the Ubuntu font stylesheet and the static CSS style.css file. #}
+    {# Load in the Ubuntu font stylesheet and the static CSS style_edit_team.css file. #}
     <link rel="stylesheet" href={% static "css/style_edit_team.css" %}>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
@@ -33,31 +33,56 @@
 
             {# Ask for user input  #}
             <div class="container">
-                <label>Edit Username</label>
-                <input type="text" class="input_text" name="new_username" placeholder="Enter New Username">
+                <label>Edit Username
+                    <input type="text" class="input_text" name="new_username" placeholder="Enter New Username">
+                </label>
             </div>
 
             <div class="container">
-                <label>Edit Team Name</label>
-                <input type="text" class="input_text" name="new_team_name" placeholder="Enter New Team Name">
+                <label>Edit Team Name
+                    <input type="text" class="input_text" name="new_team_name" placeholder="Enter New Team Name">
+                </label>
             </div>
 
             <div class="container">
-                <label>Edit Password</label>
-                <input type="text" class="input_text" name="new_password" placeholder="Enter New Password">
+                <label>Edit Password
+                    <input type="text" class="input_text" name="new_password" placeholder="Enter New Password">
+                </label>
             </div>
             <div class="container">
-                <label>Confirm New Password</label>
-                <input type="text" class="input_text" name="confirm_password" placeholder="Confirm New Password">
+                <label>Confirm New Password
+                    <input type="text" class="input_text" name="confirm_password" placeholder="Confirm New Password">
+                </label>
             </div>
 
             <div class="container">
-                <label>Edit Email</label>
-                <input type="text" class="input_text" name="new_email" placeholder="Enter New Email">
+                <label>Edit Email
+                    <input type="text" class="input_text" name="new_email" placeholder="Enter New Email">
+                </label>
             </div>
+
+            <div class="container">
+                <label>Edit Longitude
+                    <input type="text" class="input_text" name="new_longitude"
+                           placeholder="Enter New Longitude Coordinates">
+                </label>
+            </div>
+
+            <div class="container">
+                <label>Edit Latitude
+                    <input type="text" class="input_text" name="new_latitude"
+                           placeholder="Enter New Latitude Coordinates">
+                </label>
+            </div>
+
+            <p class="pass_note">Note: Changing your password will prompt you to login again.</p>
 
             <div class="container">
                 <input class="my_save_button" type="submit" align="center" value="Save Changes">
+                <a class="team_pg_redirect" href="{% url 'team_page' team_username %}" align="center">
+                    <button type="button" class="redirect_btn">Back to Team Page</button>
+                </a>
+
             </div>
         </form>
 

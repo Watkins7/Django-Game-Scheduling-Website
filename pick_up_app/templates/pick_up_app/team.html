@@ -22,7 +22,7 @@
         <div class = "mmr" align ="center">
             <p class="mmrScore">Team MMR Score: {{user.mmrScore}}</p>
         </div>
-  
+
         <div class = "emailList" align="center">
             <p class="email">Team Member Email List</p>
             <ul>
@@ -34,11 +34,11 @@
         <div><img src="{% static 'pick up app/media/powerrangers.gif' %}" alt="spin" style="position: absolute; width: 300px; top:150px; right: 10px;float: right; margin-right: 20px"></div>
 
         <div class="redirect_buttons" align="center">
-            <p class="calendar" style= "display:inline-block;"><a href="{% url 'calendar' username %}">View Team Calendar</a></p> 
-            <p class="edit_team_page" style="display:inline-block;"><a href="{% url 'edit_team' username %}">Edit Team Page</a></p> 
-            <p class="home_page" style="display:inline-block;"><a href="{% url 'home_page' username %}">Go to Home Page</a></p> 
+            <p class="calendar" style= "display:inline-block;"><a href="{% url 'calendar' username %}">View Team Calendar</a></p>
+            <p class="edit_team_page" style="display:inline-block;"><a href="{% url 'edit_team' username %}">Edit Team Page</a></p>
+            <p class="home_page" style="display:inline-block;"><a href="{% url 'home_page' username %}">Go to Home Page</a></p>
             <p class="delete_team" style="display:inline-block;"><a href="#">Delete Team</a></p> 
-            <p class="logout" style="display:inline-block;"><a href="{% url 'index' %}">Logout</a></p> 
+            <p class="logout" style="display:inline-block;"><a href="{% url 'index' %}">Logout</a></p>
         </div>
 
     </body>
