@@ -32,4 +32,4 @@ jobs:
     - name: Run Tests
       run: |
         python manage.py test pick_up_app.tests.test_form
-        python manage.py test pick_up_app.tests.test_model
+        python manage.py test pick_up_app.tests.tests_model
