@@ -424,12 +424,15 @@ def timeslot(request, username, timeslot_id=None):
             else:
                 instance = TimeSlot(host_team=cur_team)
 
+            # Render both forms for the timeslot page
             timeslot_form = TimeSlotForm(instance=instance)
             game_form = NewGameForm()
 
-            # If the request is a post and the form has been cleaned either save the form or delete the timeslot
+            # Check if the request is a post
             if request.method == 'POST':
+                # Check if the info submitted is for the timeslot form
                 if 'is_timeslot_form' in request.POST:
+                    # If the form has been cleaned either save the form or delete the timeslot
                     timeslot_form = TimeSlotForm(request.POST, instance=instance)
                     if request.POST.get('delete'):
                         instance.delete()
@@ -438,9 +441,12 @@ def timeslot(request, username, timeslot_id=None):
                         if timeslot_form.is_valid():
                             timeslot_form.save()
                             return HttpResponseRedirect(reverse('calendar', args=(username,)))
+
+                # Check if the info submitted is for the new_game form
                 if 'is_game_form' in request.POST:
                     # Post new game form
                     game_form = NewGameForm(request.POST)
+
                     # Try save game if form is valid
                     if game_form.is_valid():
                         game_form.save()
@@ -462,13 +468,14 @@ def timeslot(request, username, timeslot_id=None):
 
 
 def edit_team(request, username):
-    # Ensures only authenticated team can edit timeslot data
+    # Ensures only authenticated team can edit their team info
     if request.user.is_authenticated:
         if request.user.username != username:
             return HttpResponse("You are trying to view a page that is not yours!")
         else:
             context = {'team_username': username}
             return render(request, 'pick_up_app/edit_team.html', context)
+    # Otherwise, user not logged in
     else:
         return HttpResponse("You are not logged in!")
 
@@ -477,6 +484,7 @@ def check_team_changes(request):
     curr_username = request.user.username
     my_user = User.objects.get(username=curr_username)
 
+    # Get the form values
     new_username = request.POST['new_username']
     new_team_name = request.POST['new_team_name']
     new_password = request.POST['new_password']
@@ -505,7 +513,7 @@ def check_team_changes(request):
             else:
                 messages.error(request, "ERROR: This username is already taken.")
 
-    # If new team name, save if not the same as current team name
+    # If new team name given, save if not the same as current team name
     if new_team_name:
         if my_user.teamname == new_team_name:
             messages.error(request, "ERROR: The team name given is already this team's team name.")
@@ -526,7 +534,7 @@ def check_team_changes(request):
     # If new longitude given make sure it doesn't match the current coordinate and validate in correct range
     if new_longitude:
         try:
-            new_longitude = float(new_longitude)
+            new_longitude = float(new_longitude)  # Also validate that the value given is a number
             if my_user.longitude == new_longitude:
                 messages.error(request, "ERROR: The longitude given is already this team's longitude coordinate.")
             elif new_longitude < -180 or new_longitude > 180:
@@ -535,13 +543,14 @@ def check_team_changes(request):
                 my_user.longitude = new_longitude
                 my_user.save()
                 messages.success(request, "SUCCESS: Team longitude coordinate changed successfully.")
+        # If message not a number, send error message
         except ValueError as VErr:
             messages.error(request, "ERROR: Longitude coordinate must be a number.")
 
     # If new latitude given, make sure that it does not match current coordinate and validate in correct range
     if new_latitude:
         try:
-            new_latitude = float(new_latitude)
+            new_latitude = float(new_latitude)  # Also validate that the value given is a number
             if my_user.latitude == new_latitude:
                 messages.error(request, "ERROR: The latitude given is already this team's latitude coordinate.")
             elif new_latitude < -90 or new_latitude > 90:
@@ -550,6 +559,7 @@ def check_team_changes(request):
                 my_user.latitude = new_latitude
                 my_user.save()
                 messages.success(request, "SUCCESS: Team latitude coordinate changed successfully.")
+        # If message not a number, send error message
         except ValueError as VErr:
             messages.error(request, "ERROR: Latitude coordinate must be a number.")
 
