@@ -1401,7 +1401,6 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         for message in messages_found:
             message_text = message.text
         # Compare error message (if any) to the expected message string
-        print(message_text)
         self.assertTrue(message_text == expected_message_4)
 
         # Close browser
