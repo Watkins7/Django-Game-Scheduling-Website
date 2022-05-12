@@ -14,7 +14,7 @@ class NameField(models.CharField):
 
 # Create your models here.
 class User(AbstractUser):
-    mmrScore = models.IntegerField(default=50)
+    mmrScore = models.IntegerField(default=100)
     teamname = models.CharField(max_length=50,default='')
     email = models.EmailField(max_length=100, default='')
     checkpassword = models.CharField(max_length=50, default='')
