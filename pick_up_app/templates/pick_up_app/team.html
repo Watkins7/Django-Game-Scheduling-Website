@@ -38,7 +38,7 @@
             <p class="edit_team_page" style="display:inline-block;"><a href="{% url 'edit_team' username %}">Edit Team Page</a></p> 
             <p class="home_page" style="display:inline-block;"><a href="{% url 'home_page' username %}">Go to Home Page</a></p> 
             <p class="delete_team" style="display:inline-block;"><a href="#">Delete Team</a></p> 
-            <p class="logout" style="display:inline-block;"><a href="#">Logout</a></p> 
+            <p class="logout" style="display:inline-block;"><a href="{% url 'index' %}">Logout</a></p> 
         </div>
 
     </body>
