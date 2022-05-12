@@ -326,10 +326,6 @@ class loginSeleniumTests(StaticLiveServerTestCase):
 
         try:
             driver.find_element_by_class_name("middle_box")
-            driver.find_element_by_class_name("main")
-            driver.find_element_by_class_name("user")
-            driver.find_element_by_class_name("pass")
-            driver.find_element_by_class_name("login")
             print("SUCCESS, found the classes")
         except Exception:
             print("FAILED, couldn't find the classes")
@@ -1620,7 +1616,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        messages_found = driver.find_elements_by_xpath('//p[@class="alert-danger"]')
         message_text = ""  # Primes variable for the message (if one exists)
         for message in messages_found:
             message_text = message.text
@@ -1634,7 +1630,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        messages_found = driver.find_elements_by_xpath('//p[@class="alert-danger"]')
         message_text = ""  # Reset message text to empty
         for message in messages_found:
             message_text = message.text
@@ -1649,7 +1645,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        messages_found = driver.find_elements_by_xpath('//p[@class="alert-danger"]')
         message_text = ""  # Reset message text to empty
         for message in messages_found:
             message_text = message.text
@@ -1663,7 +1659,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        messages_found = driver.find_elements_by_xpath('//p[@class="alert-danger"]')
         message_text = ""  # Reset message text to empty
         for message in messages_found:
             message_text = message.text
@@ -1677,7 +1673,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        messages_found = driver.find_elements_by_xpath('//p[@class="alert-danger"]')
         message_text = ""  # Reset message text to empty
         for message in messages_found:
             message_text = message.text
@@ -1691,7 +1687,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        messages_found = driver.find_elements_by_xpath('//p[@class="alert-danger"]')
         message_text = ""  # Reset message text to empty
         for message in messages_found:
             message_text = message.text
@@ -1717,6 +1713,8 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         # Expected messages for submitting duplicate data
         expected_message = ["ERROR: Longitude must be within -180 to 180",
                             "ERROR: Latitude must be within -90 to 90",
+                            "ERROR: Longitude coordinate must be a number.",
+                            "ERROR: Latitude coordinate must be a number.",
                             ]
 
         # Setup Firefox web driver
@@ -1744,7 +1742,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        messages_found = driver.find_elements_by_xpath('//p[@class="alert-danger"]')
         message_text = ""  # Reset message text to empty
         for message in messages_found:
             message_text = message.text
@@ -1758,7 +1756,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        messages_found = driver.find_elements_by_xpath('//p[@class="alert-danger"]')
         message_text = ""  # Reset message text to empty
         for message in messages_found:
             message_text = message.text
@@ -1772,7 +1770,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        messages_found = driver.find_elements_by_xpath('//p[@class="alert-danger"]')
         message_text = ""  # Reset message text to empty
         for message in messages_found:
             message_text = message.text
@@ -1786,12 +1784,44 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         driver.implicitly_wait(0.5)  # Wait before proceeding
 
         # Get error message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="error"]')
+        messages_found = driver.find_elements_by_xpath('//p[@class="alert-danger"]')
         message_text = ""  # Reset message text to empty
         for message in messages_found:
             message_text = message.text
         # Compare error message (if any) to the expected message string
         self.assertTrue(message_text == expected_message[1])
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Enter non-number in longitude
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_longitude"]').send_keys("taco")
+        driver.find_element_by_class_name("my_save_button").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Get error message from messages
+        messages_found = driver.find_elements_by_xpath('//p[@class="alert-danger"]')
+        message_text = ""  # Reset message text to empty
+        for message in messages_found:
+            message_text = message.text
+        # Compare error message (if any) to the expected message string
+        self.assertTrue(message_text == expected_message[2])
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Enter non-number in latitude
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_latitude"]').send_keys("taco")
+        driver.find_element_by_class_name("my_save_button").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Get error message from messages
+        messages_found = driver.find_elements_by_xpath('//p[@class="alert-danger"]')
+        message_text = ""  # Reset message text to empty
+        for message in messages_found:
+            message_text = message.text
+        # Compare error message (if any) to the expected message string
+        self.assertTrue(message_text == expected_message[3])
 
         driver.implicitly_wait(0.5)  # Wait before proceeding
 

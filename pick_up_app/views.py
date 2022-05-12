@@ -514,21 +514,6 @@ def check_team_changes(request):
             my_user.save()
             messages.success(request, "SUCCESS: Team name changed successfully.")
 
-    # If new password is not the same as old one, make sure it matches confirmation password before saving
-    if new_password:
-        if my_user.password == new_password:
-            messages.error(request, "ERROR: The password given is already this team's password.")
-        else:
-            if new_password == confirm_password:
-                my_user.password = new_password
-                my_user.checkpassword = confirm_password
-                my_user.save()
-
-                # Changing the password will prompt you to login again with your new password
-                return HttpResponseRedirect(reverse('index'))
-            else:
-                messages.error(request, "ERROR: The new password and password confirmation do not match.")
-
     # If new email given, make sure that the email is not the current email before saving
     if new_email:
         if my_user.email == new_email:
@@ -567,6 +552,21 @@ def check_team_changes(request):
                 messages.success(request, "SUCCESS: Team latitude coordinate changed successfully.")
         except ValueError as VErr:
             messages.error(request, "ERROR: Latitude coordinate must be a number.")
+
+    # If new password is not the same as old one, make sure it matches confirmation password before saving
+    if new_password:
+        if my_user.password == new_password:
+            messages.error(request, "ERROR: The password given is already this team's password.")
+        else:
+            if new_password == confirm_password:
+                my_user.password = new_password
+                my_user.checkpassword = confirm_password
+                my_user.save()
+
+                # Changing the password will prompt you to login again with your new password
+                return HttpResponseRedirect(reverse('index'))
+            else:
+                messages.error(request, "ERROR: The new password and password confirmation do not match.")
 
 
     return HttpResponseRedirect(reverse('edit_team', args=(my_user.username,)))
