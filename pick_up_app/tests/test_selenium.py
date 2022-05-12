@@ -1320,13 +1320,6 @@ class EditTeamPageTests(StaticLiveServerTestCase):
                         email="tim@gmail.com", longitude=-76.71, latitude=39.2543)
         new_user.save()
 
-        # # List of expected success messages
-        # expected_messages = ["Username changed successfully.",
-        #                      "Team name changed successfully.",
-        #                      "Password changed successfully.",
-        #                      "Team email changed successfully."]
-
-
         # Setup Firefox web driver
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
         driver.implicitly_wait(0.5)
@@ -1353,22 +1346,27 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         driver.find_element_by_xpath('//input[@type="text"][@name="new_password"]').send_keys("lemon")
         driver.find_element_by_xpath('//input[@type="text"][@name="confirm_password"]').send_keys("lemon")
         driver.find_element_by_xpath('//input[@type="text"][@name="new_email"]').send_keys("lime@gmail.com")
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_longitude"]').send_keys("-76.3503")
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_latitude"]').send_keys("39.5375")
 
         # Find and click the save changes button
         driver.find_element_by_class_name("my_save_button").click()
 
         driver.implicitly_wait(0.5)  # Wait before checking that team info was updated
-        # Get success messages and check with expected
-        messages_found = driver.find_elements_by_xpath('//p[@class="success"]')
-        message_text = ""  # Primes variable for the message (if one exists)
-        for i in range(len(messages_found)):
-            message_text = messages_found[i].text
-            # Compare messages (if any) to the expected message string
-            self.assertTrue(message_text == expected_messages[i])
 
+        # Get the newly updated user and check that all values were correctly changed
+        my_user = User.objects.filter(username="lime")
+        self.assertTrue(my_user.first().username == "lime")
+        self.assertTrue(my_user.first().teamname == "limeade")
+        self.assertTrue(my_user.first().password == "lemon")
+        self.assertTrue(my_user.first().checkpassword == "lemon")
+        self.assertTrue(my_user.first().email == "lime@gmail.com")
+        self.assertTrue(my_user.first().longitude == -76.3503)
+        self.assertTrue(my_user.first().latitude == 39.5375)
 
         # Close browser
         driver.quit()
+
 
     def test_team_changes_made_individually_are_successful(self):
         """
@@ -1381,12 +1379,6 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         new_user = User(username="tim", teamname="timtom", password="tommy", checkpassword="tommy",
                         email="tim@gmail.com", longitude=-76.71, latitude=39.2543)
         new_user.save()
-
-        # # List of expected success messages
-        # expected_messages = ["Username changed successfully.",
-        #                      "Team name changed successfully.",
-        #                      "Password changed successfully.",
-        #                      "Team email changed successfully.", ]
 
         # Setup Firefox web driver
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
@@ -1411,56 +1403,70 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         # Enter new username info and save changes
         driver.find_element_by_xpath('//input[@type="text"][@name="new_username"]').send_keys("lime")
         driver.find_element_by_class_name("my_save_button").click()
+        driver.implicitly_wait(0.5)
 
-    # ADD HERE ##############################################
-        self.assertTrue(message_text == expected_messages[0])
+        # Get the newly updated user and check that username was correctly changed
+        my_user = User.objects.filter(username="lime")
+        self.assertTrue(my_user.first().username == "lime")
 
         # Enter new team name info and save changes
         driver.find_element_by_xpath('//input[@type="text"][@name="new_team_name"]').send_keys("limeade")
         driver.find_element_by_class_name("my_save_button").click()
-
-        # Wait before confirming that team name was changed
         driver.implicitly_wait(0.5)
-        # Get success message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="success"]')
-        message_text = ""  # Clears message_text for next message
-        for message in messages_found:
-            message_text = message.text
-        # Compare message (if any) to the expected message string
-        self.assertTrue(message_text == expected_messages[1])
+
+        # Get the newly updated user and check that teamname was correctly changed
+        my_user = User.objects.filter(username="lime")
+        self.assertTrue(my_user.first().teamname == "limeade")
 
         # Enter password and confirm password and save changes
         driver.find_element_by_xpath('//input[@type="text"][@name="new_password"]').send_keys("lemon")
         driver.find_element_by_xpath('//input[@type="text"][@name="confirm_password"]').send_keys("lemon")
         driver.find_element_by_class_name("my_save_button").click()
-
-        # Wait before confirming that password(s) changed
         driver.implicitly_wait(0.5)
-        # Get success message from messages
-        messages_found = driver.find_elements_by_xpath('//p[@class="success"]')
-        message_text = ""  # Clears message_text for next message
-        for message in messages_found:
-            message_text = message.text
-        # Compare message (if any) to the expected message string
-        self.assertTrue(message_text == expected_messages[2])
-        #
-        # # Wait before proceeding
-        # driver.implicitly_wait(0.5)
-        #
-        # driver.find_element_by_xpath('//input[@type="text"][@name="new_email"]').send_keys("lime@gmail.com")
-        # driver.find_element_by_class_name("my_save_button").click()
-        #
-        # time.sleep(2)
-        # # Wait before confirming that email was changed
-        # driver.implicitly_wait(0.5)
-        # # Get success message from messages
-        # messages_found = driver.find_elements_by_xpath('//p[@class="success"]')
-        # message_text = ""  # Clears message_text for next message
-        # for message in messages_found:
-        #     message_text = message.text
-        # # Compare message (if any) to the expected message string
-        # print(message_text)
-        # self.assertTrue(message_text == expected_messages[3])
+
+        # Get the newly updated user and check that password and password confirmation was correctly changed
+        my_user = User.objects.filter(username="lime")
+        self.assertTrue(my_user.first().password == "lemon")
+        self.assertTrue(my_user.first().checkpassword == "lemon")
+
+        # Open the login page URL again (re-login with new credentials)
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user so we can access new_game page
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Open the login page URL
+        driver.get(self.live_server_url + reverse('edit_team', kwargs={'username': 'lime'}))
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_email"]').send_keys("lime@gmail.com")
+        driver.find_element_by_class_name("my_save_button").click()
+        driver.implicitly_wait(0.5)
+
+        # Get the newly updated user and check that email was correctly changed
+        my_user = User.objects.filter(username="lime")
+        self.assertTrue(my_user.first().email == "lime@gmail.com")
+
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_longitude"]').send_keys("-76.3503")
+        driver.find_element_by_class_name("my_save_button").click()
+        driver.implicitly_wait(0.5)
+
+        # Get the newly updated user and check that longitude was correctly changed
+        my_user = User.objects.filter(username="lime")
+        self.assertTrue(my_user.first().longitude == -76.3503)
+
+        driver.find_element_by_xpath('//input[@type="text"][@name="new_latitude"]').send_keys("39.5375")
+        driver.find_element_by_class_name("my_save_button").click()
+        driver.implicitly_wait(0.5)
+
+        # Get the newly updated user and check that longitude was correctly changed
+        my_user = User.objects.filter(username="lime")
+        self.assertTrue(my_user.first().latitude == 39.5375)
 
         # Close browser
         driver.quit()
