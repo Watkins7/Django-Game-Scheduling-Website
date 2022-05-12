@@ -1358,7 +1358,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         for message in messages_found:
             message_text = message.text
         # Compare error message (if any) to the expected message string
-        #self.assertTrue(message_text == expected_message_1)
+        self.assertTrue(message_text == expected_message_1)
 
         # Enter same team name info and save changes
         driver.find_element_by_xpath('//input[@type="text"][@name="new_team_name"]').send_keys("timtom")
@@ -1372,7 +1372,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         for message in messages_found:
             message_text = message.text
         # Compare error message (if any) to the expected message string
-        #self.assertTrue(message_text == expected_message_2)
+        self.assertTrue(message_text == expected_message_2)
 
         # Enter same password and confirm password and save changes
         driver.find_element_by_xpath('//input[@type="text"][@name="new_password"]').send_keys("tommy")
@@ -1387,7 +1387,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
         for message in messages_found:
             message_text = message.text
         # Compare error message (if any) to the expected message string
-        #self.assertTrue(message_text == expected_message_3)
+        self.assertTrue(message_text == expected_message_3)
 
         # Enter same email address
         driver.find_element_by_xpath('//input[@type="text"][@name="new_email"]').send_keys("tim@gmail.com")
@@ -1402,7 +1402,7 @@ class EditTeamPageTests(StaticLiveServerTestCase):
             message_text = message.text
         # Compare error message (if any) to the expected message string
         print(message_text)
-        #self.assertTrue(message_text == expected_message_4)
+        self.assertTrue(message_text == expected_message_4)
 
         # Close browser
         driver.quit()
