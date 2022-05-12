@@ -31,4 +31,5 @@ jobs:
         python manage.py migrate
     - name: Run Tests
       run: |
-        python manage.py test
+        python manage.py test pick_up_app.tests.test_form
+        python manage.py test pick_up_app.tests.test_model
