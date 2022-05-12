@@ -3,6 +3,7 @@ from django.urls import reverse
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.action_chains import ActionChains
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.common.keys import Keys
 import time
@@ -975,6 +976,110 @@ class TimeslotHTMLTests(StaticLiveServerTestCase):
 
 
 class NewGameOverlayTests(StaticLiveServerTestCase):
+    def test_open_new_game_overlay(self):
+        """
+        This function tests that the new_game overlay opens when the
+        'Add Game' button is clicked.
+        :return: None
+        """
+
+        # Add a new test user
+        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user so we can access new_game page
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Open the calendar of the user we made
+        driver.get(self.live_server_url + "/pick_up_app/calendar/lime")
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Click on new timeslot button then the new_game link
+        driver.find_element_by_class_name("new_timeslot_btn").click()
+        driver.find_element_by_class_name("new_game_btn").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        is_overlay_open = True  # Boolean for checking if overlay is open
+
+        try:
+            # Try to find the close button of the overlay
+            driver.find_element_by_class_name("game_button")
+        except Exception:
+            is_overlay_open = False
+
+        self.assertTrue(is_overlay_open)
+
+        # CLose browser
+        driver.quit()
+
+    def test_close_new_game_overlay(self):
+        """
+        This function tests that the new_game overlay closes when the
+        X button is clicked.
+        :return: None
+        """
+
+        # Add a new test user
+        new_user = User(username="lime", password="lemon", teamname="citrus")
+        new_user.save()
+
+        # Setup Firefox web driver
+        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        driver.implicitly_wait(0.5)
+        driver.maximize_window()
+
+        # Open the login page URL
+        driver.get(self.live_server_url + "/pick_up_app/login/")
+
+        # Login user so we can access new_game page
+        driver.find_element_by_xpath('//input[@class="user"][@type="username"]').send_keys("lime")
+        driver.find_element_by_xpath('//input[@class="pass"][@type="password"]').send_keys("lemon")
+        driver.find_element_by_class_name("login").click()
+
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Open the calendar of the user we made
+        driver.get(self.live_server_url + "/pick_up_app/calendar/lime")
+        driver.implicitly_wait(0.5)  # Wait before proceeding
+
+        # Click on new timeslot button then the new_game link
+        driver.find_element_by_class_name("new_timeslot_btn").click()
+        driver.find_element_by_class_name("new_game_btn").click()
+
+        driver.implicitly_wait(1)  # Wait before proceeding
+
+        is_overlay_closed = True  # Boolean for checking if overlay is closed
+
+        try:
+            # Try to click the X button then check for "Add Game" button
+            close_button = driver.find_element_by_class_name("btn")
+            # Note: ActionChains is needed to avoid obscuring of the button in Selenium
+            ActionChains(driver).move_to_element(close_button).click().perform()
+
+            driver.find_element_by_class_name("new_game_btn")
+        except Exception as ex:
+            print(ex)
+            is_overlay_closed = False
+
+        self.assertTrue(is_overlay_closed)
+
+        # CLose browser
+        driver.quit()
+
+
     def test_new_game_adds_to_database_successfully(self):
         """
         This function tests that a game added via the new_game page actually
